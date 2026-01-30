@@ -1,0 +1,23 @@
+# Dependency folders
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build folders
+Frontend/dist/
+Frontend/build/
+Backend/dist/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Prisma
+Backend/generated/
