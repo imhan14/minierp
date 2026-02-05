@@ -4,8 +4,6 @@ import {verifyUser} from '../services/authService.js'
 
 export const login = async (req, res) => {
     const {username, password} = req.body;
-
-    try{
         const user = await verifyUser(username);
         if(!user) return res.status(401).json({error: "Sai tên đăng nhập"});
 
@@ -17,7 +15,4 @@ export const login = async (req, res) => {
             {expiresIn: '1d'}
         )
         res.json({error:"Đăng nhập thành công", token})
-    }catch(error){
-        res.status(500).json({ error: "Lỗi đăng nhập", details: error.message });
-    }
 }
