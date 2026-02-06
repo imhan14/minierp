@@ -17,24 +17,25 @@ model formula_details {
 }
 
 model formulas {
-  id                    Int                 @id @default(autoincrement())
+  id                    Int               @id @default(autoincrement())
+  formula_code          Int?              @unique(map: "unique_formula_code")
   formula_name          String?
   product_id            Int?
   is_active             Boolean?
   product_line          String?
-  specification         String?             @db.VarChar(50)
-  color                 String?             @db.VarChar(20)
-  type_of_specification String?             @db.VarChar(20)
-  created_at            DateTime?           @default(now()) @db.Timestamp(6)
+  specification         String?           @db.VarChar(50)
+  color                 String?           @db.VarChar(10)
+  type_of_specification String?           @db.VarChar(10)
+  created_at            DateTime?         @default(now()) @db.Timestamp(6)
   created_by            String?
   formula_details       formula_details[]
-  products              products?           @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_formula_product")
-  production_orders     production_orders[]
+  products              products?         @relation(fields: [product_id], references: [id], onUpdate: NoAction, map: "fk_formula_product")
+  product_orders        product_orders[]
 }
 
 model ingredients {
   id               Int                @id @default(autoincrement())
-  ingredient_code  String             @unique(map: "unique_ingredient") @db.VarChar(20)
+  ingredient_code  String             @unique(map: "unique_ingredient_code") @db.VarChar(20)
   ingredient_name  String?
   unit             String?            @db.VarChar(15)
   description      String?            @db.VarChar(50)
@@ -49,7 +50,7 @@ model material_details {
   ingredient_id    Int?
   weight           Float?
   real_percent     Float?
-  note_            String?
+  note             String?
   ingredients      ingredients?      @relation(fields: [ingredient_id], references: [id], onUpdate: NoAction, map: "fk_materialdetail_ingredient")
   material_reports material_reports? @relation(fields: [material_id], references: [id], onUpdate: NoAction, map: "fk_materialdetail_material")
 }
@@ -58,13 +59,13 @@ model material_reports {
   id               Int                @id @default(autoincrement())
   team_id          Int?
   report_date      DateTime?          @db.Date
-  shift            String?            @db.VarChar(20)
+  shift            shift_type?
   start_time       DateTime?          @db.Time(6)
   end_time         DateTime?          @db.Time(6)
   extral_materials Json?              @default("[]")
   foreman_check    Boolean?
   material_details material_details[]
-  teams            teams?             @relation(fields: [team_id], references: [team_id], onUpdate: NoAction, map: "fk_material_team")
+  teams            teams?             @relation(fields: [team_id], references: [id], onUpdate: NoAction, map: "fk_material_team")
 }
 
 model product_reports {
@@ -72,12 +73,12 @@ model product_reports {
   report_date       DateTime?          @db.Date
   team_id           Int?
   furnace           Int?
-  shift             String?            @db.VarChar(20)
+  shift             shift_type?
   start_time        DateTime?          @db.Time(6)
   end_time          DateTime?          @db.Time(6)
   warehouse_check   Boolean?
   producttion_check Boolean?
-  teams             teams?             @relation(fields: [team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productreport_team")
+  teams             teams?             @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productreport_team")
   reports_products  reports_products[]
 }
 
@@ -90,39 +91,19 @@ model production_logs {
   on_work              Int?
   unauthorized_absence String?
   authorized_absence   String?
-  HT_di                String?
-  HT_den               String?
+  ht_di                String?
+  ht_den               String?
   forklift             String?
   shift_leader         String?
   team_id              Int?
   electric             Int?
   extral_logs          Json?     @default("[]")
-  teams                teams?    @relation(fields: [team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productlogs_teams")
-}
-
-model production_orders {
-  id                  Int          @id @default(autoincrement())
-  order_date          DateTime?    @db.Date
-  formula_id          Int?
-  team_id             Int?
-  product_shift       shift_type?
-  target_quantity     Float?
-  urea_rate           Float?
-  status              status_type? @default(pending)
-  input_temprature_1  Int?
-  output_temprature_1 Int?
-  input_temprature_2  Int?
-  output_temprature_2 Int?
-  order_note          String?
-  created_at          DateTime?    @default(now()) @db.Timestamp(6)
-  created_by          String?
-  formulas            formulas?    @relation(fields: [formula_id], references: [id], onUpdate: NoAction, map: "fk_order_formula")
-  teams               teams?       @relation(fields: [team_id], references: [team_id], onUpdate: NoAction, map: "fk_order_team")
+  teams                teams?    @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productlogs_teams")
 }
 
 model products {
   id               Int                @id @default(autoincrement())
-  product_code     String             @unique(map: "unique_product") @db.VarChar(20)
+  product_code     String             @unique(map: "unique_product_code") @db.VarChar(20)
   product_name     String?
   unit             String?            @db.VarChar(50)
   description      String?
@@ -137,7 +118,7 @@ model reports_products {
   report_id             Int?
   weight_               Float?
   is_finish             Boolean?
-  type_of_specification String?          @db.Char(1)
+  type_of_specification String?          @db.VarChar(20)
   product_line          String?
   specification         String?
   start_time            DateTime?        @db.Time(6)
@@ -148,7 +129,7 @@ model reports_products {
 }
 
 model roles {
-  role_id        Int       @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   role_name      String?   @db.VarChar(50)
   priority_level Int
   created_at     DateTime? @default(now()) @db.Timestamp(6)
@@ -156,38 +137,58 @@ model roles {
 }
 
 model teams {
-  team_id           Int                 @id @default(autoincrement())
-  team_name         String?             @db.VarChar(50)
-  leader_id         Int?
-  material_reports  material_reports[]
-  product_reports   product_reports[]
-  production_logs   production_logs[]
-  production_orders production_orders[]
-  users             users?              @relation(fields: [leader_id], references: [id], onUpdate: NoAction, map: "fk_team_user")
+  id               Int                @id @default(autoincrement())
+  team_name        String?            @db.VarChar(50)
+  user_id          Int?
+  material_reports material_reports[]
+  product_orders   product_orders[]
+  product_reports  product_reports[]
+  production_logs  production_logs[]
+  users            users?             @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "fk_team_user")
 }
 
 model users {
   id            Int       @id @default(autoincrement())
-  username      String    @unique(map: "unique_username")
+  username      String    @unique(map: "unique_username") @db.VarChar(50)
   password_hash String
   full_name     String?   @db.VarChar(100)
   role_id       Int?
   created_at    DateTime? @default(now()) @db.Timestamp(6)
   is_active     Boolean?
   teams         teams[]
-  roles         roles?    @relation(fields: [role_id], references: [role_id], onUpdate: NoAction, map: "fk_user_role")
+  roles         roles?    @relation(fields: [role_id], references: [id], onUpdate: NoAction, map: "fk_user_role")
+}
+
+model product_orders {
+  id                  Int          @id @default(autoincrement())
+  order_date          DateTime?    @db.Date
+  formula_id          Int?
+  team_id             Int?
+  product_shift       shift_type?
+  target_quantity     Float?
+  urea_rate           Float?
+  status              status_type?
+  input_temprature_1  Int?
+  output_temprature_1 Int?
+  input_temprature_2  Int?
+  output_temprature_2 Int?
+  order_note          String?
+  created_at          DateTime?    @default(now()) @db.Timestamp(6)
+  created_by          String?
+  formulas            formulas?    @relation(fields: [formula_id], references: [id], onUpdate: NoAction, map: "fk_order_formula")
+  teams               teams?       @relation(fields: [team_id], references: [id], onUpdate: NoAction, map: "fk_order_team")
 }
 
 enum shift_type {
-  s1x8  @map("1x8")
-  s1x12 @map("1x12")
-  s2x8  @map("2x8")
-  s2x12 @map("2x12")
-  s3x8  @map("3x8")
+  C1x8
+  C2x8
+  C1x12
+  C2x12
+  C3x8
 }
 
 enum status_type {
   pending
-  sent
-  cancelled
+  ok
+  cancel
 }
