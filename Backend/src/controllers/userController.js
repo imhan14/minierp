@@ -11,7 +11,9 @@ export const getUsers = async (req, res) => {
 }
 
 export const getAUser = async (req, res) =>{
-        const user = await getAUserService(req.params);
+        const id = Number(req.params.id);
+        if (isNaN(id)) throw new Error("Invalid ID");
+        const user = await getAUserService(id);
         if (!user) {
             return res.status(404).json({ error: 'User unavailable!' });
         }

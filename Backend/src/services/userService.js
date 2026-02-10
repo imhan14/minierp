@@ -24,11 +24,9 @@ export const createUserService = async (userData) => {
     });
 };
 
-export const getAUserService = async (filter) => {
-    const {id} = filter;
-    if (isNaN(id)) throw new Error("Invalid ID");
+export const getAUserService = async (id) => {
     return await prisma.users.findUnique({
-        where: {id: Number(id)},
+        where: {id: id},
         select:{
             id: true,
             username: true,
