@@ -62,22 +62,46 @@ export const getUsersService = async (filters) => {
     });
 };
 
-export const updateUserService = async (filters, userData) => {
-    const {id} = filters;
-    const { username, full_name, role_id, is_active, password } = userData;
+export const updateUserService = async (id, userData) => {
+    const { username, full_name, role_id, is_active, old_password, new_password } = userData;
     const data = {};
     if (username) data.username = username;
     if (full_name) data.full_name = full_name;
-    if (role_id) data.role_id = role_id;
+    if (role_id) data.role_id = Number(role_id);
     if (is_active !== undefined) data.is_active = is_active;
-    if (password) {
-        data.password_hash = await bcrypt.hash(password, 10);
+    if (new_password){
+        const user = await prisma.users.findUnique({ where: { id: id } });
+        if (!user) throw new Error("User does not exist!");
+        const isMatch = await bcrypt.compare(old_password, user.password_hash);
+        if (!isMatch) {
+            const error = new Error("The old password is incorrect.");
+            error.statusCode = 400;
+            throw error;
+        }
+        const isSameAsOld = await bcrypt.compare(new_password, user.password_hash);
+        if (isSameAsOld) {
+            const error = new Error("The new password must not be the same as the old password.");
+            error.statusCode = 400;
+            throw error;
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedNewPassword = await bcrypt.hash(new_password, salt);
+        data.password_hash = hashedNewPassword;
     }
     return await prisma.users.update({
         where: {
-            id: Number(id)
+            id: id
         },
-        data: data
+        data: data,
+        select:{
+            id: true,
+            username: true,
+            full_name: true,
+            is_active: true,
+            roles:{
+                select: {role_name: true}
+            }
+        }
     });
 };
 

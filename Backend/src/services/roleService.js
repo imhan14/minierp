@@ -19,15 +19,14 @@ export const craeteRoleService = async(roleData) => {
     })
 }
 
-export const updateRoleService = async(filters, roleData) => {
-    const {id} = filters;
+export const updateRoleService = async(id, roleData) => {
     const {role_name, priority_level} = roleData;
     const data = {}
-    if(role_name) data.roleName = role_name;
-    if(priority_level) data.priorityLevel = priority_level;
+    if(role_name) data.role_name = role_name;
+    if(priority_level) data.priority_level = priority_level;
     return await prisma.roles.update({
-        where: {id: Number(id)},
-        data:data
+        where: {id: id},
+        data: data
     })
 }
 
