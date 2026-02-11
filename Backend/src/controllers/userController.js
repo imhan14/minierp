@@ -11,7 +11,9 @@ export const getUsers = async (req, res) => {
 }
 
 export const getAUser = async (req, res) =>{
-        const user = await getAUserService(req.params);
+        const id = Number(req.params.id);
+        if (isNaN(id)) throw new Error("Invalid ID");
+        const user = await getAUserService(id);
         if (!user) {
             return res.status(404).json({ error: 'User unavailable!' });
         }
@@ -24,7 +26,12 @@ export const createUser = async (req, res) => {
 }
 
 export const updateUser = async (req, res) => {
-        const user = await updateUserService(req.params, req.body);
+        const id = Number(req.params.id);
+        if(isNaN(Number(req.body.role_id)))
+                throw new Error("Invalid role id.");
+        if(isNaN(Number(req.body.id)))
+                throw new Error("Invalid id.");
+        const user = await updateUserService(id, req.body);
         res.status(200).json(user);
 }
 

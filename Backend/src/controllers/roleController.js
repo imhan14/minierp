@@ -12,13 +12,17 @@ export const createRole = async (req, res) =>{
 }
 
 export const updateRole = async (req, res) =>{
-    const filters = {id: req.query.id? Number(req.query.id): undefined};
-    const role = await updateRoleService(filters, req.bpdy);
-    res.status(200).json(role)
+    const id = Number(req.params.id);
+    if(isNaN(Number(req.params.id)))
+        throw new Error("Invalid id.");
+    const role = await updateRoleService(id, req.body);
+    res.status(200).json(role);
 }
 
 export const deleteRole = async (req, res) =>{
-    const filters = {id: req.query.id? Number(req.query.id): undefined};
-    await deleteRoleService(filters); 
+        const id = Number(req.params.id);
+    if(isNaN(Number(req.params.id)))
+        throw new Error("Invalid id.");
+    await deleteRoleService(id); 
     res.status(200).json({message:'Deleted Role successful!'})
 }
