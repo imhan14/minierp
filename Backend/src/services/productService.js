@@ -32,7 +32,6 @@ export const createProductService = async (dataProduct) =>{
             unit,
             description
         }
-
     });
 }
 
