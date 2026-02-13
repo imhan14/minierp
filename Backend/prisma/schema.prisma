@@ -76,8 +76,8 @@ model product_reports {
   shift             shift_type?
   start_time        DateTime?          @db.Time(6)
   end_time          DateTime?          @db.Time(6)
-  warehouse_check   Boolean?
-  producttion_check Boolean?
+  warehouse_check   Boolean?           @default(false)
+  producttion_check Boolean?           @default(false)
   teams             teams?             @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productreport_team")
   reports_products  reports_products[]
 }
