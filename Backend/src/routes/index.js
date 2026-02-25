@@ -13,6 +13,6 @@ router.use('/users', userRouter);
 router.use('/teams', teamRouter);
 router.use('/product', productRouter);
 router.use('/role', roleRouter);
-router.use('/productReport', productReportRouter);
+router.use('/product-report', productReportRouter);
 
 export default router;

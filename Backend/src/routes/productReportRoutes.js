@@ -1,5 +1,5 @@
 import express from 'express'
-import { createProductReport } from "../controllers/productReportController";
+import { createProductReport, deleteProductReport, getProductReport, updateProductReport } from "../controllers/productReportController";
 import { validate } from '../middlewares/validate.middleware';
 import { createProductReportSchema } from '../validations/productReport.validation';
 import { authenticate } from '../middlewares/authMiddleware';
@@ -7,5 +7,8 @@ import { authenticate } from '../middlewares/authMiddleware';
 const router = express.Router();
 
 router.post('/', validate(createProductReportSchema), authenticate, createProductReport);
+router.get('/', authenticate, getProductReport);
+router.patch('/:id', authenticate, updateProductReport);
+router.delete('/:id', authenticate, deleteProductReport);
 
 export default router;
