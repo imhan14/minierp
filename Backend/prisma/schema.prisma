@@ -74,10 +74,10 @@ model product_reports {
   team_id           Int?
   furnace           Int?
   shift             shift_type?
-  start_time        DateTime?          @db.Time(6)
-  end_time          DateTime?          @db.Time(6)
   warehouse_check   Boolean?           @default(false)
   producttion_check Boolean?           @default(false)
+  start_time        DateTime?          @db.Timestamp(6)
+  end_time          DateTime?          @db.Timestamp(6)
   teams             teams?             @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productreport_team")
   reports_products  reports_products[]
 }

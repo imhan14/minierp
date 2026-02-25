@@ -22,7 +22,7 @@ export const getProductReportService = async (filters) =>{
 }
 
 export const updateProductReportService = async (id, data) =>{
-
+    
     return await prisma.product_reports.update({
         where: {id:id},
         data:data
