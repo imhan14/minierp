@@ -148,15 +148,16 @@ model teams {
 }
 
 model users {
-  id            Int       @id @default(autoincrement())
-  username      String    @unique(map: "unique_username") @db.VarChar(50)
-  password_hash String
-  full_name     String?   @db.VarChar(100)
-  role_id       Int?
-  created_at    DateTime? @default(now()) @db.Timestamp(6)
-  is_active     Boolean?
-  teams         teams[]
-  roles         roles?    @relation(fields: [role_id], references: [id], onUpdate: NoAction, map: "fk_user_role")
+  id             Int              @id @default(autoincrement())
+  username       String           @unique(map: "unique_username") @db.VarChar(50)
+  password_hash  String
+  full_name      String?          @db.VarChar(100)
+  role_id        Int?
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  is_active      Boolean?
+  product_orders product_orders[]
+  teams          teams[]
+  roles          roles?           @relation(fields: [role_id], references: [id], onUpdate: NoAction, map: "fk_user_role")
 }
 
 model product_orders {
@@ -167,14 +168,15 @@ model product_orders {
   product_shift       shift_type?
   target_quantity     Float?
   urea_rate           Float?
-  status              status_type?
+  status              status_type? @default(pending)
   input_temprature_1  Int?
   output_temprature_1 Int?
   input_temprature_2  Int?
   output_temprature_2 Int?
   order_note          String?
   created_at          DateTime?    @default(now()) @db.Timestamp(6)
-  created_by          String?
+  created_by          Int?
+  users               users?       @relation(fields: [created_by], references: [id], onUpdate: NoAction, map: "fk_created_by")
   formulas            formulas?    @relation(fields: [formula_id], references: [id], onUpdate: NoAction, map: "fk_order_formula")
   teams               teams?       @relation(fields: [team_id], references: [id], onUpdate: NoAction, map: "fk_order_team")
 }
