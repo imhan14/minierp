@@ -9,6 +9,7 @@ const router = express.Router();
 router.get('/', authenticate, getProductOrder)
 router.post('/', validate(createProductOrderSchema), authenticate, createProductOrder);
 router.patch('/:id', validate(updateProductOrderSchema), authenticate, updateProductOrder);
-
+router.patch('/:id/confirm', authenticate, confirmProductOrder);
+router.patch('/:id/cancel', authenticate, cancelProductOrder);
 
 export default router;
