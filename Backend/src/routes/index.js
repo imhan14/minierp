@@ -5,7 +5,8 @@ import teamRouter from './teamRoutes.js'
 import productRouter from './productRoutes.js'
 import roleRouter from './roleRoutes.js'
 import productReportRouter from './productReportRoutes.js'
-import productOrder from './productOrderRoutes.js'
+import productOrderRouter from './productOrderRoutes.js'
+import ingredientRouter from './ingredientRoutes.js'
 
 const router = express.Router();
 
@@ -14,7 +15,8 @@ router.use('/users', userRouter);
 router.use('/teams', teamRouter);
 router.use('/product', productRouter);
 router.use('/role', roleRouter);
+router.use('/ingredient', ingredientRouter)
 router.use('/product-report', productReportRouter);
-router.use('/product-order', productOrder)
+router.use('/product-order', productOrderRouter)
 
 export default router;
