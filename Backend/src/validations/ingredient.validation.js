@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 export const createIngredientSchema = Joi.object({
-    ingredient_code: Joi.string().min(2).max(100).required(),
+    ingredient_code: Joi.string().required(),
     ingredient_name: Joi.string().min(1).required(),
     unit: Joi.string().min(1).required(),
     description: Joi.string().optional(),
