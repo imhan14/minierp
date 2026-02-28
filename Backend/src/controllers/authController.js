@@ -14,5 +14,14 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             {expiresIn: '1d'}
         )
-        res.json({error:"Đăng nhập thành công", token})
+        res.json({
+            message:"Đăng nhập thành công", 
+            token,
+            user: {
+                id: user.id,
+                username: user.username,
+                full_name: user.full_name, 
+                role: user.role_id    
+            }
+        })
 }

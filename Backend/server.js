@@ -1,8 +1,15 @@
 import express from 'express';
 import rootRouter from './src/routes/index.js';
 import { globalErrorHandler } from './src/middlewares/errorMiddleware.js';
-
+import cors from 'cors'; 
 const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true 
+}));
+
 app.use(express.json());
 
 // routes
