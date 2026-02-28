@@ -1,0 +1,46 @@
+import { createBrowserRouter } from "react-router";
+import NotFound from "../pages/NotFound";
+import UserLayout from "../layouts/UserLayout";
+import Home from "../pages/Home";
+import AdminLayout from "../layouts/AdminLayout";
+import Dashboard from "../pages/Dashboard";
+import Login from "../pages/Login";
+import AuthLayout from "../layouts/AuthLayout";
+
+const router = createBrowserRouter([
+    {
+        element: <AuthLayout/>,
+        children:[
+            {
+                path:"login",
+                element: <Login/>
+            }
+        ]
+    },
+    {
+        path: "/",
+        element: <UserLayout/>,
+        children:[
+            {
+                index: true,
+                element: <Home/>
+            }
+        ]
+    },
+    {
+        path: "admin",
+        element: <AdminLayout/>,
+        children:[
+            {
+                index: true,
+                element: <Dashboard/>
+            }
+        ]
+    },
+    {
+        path: "*",
+        element: <NotFound/>
+    }
+]);
+
+export default router;
