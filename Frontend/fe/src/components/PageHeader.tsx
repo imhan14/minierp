@@ -1,6 +1,7 @@
 import React from 'react'
 // import MenuIcon from '@mui/icons-material/Menu';
 import Typography from '@mui/material/Typography';
+import {  useTheme } from '@mui/material/styles';
 // import MuiAppBar from '@mui/material/AppBar';
 // import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -10,6 +11,7 @@ import AppBar from '@mui/material/AppBar';
 // import IconButton from '@mui/material/IconButton';
 
 // const drawerWidth = 240;
+// const closedWidth = 64;
 
 // interface AppBarProps extends MuiAppBarProps {
 //   open?: boolean;
@@ -18,7 +20,7 @@ import AppBar from '@mui/material/AppBar';
 // const AppBar = styled(MuiAppBar, {
 //   shouldForwardProp: (prop) => prop !== 'open',
 // })<AppBarProps>(({ theme }) => ({
-//   zIndex: theme.zIndex.drawer + 1,
+//   // zIndex: theme.zIndex.drawer + 1,
 //   transition: theme.transitions.create(['width', 'margin'], {
 //     easing: theme.transitions.easing.sharp,
 //     duration: theme.transitions.duration.leavingScreen,
@@ -39,19 +41,26 @@ import AppBar from '@mui/material/AppBar';
 // }));
 
 interface HeaderProps {
-    title?: string
+  open: boolean,
+  title?: string,
+  drawerWidth?: number,
+  closedWidth?: number
 }
 
+const PageHeader = ({open, title, drawerWidth, closedWidth}:HeaderProps) => {
+  const theme = useTheme();
 
-const PageHeader = ({title}:HeaderProps) => {
-//     const [open, setOpen] = React.useState(false);
-//     const handleDrawerOpen = () => {
-//     setOpen(true);
-//   };
   return (
+
         <AppBar 
-            // position="fixed"
-            // sx={{ width: '85%' }}
+            sx={{
+              width: `calc(100% - ${open ? drawerWidth:closedWidth}px)`,
+              transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+            }}
+            
         >
         <Toolbar>
           {/* <IconButton
@@ -69,7 +78,7 @@ const PageHeader = ({title}:HeaderProps) => {
             <MenuIcon />
           </IconButton> */}
           <Typography variant="h6" noWrap component="div">
-            Mini variant drawer {title}
+            {title}
           </Typography>
         </Toolbar>
       </AppBar>

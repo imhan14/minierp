@@ -1,29 +1,29 @@
 import * as React from 'react';
 import type {  Theme, CSSObject } from '@mui/material/styles';
 import {styled} from '@mui/material/styles';
-// import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
-// import MuiAppBar from '@mui/material/AppBar';
-// import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-// import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 // import CssBaseline from '@mui/material/CssBaseline';
-// import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-// import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-// import PageHeader from './PageHeader';
-
+import { Box, Typography } from '@mui/material';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import GradingIcon from '@mui/icons-material/Grading';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const drawerWidth = 240;
+const backgroundColor = '#22C55E';
+const textColor = 'white';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -32,6 +32,8 @@ const openedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: 'hidden',
+  backgroundColor: backgroundColor,
+  color: textColor,
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -44,6 +46,8 @@ const closedMixin = (theme: Theme): CSSObject => ({
   [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
+  backgroundColor: backgroundColor,
+  color:textColor,
 });
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -55,39 +59,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-// interface AppBarProps extends MuiAppBarProps {
-//   open?: boolean;
-// }
-
-// const AppBar = styled(MuiAppBar, {
-//   shouldForwardProp: (prop) => prop !== 'open',
-// })<AppBarProps>(({ theme }) => ({
-//   zIndex: theme.zIndex.drawer + 1,
-//   transition: theme.transitions.create(['width', 'margin'], {
-//     easing: theme.transitions.easing.sharp,
-//     duration: theme.transitions.duration.leavingScreen,
-//   }),
-//   variants: [
-//     {
-//       props: ({ open }) => open,
-//       style: {
-//         marginLeft: drawerWidth,
-//         width: `calc(100% - ${drawerWidth}px)`,
-//         transition: theme.transitions.create(['width', 'margin'], {
-//           easing: theme.transitions.easing.sharp,
-//           duration: theme.transitions.duration.enteringScreen,
-//         }),
-//       },
-//     },
-//   ],
-// }));
-
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme }) => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     boxSizing: 'border-box',
+    display: 'flex',
     variants: [
       {
         props: ({ open }) => open,
@@ -107,127 +85,184 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const SideBar = () => {
+interface SideBarProps{
+  open: boolean,
+  onOpen: () => void,
+  onTitleChange: (title: string) => void,
+}
+
+const menuItems = [
+  {text: 'Order', icon: <AssignmentIcon/>, path:'/'},
+  {text: 'Material Report', icon: <InventoryIcon/>, path:'/'},
+  {text: 'Product Report', icon: <AssignmentTurnedInIcon/>, path: '/'},
+  {text: 'Production Log', icon: <GradingIcon/>, path: '/'}
+]
+
+const menu2 = [
+  {text:'Setting', icon: <SettingsIcon/>},
+  {text:'Logout', icon: <LogoutIcon/>}
+]
+
+const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
   // const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-  const handleToggleSideBar = () =>{
-    setOpen(!open);
-  }
+  // const [open, setOpen] = React.useState(true);
+  // const handleToggleSideBar = () =>{
+  //   setOpen(!open);
+  // }
   return (
       <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleToggleSideBar} 
+        <Box sx={{flex:1}}>
+          <DrawerHeader sx={{display:'flex', justifyContent:'space-around'}}>
+          {open && <Typography variant='h5' noWrap >TITLE NAME</Typography>}
+          <IconButton onClick={onOpen} 
             >
             {/* {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />} */}
               {
                 open ? <ChevronLeftIcon/> : <ChevronRightIcon />
               }
           </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
+          </DrawerHeader>
+          <Divider />
+          <List>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+            <ListItemButton
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                open
+                  ? {
+                      justifyContent: 'initial',
+                    }
+                  : {
+                      justifyContent: 'center',
+                    },
+              ]}
+            >
+              <ListItemIcon
                 sx={[
                   {
-                    minHeight: 48,
-                    px: 2.5,
+                    minWidth: 0,
+                    justifyContent: 'center',
+                    color: 'white',
+                    py:1.5
                   },
                   open
                     ? {
-                        justifyContent: 'initial',
+                        mr: 3,
                       }
                     : {
-                        justifyContent: 'center',
+                        mr: 'auto',
                       },
                 ]}
               >
-                <ListItemIcon
+                <PersonIcon/>
+              </ListItemIcon>
+              {
+                open && 
+                <Box>
+                  <Typography>NAME{}</Typography>
+                  <Typography>role</Typography>
+                </Box>
+              }
+            </ListItemButton>
+          </ListItem>
+          </List>
+          <Divider />
+          <List>
+            {menuItems.map((item) => (
+              <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  onClick={() => onTitleChange(item.text)}
                   sx={[
                     {
-                      minWidth: 0,
-                      justifyContent: 'center',
+                      minHeight: 48,
+                      px: 2.5,
                     },
                     open
                       ? {
-                          mr: 3,
+                          justifyContent: 'initial',
                         }
                       : {
-                          mr: 'auto',
+                          justifyContent: 'center',
                         },
                   ]}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={text}
+                  <ListItemIcon
+                    sx={[
+                      { minWidth: 0, justifyContent: 'center', color: 'white' },
+                      open
+                        ? {
+                            mr: 3,
+                          }
+                        : {
+                            mr: 'auto',
+                          },
+                    ]}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={[
+                      open
+                        ? {
+                            opacity: 1,
+                          }
+                        : {
+                            opacity: 0,
+                          },
+                    ]}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+        <Box>
+          <Divider />
+          <List>
+            {menu2.map((item) => (
+              <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+                <ListItemButton
+                  onClick={() => onTitleChange(item.text)}
                   sx={[
+                    { minHeight: 48, px: 2.5, },
                     open
                       ? {
-                          opacity: 1,
+                          justifyContent: 'initial',
                         }
                       : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                sx={[
-                  {
-                    minHeight: 48,
-                    px: 2.5,
-                  },
-                  open
-                    ? {
-                        justifyContent: 'initial',
-                      }
-                    : {
-                        justifyContent: 'center',
-                      },
-                ]}
-              >
-                <ListItemIcon
-                  sx={[
-                    {
-                      minWidth: 0,
-                      justifyContent: 'center',
-                    },
-                    open
-                      ? {
-                          mr: 3,
-                        }
-                      : {
-                          mr: 'auto',
+                          justifyContent: 'center',
                         },
                   ]}
                 >
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText
-                  primary={text}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+                  <ListItemIcon
+                    sx={[
+                      { minWidth: 0, justifyContent: 'center', color: 'white' },
+                      open ? { mr: 3, } : { mr: 'auto', },
+                    ]}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={[
+                      open
+                        ? {
+                            opacity: 1,
+                          }
+                        : {
+                            opacity: 0,
+                          },
+                    ]}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
       </Drawer>
   )
 }

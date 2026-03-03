@@ -5,7 +5,10 @@ import {VisibilityOff, Visibility} from '@mui/icons-material'
 import api from '../apis/axios'
 import { useNavigate } from 'react-router'
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { authInformation } from '../redux/slices/authSlice';
 
+const dispatch = useDispatch();
 interface loginData{
   username: string,
   password: string
@@ -36,12 +39,13 @@ const Login = () => {
   const onSubmit = async ( data: loginData ) =>{
     setServerError("");
     try{
-      
       const response = await api.post('/auth/login', data);
       const {token, user} = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       
+
+
       if (user.role === 1) {
         navigate('/admin');
       } else {
