@@ -19,7 +19,12 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import GradingIcon from '@mui/icons-material/Grading';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import SettingsIcon from '@mui/icons-material/Settings';
+// import SettingsIcon from '@mui/icons-material/Settings';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../redux/store';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/slices/authSlice';
+import { useNavigate } from 'react-router';
 
 const drawerWidth = 240;
 const backgroundColor = '#22C55E';
@@ -97,18 +102,18 @@ const menuItems = [
   {text: 'Product Report', icon: <AssignmentTurnedInIcon/>, path: '/'},
   {text: 'Production Log', icon: <GradingIcon/>, path: '/'}
 ]
-
-const menu2 = [
-  {text:'Setting', icon: <SettingsIcon/>},
-  {text:'Logout', icon: <LogoutIcon/>}
-]
-
 const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
-  // const theme = useTheme();
-  // const [open, setOpen] = React.useState(true);
-  // const handleToggleSideBar = () =>{
-  //   setOpen(!open);
-  // }
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { full_name, role } = useSelector((state: RootState) => state.auth);
+
+  const handleLogout = () =>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    // localStorage.clear();
+    dispatch(logout());
+    navigate('/login');
+  }
   return (
       <Drawer variant="permanent" open={open}>
         <Box sx={{flex:1}}>
@@ -125,49 +130,49 @@ const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
           <Divider />
           <List>
             <ListItem disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
-              sx={[
-                {
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                      justifyContent: 'initial',
-                    }
-                  : {
-                      justifyContent: 'center',
-                    },
-              ]}
-            >
-              <ListItemIcon
+              <ListItemButton
                 sx={[
                   {
-                    minWidth: 0,
-                    justifyContent: 'center',
-                    color: 'white',
-                    py:1.5
+                    minHeight: 48,
+                    px: 2.5,
                   },
                   open
                     ? {
-                        mr: 3,
+                        justifyContent: 'initial',
                       }
                     : {
-                        mr: 'auto',
+                        justifyContent: 'center',
                       },
                 ]}
               >
-                <PersonIcon/>
-              </ListItemIcon>
-              {
-                open && 
-                <Box>
-                  <Typography>NAME{}</Typography>
-                  <Typography>role</Typography>
-                </Box>
-              }
-            </ListItemButton>
-          </ListItem>
+                <ListItemIcon
+                  sx={[
+                    {
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      color: 'white',
+                      py:1.5
+                    },
+                    open
+                      ? {
+                          mr: 3,
+                        }
+                      : {
+                          mr: 'auto',
+                        },
+                  ]}
+                >
+                  <PersonIcon/>
+                </ListItemIcon>
+                {
+                  open && 
+                  <Box>
+                    <Typography>{full_name}</Typography>
+                    <Typography>{role}</Typography>
+                  </Box>
+                }
+              </ListItemButton>
+            </ListItem>
           </List>
           <Divider />
           <List>
@@ -192,55 +197,6 @@ const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
                   <ListItemIcon
                     sx={[
                       { minWidth: 0, justifyContent: 'center', color: 'white' },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: 'auto',
-                          },
-                    ]}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.text}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-        <Box>
-          <Divider />
-          <List>
-            {menu2.map((item) => (
-              <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
-                  onClick={() => onTitleChange(item.text)}
-                  sx={[
-                    { minHeight: 48, px: 2.5, },
-                    open
-                      ? {
-                          justifyContent: 'initial',
-                        }
-                      : {
-                          justifyContent: 'center',
-                        },
-                  ]}
-                >
-                  <ListItemIcon
-                    sx={[
-                      { minWidth: 0, justifyContent: 'center', color: 'white' },
                       open ? { mr: 3, } : { mr: 'auto', },
                     ]}
                   >
@@ -248,21 +204,51 @@ const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
                   </ListItemIcon>
                   <ListItemText
                     primary={item.text}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
+                    sx={[ open ? { opacity: 1, } : { opacity: 0, }, ]}
                   />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Box>
+        <Divider />
+          <List>
+            <ListItem disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                onClick={handleLogout}
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? {
+                        justifyContent: 'initial',
+                      }
+                    : {
+                        justifyContent: 'center',
+                      },
+                ]}
+              >
+                <ListItemIcon
+                  sx={[
+                    {
+                      minWidth: 0,
+                      justifyContent: 'center',
+                      color: 'white',
+                    },
+                    open ? { mr: 3, } : { mr: 'auto', },
+                  ]}
+                >
+                  <LogoutIcon/>
+                </ListItemIcon>
+                <ListItemText
+                    primary={"Logout"}
+                    sx={[{color: 'white',},open ? { opacity: 1, } : { opacity: 0, }, ]}
+                  />
+              </ListItemButton>
+            </ListItem>
+          </List>
       </Drawer>
   )
 }

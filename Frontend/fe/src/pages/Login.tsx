@@ -8,12 +8,13 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { authInformation } from '../redux/slices/authSlice';
 
-const dispatch = useDispatch();
+
 interface loginData{
   username: string,
   password: string
 }
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = React.useState(false);
@@ -44,7 +45,12 @@ const Login = () => {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       
-
+      dispatch(authInformation({
+        id: user.id,
+        username: user.username,
+        full_name: user.full_name, 
+        role: user.role
+      }))
 
       if (user.role === 1) {
         navigate('/admin');
