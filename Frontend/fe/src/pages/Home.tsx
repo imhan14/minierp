@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import PageHeader from '../components/PageHeader';
+// import PageHeader from '../components/PageHeader';
 import {styled} from '@mui/material/styles';
-import SideBar from '../components/SideBar';
+// import SideBar from '../components/SideBar';
 import { Typography } from '@mui/material';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -20,8 +20,6 @@ const Home = () => {
     <div>
       <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <PageHeader/>
-      <SideBar/>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         <Typography sx={{ marginBottom: 2 }}>
