@@ -98,9 +98,9 @@ interface SideBarProps{
 
 const menuItems = [
   {text: 'Order', icon: <AssignmentIcon/>, path:'/'},
-  {text: 'Material Report', icon: <InventoryIcon/>, path:'/'},
-  {text: 'Product Report', icon: <AssignmentTurnedInIcon/>, path: '/'},
-  {text: 'Production Log', icon: <GradingIcon/>, path: '/'}
+  {text: 'Material Report', icon: <InventoryIcon/>, path:'/material-report'},
+  {text: 'Product Report', icon: <AssignmentTurnedInIcon/>, path: '/production-report'},
+  {text: 'Production Log', icon: <GradingIcon/>, path: '/production-log'}
 ]
 const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
   const dispatch = useDispatch();
@@ -179,7 +179,7 @@ const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
             {menuItems.map((item) => (
               <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
-                  onClick={() => onTitleChange(item.text)}
+                  onClick={() => {onTitleChange(item.text);navigate(item.path);}}
                   sx={[
                     {
                       minHeight: 48,

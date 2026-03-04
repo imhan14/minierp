@@ -6,6 +6,9 @@ import AdminLayout from "../layouts/AdminLayout";
 import Dashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
 import AuthLayout from "../layouts/AuthLayout";
+import ProductionReportPage from "../pages/ProductionReportPage";
+import ProductionLogPage from "../pages/ProductionLogPage";
+import MaterialReportPage from "../pages/MaterialReportPage";
 
 const router = createBrowserRouter([
     {
@@ -24,6 +27,18 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <Home/>
+            },
+            {
+                path: '/production-report',
+                element: <ProductionReportPage/>
+            },
+            {
+                path: '/production-log',
+                element: <ProductionLogPage/>
+            },
+            {
+                path: '/material-report',
+                element: <MaterialReportPage/>
             }
         ]
     },
