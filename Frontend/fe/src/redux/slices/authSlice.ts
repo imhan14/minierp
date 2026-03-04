@@ -35,7 +35,7 @@ export const authSlice = createSlice({
             state.role = ROLE_MAP[action.payload.role] || "Unknown Role";
         },
         logout: (state) => {
-            state.id = 0;
+            // state.id = 0;
             return initialState;
         }
     }
