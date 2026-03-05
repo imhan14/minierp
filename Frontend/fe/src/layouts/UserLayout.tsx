@@ -18,11 +18,29 @@ const UserLayout = () => {
   }
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ display: 'flex', backgroundColor:'#cbffde', overflowX: 'hidden', minHeight: '100vh', width: '100%',}}>
+      <Box sx={{ display: 'flex', backgroundColor:'#cbffde', overflowX: 'hidden', height: '100vh', width: '100%', overflow: 'hidden'}}>
         <CssBaseline />
         <PageHeader title={title} open={open} drawerWidth={drawerWidth} closedWidth={closedWidth} />
         <SideBar open={open} onOpen={handleToggleSideBar} onTitleChange={setTitle} />
-        <Outlet context={[setTitle]}/>
+        <Box 
+          component="main" 
+          sx={{ 
+            flexGrow: 1, 
+            height: '100vh',
+            display: 'flex', 
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}
+        >
+
+          <Box sx={{ 
+            flexGrow: 1, 
+            overflowY: 'auto',
+            p: 3 
+          }}>
+            <Outlet context={[setTitle]}/>
+          </Box>
+        </Box>
       </Box>
     </LocalizationProvider>
   )
