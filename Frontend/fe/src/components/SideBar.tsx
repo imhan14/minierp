@@ -24,7 +24,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../redux/store';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 
 const drawerWidth = 240;
 const backgroundColor = '#22C55E';
@@ -105,6 +105,7 @@ const menuItems = [
 const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { full_name, role } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () =>{
@@ -176,14 +177,17 @@ const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
           </List>
           <Divider />
           <List>
-            {menuItems.map((item) => (
-              <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+            {menuItems.map((item) => {
+                const isActive = location.pathname === item.path;
+              return (
+                <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
-                  onClick={() => {onTitleChange(item.text);navigate(item.path);}}
+                  onClick={() => {onTitleChange(item.text); navigate(item.path);}}
                   sx={[
                     {
                       minHeight: 48,
                       px: 2.5,
+                      backgroundColor: isActive? 'rgba(255, 255, 255, 0.2)' : 'transparent',
                     },
                     open
                       ? {
@@ -208,7 +212,8 @@ const SideBar = ({open, onOpen, onTitleChange}:SideBarProps) => {
                   />
                 </ListItemButton>
               </ListItem>
-            ))}
+              )
+            })}
           </List>
         </Box>
         <Divider />
