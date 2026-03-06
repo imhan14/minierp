@@ -8,9 +8,10 @@ export const createProductOrder = async (req, res) =>{
 
 export const getProductOrder = async (req, res) =>{
     const filters = {
-        id: req.query.id? Number(req.query.id) : undefined
+        id: req.query.id? Number(req.query.id) : undefined,
+        date: req.query.date? req.query.date: undefined
     }
-    // console.log(req.users)
+
     const productOrders = await getProductOrderService(filters);
     res.status(200).json(productOrders);
 }

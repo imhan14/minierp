@@ -1,4 +1,4 @@
-import { Box, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { Box, CircularProgress, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import {styled} from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -6,8 +6,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import DataTable, {type ColumnConfig, type ActionConfig} from '../components/DataTable';
 import api from '../apis/axios'
-import axios from 'axios';
-
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -18,19 +17,45 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-interface Order{
-    code: number, 
-    name: string, 
-    team: string,
-    shift: string,
-    quantity: number,
-    color: string, 
-    specifications: string, 
-    start: string,
-    end: string,
-    details: string
+interface Team {
+  team_name: string;
+}
+interface OrderData{
+    id: number,
+    order_date: string,
+    formula_id: number,
+    teams: Team,
+    product_shift: string,
+    target_quantity:number,
+    urea_rate?: number | null,
+    status: string,
+    input_temprature_1 :number,
+    output_temprature_1:number,
+    input_temprature_2 :number,
+    output_temprature_2:number,
+    order_note         :string,
+    created_at         :string,
+    created_by         :number
+}   
+interface OrderDisplay extends Omit<OrderData, 'teams'> {
+  team_name: string;
 }
 
+interface Status{
+    ok: string,
+    pending: string,
+    cancel: string
+}
+const textStatus:Status = {
+    'ok': '#e8f5e9',
+    'pending': '#ffd7b5',
+    'cancel':'#ffebee'
+}
+const bgStatus:Status = {
+    'ok': '#2e7d32',
+    'pending': '#ff6700',
+    'cancel':'#d32f2f'
+}
 const OrderPage = () => {
     // const orders:Order[]  = [
     //     { code: 13234, name: 'Sản phẩm A', team: '100.000đ', shift: '1C2x12', quantity: 5044545645, color: 'red', specifications:'50', start: '2026-01-16 06:00', end: '8:00', details: 'icon' },
@@ -45,70 +70,117 @@ const OrderPage = () => {
     //     { code: 10, name: 'Sản phẩm A', team: '100.000đ', shift: '1', quantity: 50, color: 'red', specifications:'50', start: '7:00', end: '8:2026-01-16 06:00', details: 'icon' },
     // ];
 
-    const orderColumns: ColumnConfig<Order>[] = [
-        { id: 'code',           label: 'Code',              width: 100 },
-        { id: 'name',           label: 'Name',              width:200, noWrap:true },
-        { id: 'team',           label: 'Team'               },        
-        { id: 'shift',          label: 'Shift',             align: 'right' },
-        { id: 'quantity',       label: 'Quantity',          align: 'right' },
-        { id: 'color',          label: 'Color',             align: 'right' },
-        { id: 'specifications', label: 'Specifications',    align: 'right' },
-        { id: 'start',          label: 'Start',             width:200, align: 'right' },
-        { id: 'end',            label: 'End',               align: 'right' },
+    const orderColumns: ColumnConfig<OrderData>[] = [
+        { id: 'id',           label: 'Id',              width: 100 },
+        { id: 'order_date',           label: 'Date',              width:200, noWrap:true, render:(value: string) => {
+            if (!value) return '-';
+            return dayjs(value).add(24, 'hour').format('DD/MM/YYYY');
+            } },
+        { id: 'formula_id',           label: 'Formular'               },        
+        { id: 'team_name',          label: 'Team Name',width:200,             align: 'right' },
+        { id: 'product_shift',       label: 'Shift',          align: 'right' },
+        { id: 'target_quantity',          label: 'Quantity',             align: 'right' },
+        { id: 'urea_rate', label: 'Urea',    align: 'right' },
+        { id: 'status',          label: 'Status',             width:200, align: 'right', noWrap:true, render: (value: string) => (
+                <span style={{ 
+                    backgroundColor: textStatus[value as keyof Status], 
+                    color: bgStatus[value as keyof Status],
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase'
+                }}>
+                {value === 'ok' ? 'Hoàn tất' : value === 'pending' ? 'đang đợi': 'Đã hủy'}
+                </span>
+            ) },
+        { id: 'input_temprature_1',            label: 'In Temp 1',               align: 'right' },
+        { id: 'output_temprature_1',            label: 'Out Temp 1',               align: 'right' },
+        { id: 'input_temprature_2',            label: 'In Temp 2',               align: 'right' },
+        { id: 'output_temprature_2',            label: 'Out Temp 2',               align: 'right' },
+        // { id: 'order_note',            label: 'Note',               align: 'right', width:200, noWrap:true },
         { id: 'actions',        label: 'Details',          align: 'right' },
     ];
-    const actions: ActionConfig<Order>[] = [
+    const actions: ActionConfig<OrderData>[] = [
         {
-        label: 'Sửa',
-        color: 'primary',
-        onClick: (row) => console.log('Edit user:', row.code),
-        },
-        {
-        label: 'Xóa',
-        color: 'error',
-        onClick: (row) => alert('Xóa user: ' + row.name),
+            label: 'Details',
+            color: 'primary',
+            icon: <RemoveRedEyeOutlinedIcon/>,
+            onClick: (row) => console.log('Detail of:', row.id),
         },
     ];
-    const [value, setValue] = React.useState<Dayjs | null>(dayjs());
-    const [orders, setOrders] = useState<Order[]>([]);
+    // const actions: ActionConfig<OrderData>[] = [
+    //     {
+    //         label: 'Sửa',
+    //         color: 'primary',
+    //         onClick: (row) => console.log('Edit user:', row.id),
+    //     },
+    //     {
+    //         label: 'Xóa',
+    //         color: 'error',
+    //         onClick: (row) => alert('Xóa user: ' + row.id),
+    //     },
+    // ];
+    // const [value, setValue] = React.useState<Dayjs | null>(dayjs());
+    const [orders, setOrders] = useState<OrderDisplay[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
 
-    const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      // Thay URL này bằng API thật của bạn
-      const response = await axios.get<Order[]>('/product-order');
-      
-      setOrders(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!');
-      console.error('API Error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-    const onDayChange = async () =>{
-        try{
-            const response = await api.get('/product-order');
-            console.log(response.data)
-        }catch(err){
-            if (axios.isAxiosError(err)) {
-        const msg = err.response?.data?.error || "Lỗi server";
-        // setServerError(msg);
-      } else {
-        console.log("Err");
-        console.error(err)
-        // setServerError("Đã có lỗi không xác định xảy ra");
-      }
+    const fetchOrders = async (date?: Dayjs | null) => {
+        try {
+            setLoading(true);
+            const dateParam = date ? date.format('YYYY-MM-DD') : '';
+            const response = await api.get<OrderData[]>(`/product-order?date=${dateParam}`);
+            const formattedData: OrderDisplay[] = response.data.map(item => ({
+                ...item,
+                team_name: item.teams?.team_name || 'N/A'
+            }));
+            // console.log(formattedData);
+            setOrders(formattedData);
+            setError(null);
+        } catch (err) {
+            setError('Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!');
+            console.error('API Error:', err);
+        } finally {
+        setLoading(false);
         }
-    }
+    };
+    // const onDayChange = async () =>{
+    //     try{
+    //         const response = await api.get<OrderData[]>('/product-order');
+    //         const formattedData: OrderDisplay[] = response.data.map(item => ({
+    //             ...item,
+    //             team_name: item.teams?.team_name || 'N/A'
+    //         }));
+    //         setOrders(formattedData);
+
+    //     }catch(err){
+    //         if (axios.isAxiosError(err)) {
+    //         setError('Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!');
+    //         console.error('API Error:', err);
+    //         } else {
+    //             console.log("Err");
+    //             console.error(err)
+    //             // setServerError("Đã có lỗi không xác định xảy ra");
+    //         }
+    //     }
+    // }
 
     useEffect(() => {
-        fetchOrders();
-    }, []);
-if (loading) {
+        fetchOrders(selectedDate);
+    }, [selectedDate]);
+    if (loading) {
+        return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
+            <CircularProgress />
+        </Box>
+        );
+    }
+    if (error) {
+        return <Typography color="error" textAlign="center">{error}</Typography>;
+    }
+
     return (
         <Box  >
             <DrawerHeader />
@@ -132,8 +204,8 @@ if (loading) {
                 </Typography>
                 <DatePicker
                     label="Pick date"
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
+                    value={selectedDate}
+                    onChange={(newValue) => setSelectedDate(newValue)}
                     format='DD/MM/YYYY'
                     slotProps={{
                         textField: {
@@ -142,7 +214,7 @@ if (loading) {
                             fullWidth: true,
                         },
                     }}
-                    onAccept={onDayChange}
+                    // onAccept={onDayChange}
                 />
                 <TextField
                     variant="outlined"
@@ -174,9 +246,9 @@ if (loading) {
                     }}
                 />
             </Box>
-            <DataTable columns={orderColumns} data={""} actions={actions} getRowKey={(row) => row.code} />
+            <DataTable columns={orderColumns} data={orders} actions={actions} getRowKey={(row) => row.id} />
         </Box>
-    )}
+    )
 }
 
 export default OrderPage
