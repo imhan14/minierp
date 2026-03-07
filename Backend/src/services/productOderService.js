@@ -26,8 +26,8 @@ export const getProductOrderService = async (filters) =>{
         select:{
             id                 :true,
             order_date         :true,
-            formula_id         :true,
-            teams              :{select:{team_name:true}},
+            formulas           :{select:{id:true,formula_name: true}},
+            teams              :{select:{id:true,team_name:true}},
             product_shift      :true,
             target_quantity    :true,
             urea_rate          :true,

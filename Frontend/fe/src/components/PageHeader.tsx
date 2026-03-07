@@ -1,89 +1,36 @@
-import React from 'react'
-// import MenuIcon from '@mui/icons-material/Menu';
-import Typography from '@mui/material/Typography';
-import {  useTheme } from '@mui/material/styles';
-// import MuiAppBar from '@mui/material/AppBar';
-// import type { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-// import {styled} from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-// import { Box } from '@mui/material';
-// import IconButton from '@mui/material/IconButton';
-
-// const drawerWidth = 240;
-// const closedWidth = 64;
-
-// interface AppBarProps extends MuiAppBarProps {
-//   open?: boolean;
-// }
-
-// const AppBar = styled(MuiAppBar, {
-//   shouldForwardProp: (prop) => prop !== 'open',
-// })<AppBarProps>(({ theme }) => ({
-//   // zIndex: theme.zIndex.drawer + 1,
-//   transition: theme.transitions.create(['width', 'margin'], {
-//     easing: theme.transitions.easing.sharp,
-//     duration: theme.transitions.duration.leavingScreen,
-//   }),
-//   variants: [
-//     {
-//       props: ({ open }) => open,
-//       style: {
-//         marginLeft: drawerWidth,
-//         width: `calc(100% - ${drawerWidth}px)`,
-//         transition: theme.transitions.create(['width', 'margin'], {
-//           easing: theme.transitions.easing.sharp,
-//           duration: theme.transitions.duration.enteringScreen,
-//         }),
-//       },
-//     },
-//   ],
-// }));
+import React from "react";
+import Typography from "@mui/material/Typography";
+import { useTheme } from "@mui/material/styles";
+import Toolbar from "@mui/material/Toolbar";
+import AppBar from "@mui/material/AppBar";
 
 interface HeaderProps {
-  open: boolean,
-  title?: string,
-  drawerWidth?: number,
-  closedWidth?: number
+  open: boolean;
+  title?: string;
+  drawerWidth?: number;
+  closedWidth?: number;
 }
 
-const PageHeader = ({open, title, drawerWidth, closedWidth}:HeaderProps) => {
+const PageHeader = ({ open, title, drawerWidth, closedWidth }: HeaderProps) => {
   const theme = useTheme();
 
   return (
+    <AppBar
+      sx={{
+        width: `calc(100% - ${open ? drawerWidth : closedWidth}px)`,
+        transition: theme.transitions.create(["width", "margin"], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+      }}
+    >
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div">
+          {title}
+        </Typography>
+      </Toolbar>
+    </AppBar>
+  );
+};
 
-        <AppBar 
-            sx={{
-              width: `calc(100% - ${open ? drawerWidth:closedWidth}px)`,
-              transition: theme.transitions.create(['width', 'margin'], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-              }),
-            }}
-            
-        >
-        <Toolbar>
-          {/* <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            // onClick={onOpen}
-            edge="start"
-            sx={[
-              {
-                marginRight: 5,
-              },
-              open && { display: 'none' },
-            ]}
-          >
-            <MenuIcon />
-          </IconButton> */}
-          <Typography variant="h6" noWrap component="div">
-            {title}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
-  )
-}
-
-export default PageHeader
+export default PageHeader;
