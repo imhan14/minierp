@@ -4,57 +4,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import React, { type ReactElement } from "react";
-// import type { Theme, CSSObject } from "@mui/material/styles";
-// import { styled } from "@mui/material/styles";
-// import MuiDrawer from "@mui/material/Drawer";
-
-// const drawerWidth = 240;
-// const themeColor = {
-//   bg: "#22C55E",
-//   text: "white",
-// };
-
-// const drawerMixin = (theme: Theme, open: boolean): CSSObject => ({
-//   width: open ? drawerWidth : `calc(${theme.spacing(7)} + 1px)`,
-//   transition: theme.transitions.create("width", {
-//     easing: theme.transitions.easing.sharp,
-//     duration: open
-//       ? theme.transitions.duration.enteringScreen
-//       : theme.transitions.duration.leavingScreen,
-//   }),
-//   overflowX: "hidden",
-//   backgroundColor: themeColor.bg,
-//   color: themeColor.text,
-//   "& .MuiDrawer-paper": {
-//     width: open ? drawerWidth : `calc(${theme.spacing(7)} + 1px)`,
-//     backgroundColor: themeColor.bg,
-//     color: themeColor.text,
-//     transition: theme.transitions.create("width", {
-//       easing: theme.transitions.easing.sharp,
-//       duration: open
-//         ? theme.transitions.duration.enteringScreen
-//         : theme.transitions.duration.leavingScreen,
-//     }),
-//   },
-// });
-
-// const DrawerHeader = styled("div")(({ theme }) => ({
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "space-around",
-//   padding: theme.spacing(0, 1),
-//   ...theme.mixins.toolbar,
-// }));
-
-// const Drawer = styled(MuiDrawer, {
-//   shouldForwardProp: (prop) => prop !== "open",
-// })<{ open: boolean }>(({ theme, open }) => ({
-//   flexShrink: 0,
-//   whiteSpace: "nowrap",
-//   boxSizing: "border-box",
-//   ...drawerMixin(theme, open),
-// }));
+import { type ReactElement } from "react";
 
 interface NavBarType {
   open: boolean;
