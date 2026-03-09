@@ -7,10 +7,6 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import { Box, Typography } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -23,69 +19,54 @@ import type { RootState } from "../redux/store";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
 import { useNavigate, useLocation } from "react-router";
+import NavItem from "./NavItem";
 
 const drawerWidth = 240;
-const backgroundColor = "#22C55E";
-const textColor = "white";
+const themeColor = {
+  bg: "#22C55E",
+  text: "white",
+};
 
-const openedMixin = (theme: Theme): CSSObject => ({
-  width: drawerWidth,
+const drawerMixin = (theme: Theme, open: boolean): CSSObject => ({
+  width: open ? drawerWidth : `calc(${theme.spacing(7)} + 1px)`,
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
+    duration: open
+      ? theme.transitions.duration.enteringScreen
+      : theme.transitions.duration.leavingScreen,
   }),
-  overflowX: "hidden",
-  backgroundColor: backgroundColor,
-  color: textColor,
-});
-
-const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
+  // overflowX: "hidden",
+  backgroundColor: themeColor.bg,
+  color: themeColor.text,
+  "& .MuiDrawer-paper": {
+    width: open ? drawerWidth : `calc(${theme.spacing(8)} + 1px)`,
+    backgroundColor: themeColor.bg,
+    color: themeColor.text,
+    overflowX: "hidden",
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: open
+        ? theme.transitions.duration.enteringScreen
+        : theme.transitions.duration.leavingScreen,
+    }),
   },
-  backgroundColor: backgroundColor,
-  color: textColor,
 });
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-end",
+  justifyContent: "space-around",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
-})(({ theme }) => ({
-  width: drawerWidth,
+})<{ open: boolean }>(({ theme, open }) => ({
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
-  display: "flex",
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        ...openedMixin(theme),
-        "& .MuiDrawer-paper": openedMixin(theme),
-      },
-    },
-    {
-      props: ({ open }) => !open,
-      style: {
-        ...closedMixin(theme),
-        "& .MuiDrawer-paper": closedMixin(theme),
-      },
-    },
-  ],
+  ...drawerMixin(theme, open),
 }));
 
 interface SideBarProps {
@@ -94,25 +75,26 @@ interface SideBarProps {
   onTitleChange: (title: string) => void;
 }
 
-const menuItems = [
-  { text: "Order", icon: <AssignmentIcon />, path: "/" },
-  {
-    text: "Material Report",
-    icon: <InventoryIcon />,
-    path: "/material-report",
-  },
-  {
-    text: "Product Report",
-    icon: <AssignmentTurnedInIcon />,
-    path: "/production-report",
-  },
-  { text: "Production Log", icon: <GradingIcon />, path: "/production-log" },
-];
 const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { full_name, role } = useSelector((state: RootState) => state.auth);
+
+  const menuItems = [
+    { text: "Order", icon: <AssignmentIcon />, path: "/" },
+    {
+      text: "Material Report",
+      icon: <InventoryIcon />,
+      path: "/material-report",
+    },
+    {
+      text: "Product Report",
+      icon: <AssignmentTurnedInIcon />,
+      path: "/production-report",
+    },
+    { text: "Production Log", icon: <GradingIcon />, path: "/production-log" },
+  ];
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -124,9 +106,9 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
   return (
     <Drawer variant="permanent" open={open}>
       <Box sx={{ flex: 1 }}>
-        <DrawerHeader sx={{ display: "flex", justifyContent: "space-around" }}>
+        <DrawerHeader>
           {open && (
-            <Typography variant="h5" noWrap>
+            <Typography variant="h6" noWrap>
               TITLE NAME
             </Typography>
           )}
@@ -137,137 +119,40 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
         </DrawerHeader>
         <Divider />
         <List>
-          <ListItem disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              sx={[
-                {
-                  minHeight: 48,
-                  px: 2.5,
-                },
-                open
-                  ? {
-                      justifyContent: "initial",
-                    }
-                  : {
-                      justifyContent: "center",
-                    },
-              ]}
-            >
-              <ListItemIcon
-                sx={[
-                  {
-                    minWidth: 0,
-                    justifyContent: "center",
-                    color: "white",
-                    py: 1.5,
-                  },
-                  open
-                    ? {
-                        mr: 3,
-                      }
-                    : {
-                        mr: "auto",
-                      },
-                ]}
-              >
-                <PersonIcon />
-              </ListItemIcon>
-              {open && (
-                <Box>
-                  <Typography>{full_name}</Typography>
-                  <Typography>{role}</Typography>
-                </Box>
-              )}
-            </ListItemButton>
-          </ListItem>
+          <NavItem
+            open={open}
+            icon={<PersonIcon />}
+            text={full_name}
+            subtext={role}
+            isUser
+          />
         </List>
         <Divider />
         <List>
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
             return (
-              <ListItem
-                key={item.text}
-                disablePadding
-                sx={{ display: "block" }}
-              >
-                <ListItemButton
-                  onClick={() => {
-                    onTitleChange(item.text);
-                    navigate(item.path);
-                  }}
-                  sx={[
-                    {
-                      minHeight: 48,
-                      px: 2.5,
-                      backgroundColor: isActive
-                        ? "rgba(255, 255, 255, 0.2)"
-                        : "transparent",
-                    },
-                    open
-                      ? {
-                          justifyContent: "initial",
-                        }
-                      : {
-                          justifyContent: "center",
-                        },
-                  ]}
-                >
-                  <ListItemIcon
-                    sx={[
-                      { minWidth: 0, justifyContent: "center", color: "white" },
-                      open ? { mr: 3 } : { mr: "auto" },
-                    ]}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.text}
-                    sx={[open ? { opacity: 1 } : { opacity: 0 }]}
-                  />
-                </ListItemButton>
-              </ListItem>
+              <NavItem
+                open={open}
+                icon={item.icon}
+                text={item.text}
+                onClick={() => {
+                  onTitleChange(item.text);
+                  navigate(item.path);
+                }}
+                active={pathname === item.path}
+              />
             );
           })}
         </List>
       </Box>
       <Divider />
       <List>
-        <ListItem disablePadding sx={{ display: "block" }}>
-          <ListItemButton
-            onClick={handleLogout}
-            sx={[
-              {
-                minHeight: 48,
-                px: 2.5,
-              },
-              open
-                ? {
-                    justifyContent: "initial",
-                  }
-                : {
-                    justifyContent: "center",
-                  },
-            ]}
-          >
-            <ListItemIcon
-              sx={[
-                {
-                  minWidth: 0,
-                  justifyContent: "center",
-                  color: "white",
-                },
-                open ? { mr: 3 } : { mr: "auto" },
-              ]}
-            >
-              <LogoutIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary={"Logout"}
-              sx={[{ color: "white" }, open ? { opacity: 1 } : { opacity: 0 }]}
-            />
-          </ListItemButton>
-        </ListItem>
+        <NavItem
+          open={open}
+          icon={<LogoutIcon />}
+          text={"Logout"}
+          onClick={handleLogout}
+        />
       </List>
     </Drawer>
   );
