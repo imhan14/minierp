@@ -1,4 +1,3 @@
-import * as React from "react";
 import type { Theme, CSSObject } from "@mui/material/styles";
 import { styled } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
@@ -124,6 +123,9 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
             icon={<PersonIcon />}
             text={full_name}
             subtext={role}
+            onClick={() => {
+              console.log();
+            }}
             isUser
           />
         </List>
