@@ -4,6 +4,8 @@ import {
   Divider,
   Grid,
   Paper,
+  Skeleton,
+  Stack,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -50,22 +52,13 @@ const STATUS_STYLES: Record<
   cancel: { bg: "#ffebee", text: "#d32f2f", label: "Đã hủy" },
   default: { bg: "#f5f5f5", text: "#616161", label: "N/A" },
 };
-// const Item = styled(Paper)(({ theme }) => ({
-//   backgroundColor: "#fff",
-//   ...theme.typography.body2,
-//   padding: theme.spacing(2),
-//   textAlign: "center",
-//   color: (theme.vars ?? theme).palette.text.secondary,
-//   ...theme.applyStyles("dark", {
-//     backgroundColor: "#1A2027",
-//   }),
-// }));
 const OrderPage = () => {
   const [orders, setOrders] = useState<OrderDisplay[]>([]);
   const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderDisplay | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
 
@@ -131,13 +124,16 @@ const OrderPage = () => {
   const handleOpenDetail = (row: OrderDisplay) => {
     setSelectedOrder(row);
     fetchFormulaDetail(row.formula_id);
-    // console.log(row.formula_id);
     setOpenDetail(true);
   };
   const handleCloseDetail = () => {
     setOpenDetail(false);
-    setSelectedOrder(null);
+    setTimeout(() => {
+      setSelectedOrder(null);
+      setFormula([]);
+    }, 300);
   };
+
   const actions: ActionConfig<OrderDisplay>[] = [
     {
       label: "Details",
@@ -181,7 +177,7 @@ const OrderPage = () => {
 
   const fetchFormulaDetail = async (formulaId: number) => {
     try {
-      setLoading(true);
+      setDetailLoading(true);
       const response = await api.get<FormulaDetailType[]>(`/formula-detail`, {
         params: { formula_id: formulaId },
       });
@@ -195,14 +191,14 @@ const OrderPage = () => {
           };
         },
       );
-      console.log(response.data);
+
       setFormula(formattedData);
       setError(null);
     } catch (err) {
       setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
       console.error("API Error:", err);
     } finally {
-      setLoading(false);
+      setDetailLoading(false);
     }
   };
 
@@ -234,6 +230,7 @@ const OrderPage = () => {
           getRowKey={(row) => row.id}
         />
       )}
+
       <DynamicPopup
         open={openDetail}
         onClose={handleCloseDetail}
@@ -249,116 +246,67 @@ const OrderPage = () => {
             >
               General
             </Typography>
-
-            <Grid
-              container
-              spacing={{ xs: 2, md: 3 }}
-              columns={{ xs: 4, sm: 8, md: 12 }}
-            >
-              {displayFields.map((col) => {
-                const value = selectedOrder[col.id as keyof OrderDisplay];
-                return (
-                  // <Grid key={col.id} size={{ xs: 2, sm: 4, md: 4 }}>
-                  <Paper
-                    variant="outlined"
-                    sx={{ p: 1.5, bgcolor: "#f1f5f9", borderStyle: "dashed" }}
-                  >
-                    <Typography
-                      variant="caption"
-                      color="textSecondary"
-                      sx={{ fontWeight: "bold" }}
+            {detailLoading ? (
+              <Stack spacing={1}>
+                <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+                <Skeleton variant="rounded" height={60} />
+                <Skeleton variant="rounded" height={60} />
+              </Stack>
+            ) : (
+              <Grid
+                container
+                spacing={{ xs: 2, md: 3 }}
+                columns={{ xs: 4, sm: 8, md: 12 }}
+              >
+                {displayFields.map((col) => {
+                  const value = selectedOrder[col.id as keyof OrderDisplay];
+                  return (
+                    // <Grid key={col.id} size={{ xs: 2, sm: 4, md: 4 }}>
+                    <Paper
+                      variant="outlined"
+                      sx={{ p: 1.5, bgcolor: "#f1f5f9", borderStyle: "dashed" }}
                     >
-                      {col.label}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ mt: 0.5, color: "#1e293b" }}
-                    >
-                      {col.render
-                        ? col.render(value, selectedOrder)
-                        : String(value ?? "N/A")}
-                    </Typography>
-                  </Paper>
-                  // </Grid>
-                );
-              })}
-            </Grid>
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                        sx={{ fontWeight: "bold" }}
+                      >
+                        {col.label}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ mt: 0.5, color: "#1e293b" }}
+                      >
+                        {col.render
+                          ? col.render(value, selectedOrder)
+                          : String(value ?? "N/A")}
+                      </Typography>
+                    </Paper>
+                    // </Grid>
+                  );
+                })}
+              </Grid>
+            )}
 
             <Divider sx={{ my: 3 }}>
               <Typography variant="subtitle1" fontWeight="bold" color="primary">
-                Danh sách nguyên liệu (Formular)
+                Formular List (Formular)
               </Typography>
             </Divider>
-
-            <DataTable
-              columns={formulaColumns}
-              data={formula}
-              getRowKey={(row) => row.id}
-            />
+            {detailLoading ? (
+              <Stack spacing={1}>
+                <Skeleton variant="rounded" height={600} />
+              </Stack>
+            ) : (
+              <DataTable
+                columns={formulaColumns}
+                data={formula}
+                getRowKey={(row) => row.id}
+              />
+            )}
           </Box>
         )}
       </DynamicPopup>
-      {/* <PopupDetailFormula
-        openDetail={openDetail}
-        selectedOrder={selectedOrder}
-        onCloseDetail={handleCloseDetail}
-      /> */}
-      {/* <Dialog
-        open={openDetail}
-        onClose={handleCloseDetail}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle
-          sx={{
-            m: 0,
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontWeight: "bold",
-          }}
-        >
-          Details: #{selectedOrder?.id}
-          <IconButton onClick={handleCloseDetail} size="small">
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers sx={{ py: 3 }}>
-          <Typography>General</Typography>
-          <Divider />
-          <Grid
-            container
-            spacing={{ xs: 2, md: 3 }}
-            columns={{ xs: 4, sm: 8, md: 12 }}
-          >
-            {orderColumns.map((item) => (
-              <Grid key={item.id} size={{ xs: 2, sm: 4, md: 4 }}>
-                <Item>
-                  {item.label}
-                  <Typography>asd</Typography>
-                </Item>
-              </Grid>
-            ))}
-          </Grid>
-          <Divider />
-          <DataTable
-            columns={formulaColumns}
-            data={formula}
-            // actions={actions}
-            getRowKey={(row) => row.id}
-          />
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button
-            onClick={handleCloseDetail}
-            color="inherit"
-            variant="outlined"
-          >
-            Đóng
-          </Button>
-        </DialogActions>
-      </Dialog> */}
     </Box>
   );
 };

@@ -1,50 +1,95 @@
-import { Box, Typography } from '@mui/material'
-import React from 'react'
-import {styled} from '@mui/material/styles';
+import { Box } from "@mui/material";
+import { useState } from "react";
+import { styled } from "@mui/material/styles";
+import Filters from "../components/Filters";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
+import DataTable, {
+  type ActionConfig,
+  type ColumnConfig,
+} from "../components/DataTable";
+import type { MaterialReportType } from "../types/MaterialReportType";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
-const MaterialReportPage = () => {
-  return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader />
-        <Typography sx={{ marginBottom: 2 }}>
-            Material
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
-          enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
-          imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
-          Convallis convallis tellus id interdum velit laoreet id donec ultrices.
-          Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
-          nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
-          leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
-          feugiat vivamus at augue. At augue eget arcu dictum varius duis at
-          consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-          sapien faucibus et molestie ac.
-        </Typography>
-        <Typography sx={{ marginBottom: 2 }}>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
-          eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
-          neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
-          tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
-          sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
-          tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-          gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-          et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
-          tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
-      </Box>
-  )
+interface MaterialReportDisplay extends Omit<MaterialReportType, "teams"> {
+  team_name: string;
 }
 
-export default MaterialReportPage
+const MaterialReportPage = () => {
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+
+  const materialReportColumn: ColumnConfig<MaterialReportDisplay>[] = [
+    { id: "id", label: "id" },
+    { id: "team_name", label: "Team Name" },
+    { id: "report_date", label: "Report Date" },
+    { id: "shift", label: "Shift" },
+    { id: "start_time", label: "Start Time" },
+    { id: "end_time", label: "End Time" },
+    // { id: "foreman_check", label: "Foreman Check" },
+  ];
+  const materialReports: MaterialReportDisplay[] = [
+    {
+      id: 1,
+      team_name: "Team 1",
+      report_date: "02/03/2026",
+      shift: "C1",
+      start_time: "7:00",
+      end_time: "8:00",
+      foreman_check: false,
+      extral_materials: [],
+    },
+    {
+      id: 2,
+      team_name: "Team 1",
+      report_date: "02/03/2026",
+      shift: "C1",
+      start_time: "7:00",
+      end_time: "8:00",
+      foreman_check: false,
+      extral_materials: [],
+    },
+    {
+      id: 3,
+      team_name: "Team 1",
+      report_date: "02/03/2026",
+      shift: "C1",
+      start_time: "7:00",
+      end_time: "8:00",
+      foreman_check: false,
+      extral_materials: [],
+    },
+  ];
+  const actions: ActionConfig<MaterialReportDisplay>[] = [
+    {
+      label: "Details",
+      color: "primary",
+      icon: <RemoveRedEyeOutlinedIcon />,
+      onClick: (row) => console.log(row),
+    },
+  ];
+  return (
+    <Box>
+      <DrawerHeader />
+      <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <Box>
+        <DataTable
+          columns={materialReportColumn}
+          data={materialReports}
+          actions={actions}
+          getRowKey={(row) => row.id}
+        />
+      </Box>
+    </Box>
+  );
+};
+
+export default MaterialReportPage;
