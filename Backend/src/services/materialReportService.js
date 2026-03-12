@@ -4,6 +4,21 @@ export const getMaterialReportService = async (filters) => {
   const { id } = filters;
   return await prisma.material_reports.findMany({
     where: id,
+    select: {
+      id: true,
+      teams: {
+        select: {
+          id: true,
+          team_name: true,
+        },
+      },
+      report_date: true,
+      shift: true,
+      extral_materials: true,
+      foreman_check: true,
+      start_time: true,
+      end_time: true,
+    },
   });
 };
 

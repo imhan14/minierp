@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Outlet } from "react-router";
 import SideBar from "../components/SideBar";
 import { Box, CssBaseline } from "@mui/material";
@@ -16,57 +16,52 @@ const UserLayout = () => {
   const handleToggleSideBar = () => {
     setOpen(!open);
   };
-  useEffect(() => {
-    if (localStorage.getItem("token") === null) window.location.href = "/login";
-    console.log(localStorage.getItem("token"));
-  }, []);
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {localStorage.getItem("token") && (
+      <Box
+        sx={{
+          display: "flex",
+          backgroundColor: "#cbffde",
+          overflowX: "hidden",
+          height: "100vh",
+          width: "100%",
+          overflow: "hidden",
+        }}
+      >
+        <CssBaseline />
+        <PageHeader
+          title={title}
+          open={open}
+          drawerWidth={drawerWidth}
+          closedWidth={closedWidth}
+        />
+        <SideBar
+          open={open}
+          onOpen={handleToggleSideBar}
+          onTitleChange={setTitle}
+        />
         <Box
+          component="main"
           sx={{
-            display: "flex",
-            backgroundColor: "#cbffde",
-            overflowX: "hidden",
+            flexGrow: 1,
             height: "100vh",
-            width: "100%",
+            display: "flex",
+            flexDirection: "column",
             overflow: "hidden",
           }}
         >
-          <CssBaseline />
-          <PageHeader
-            title={title}
-            open={open}
-            drawerWidth={drawerWidth}
-            closedWidth={closedWidth}
-          />
-          <SideBar
-            open={open}
-            onOpen={handleToggleSideBar}
-            onTitleChange={setTitle}
-          />
           <Box
-            component="main"
             sx={{
               flexGrow: 1,
-              height: "100vh",
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
+              overflowY: "auto",
+              p: 3,
             }}
           >
-            <Box
-              sx={{
-                flexGrow: 1,
-                overflowY: "auto",
-                p: 3,
-              }}
-            >
-              <Outlet context={[setTitle]} />
-            </Box>
+            <Outlet context={[setTitle]} />
           </Box>
         </Box>
-      )}
+      </Box>
     </LocalizationProvider>
   );
 };
