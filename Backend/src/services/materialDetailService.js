@@ -13,3 +13,22 @@ export const updateMaterialDetailService = async (id, data) => {
     data: data,
   });
 };
+
+export const getMaterialDetailService = async (filters) => {
+  const { material_id } = filters;
+  return await prisma.material_details.findMany({
+    where: {
+      material_id: material_id,
+    },
+    select: {
+      id: true,
+      material_id: true,
+      ingredients: {
+        select: { ingredient_name: true, id: true },
+      },
+      weight: true,
+      real_percent: true,
+      note: true,
+    },
+  });
+};

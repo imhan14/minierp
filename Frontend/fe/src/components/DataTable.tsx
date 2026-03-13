@@ -13,14 +13,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import React from "react";
-export interface ColumnConfig<T> {
-  id: keyof T | "actions";
-  label: string;
-  align?: "left" | "right" | "center";
-  width?: number | string;
-  noWrap?: boolean;
-  render?: (value: T[keyof T] | undefined, row: T) => React.ReactNode;
-}
+import type { FieldConfig } from "../types/FieldConfig";
 
 export interface ActionConfig<T> {
   label: string;
@@ -30,7 +23,7 @@ export interface ActionConfig<T> {
 }
 
 interface DynamicTableProps<T> {
-  columns: ColumnConfig<T>[];
+  columns: FieldConfig<T>[];
   data: T[];
   actions?: ActionConfig<T>[];
   getRowKey: (row: T) => string | number;
