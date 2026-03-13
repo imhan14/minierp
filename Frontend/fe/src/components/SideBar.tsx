@@ -134,6 +134,7 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
           {menuItems.map((item) => {
             return (
               <NavItem
+                key={item.path}
                 open={open}
                 icon={item.icon}
                 text={item.text}

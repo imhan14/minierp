@@ -8,7 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import dayjs, { Dayjs } from "dayjs";
 import DataTable, {
@@ -21,6 +21,8 @@ import Filters from "../components/Filters";
 import type { ProductOrderType } from "../types/ProductOrderType";
 import type { FormulaDetailType } from "../types/FormulaDetailType";
 import DynamicPopup from "../components/DynamicPopup";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",

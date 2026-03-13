@@ -1,15 +1,14 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
-import OrderPage from './OrderPage';
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import OrderPage from "./OrderPage";
 
 const Home = () => {
   return (
-    <Box >
+    <Box>
       <CssBaseline />
-      <OrderPage/>
+      <OrderPage />
     </Box>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
