@@ -1,5 +1,4 @@
 import type { FieldConfig } from "../types/FieldConfig";
-import dayjs from "dayjs";
 import type { MaterialReportType } from "../types/MaterialReportType";
 
 export interface MaterialReportDisplay extends Omit<
@@ -9,49 +8,31 @@ export interface MaterialReportDisplay extends Omit<
   team_name: string;
 }
 
-export const materialReportSchema: FieldConfig<MaterialReportDisplay>[] = [
-  { id: "id", label: "ID", inTable: true },
-  {
+export const materialReportSchema: Record<
+  string,
+  FieldConfig<MaterialReportDisplay>
+> = {
+  id: { id: "id", label: "ID" },
+  team_name: {
     id: "team_name",
     label: "Team Name",
-    inTable: true,
-    inGeneral: true,
     isReadOnly: true,
   },
-  {
+  report_date: {
     id: "report_date",
     label: "Report Date",
-    inTable: true,
-    inGeneral: true,
     isReadOnly: true,
-    render: ((value: string) => {
-      if (!value) return "-";
-      return dayjs(value).add(24, "hour").format("DD/MM/YYYY");
-    }) as FieldConfig<MaterialReportDisplay>["render"],
   },
-  {
+  shift: {
     id: "shift",
     label: "Shift",
-    inTable: true,
-    inGeneral: true,
-    isCellEditable: true,
-    inputType: "text",
   },
-  {
+  start_time: {
     id: "start_time",
     label: "Start Time",
-    render: ((value: string) => {
-      if (!value) return "-";
-      return dayjs(value).add(24, "hour").format("HH:mm");
-    }) as FieldConfig<MaterialReportDisplay>["render"],
   },
-  {
+  end_time: {
     id: "end_time",
     label: "End Time",
-    render: ((value: string) => {
-      if (!value) return "-";
-      return dayjs(value).add(24, "hour").format("HH:mm");
-    }) as FieldConfig<MaterialReportDisplay>["render"],
   },
-  { id: "actions", label: "Details", align: "left" },
-];
+} as const;

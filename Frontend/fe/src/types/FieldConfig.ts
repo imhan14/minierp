@@ -1,5 +1,5 @@
 export interface FieldConfig<T> {
-  id: keyof T | "actions";
+  id: keyof T | string;
   label: string;
   inTable?: boolean;
   render?: (value: T[keyof T], row: T) => React.ReactNode;
@@ -9,5 +9,6 @@ export interface FieldConfig<T> {
   inGeneral?: boolean;
   isReadOnly?: boolean;
   isCellEditable?: boolean;
-  inputType?: "text" | "number" | "date" | "select";
+  inputType?: "text" | "number" | "date" | "time" | "select" | "datetime-local";
+  options?: { label: string; value: string }[];
 }
