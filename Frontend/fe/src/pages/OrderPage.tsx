@@ -11,10 +11,8 @@ import {
 import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import dayjs, { Dayjs } from "dayjs";
-import DataTable, {
-  type ColumnConfig,
-  type ActionConfig,
-} from "../components/DataTable";
+import DataTable, { type ActionConfig } from "../components/DataTable";
+import type { FieldConfig } from "../types/FieldConfig";
 import api from "../apis/axios";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import Filters from "../components/Filters";
@@ -23,13 +21,13 @@ import type { FormulaDetailType } from "../types/FormulaDetailType";
 import DynamicPopup from "../components/DynamicPopup";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
+import { orderColumns } from "../schema/orders.schema";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 export interface OrderDisplay extends Omit<
@@ -45,15 +43,6 @@ interface FormulaDetailDisplay extends Omit<FormulaDetailType, "ingredients"> {
   unit: string;
 }
 
-const STATUS_STYLES: Record<
-  string,
-  { bg: string; text: string; label: string }
-> = {
-  ok: { bg: "#e8f5e9", text: "#2e7d32", label: "Hoàn tất" },
-  pending: { bg: "#ffd7b5", text: "#ff6700", label: "Đang đợi" },
-  cancel: { bg: "#ffebee", text: "#d32f2f", label: "Đã hủy" },
-  default: { bg: "#f5f5f5", text: "#616161", label: "N/A" },
-};
 const OrderPage = () => {
   const [orders, setOrders] = useState<OrderDisplay[]>([]);
   const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
@@ -64,59 +53,7 @@ const OrderPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
 
-  const renderStatus = (status: string) => {
-    const style = STATUS_STYLES[status] || STATUS_STYLES.default;
-    return (
-      <Box
-        component="span"
-        sx={{
-          backgroundColor: style.bg,
-          color: style.text,
-          px: 1.5,
-          py: 0.5,
-          borderRadius: 1,
-          fontSize: "0.75rem",
-          fontWeight: "bold",
-          textTransform: "uppercase",
-        }}
-      >
-        {style.label}
-      </Box>
-    );
-  };
-  const orderColumns: ColumnConfig<OrderDisplay>[] = [
-    { id: "id", label: "Id", width: 70 },
-    {
-      id: "order_date",
-      label: "Date",
-      width: 120,
-      noWrap: true,
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).add(24, "hour").format("DD/MM/YYYY");
-      }) as ColumnConfig<OrderDisplay>["render"],
-    },
-    { id: "formula_name", label: "Formular", align: "center" },
-    { id: "team_name", label: "Team Name", width: 150, align: "right" },
-    { id: "product_shift", label: "Shift", align: "right" },
-    { id: "target_quantity", label: "Quantity", align: "right" },
-    { id: "urea_rate", label: "Urea", align: "right" },
-    {
-      id: "status",
-      label: "Status",
-      width: 120,
-      align: "right",
-      noWrap: true,
-      render: renderStatus as ColumnConfig<OrderDisplay>["render"],
-    },
-    { id: "input_temprature_1", label: "In °C 1", align: "right" },
-    { id: "output_temprature_1", label: "Out °C 1", align: "right" },
-    { id: "input_temprature_2", label: "In °C 2", align: "right" },
-    { id: "output_temprature_2", label: "Out °C 2", align: "right" },
-    { id: "actions", label: "Details", align: "center" },
-  ];
-
-  const formulaColumns: ColumnConfig<FormulaDetailDisplay>[] = [
+  const formulaColumns: FieldConfig<FormulaDetailDisplay>[] = [
     // { id: "id", label: "id" },
     { id: "ingredient_name", label: "Ingredient Name" },
     { id: "unit", label: "Unit" },

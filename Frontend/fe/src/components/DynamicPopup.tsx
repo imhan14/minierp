@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   IconButton,
+  Box,
   //   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -13,19 +14,23 @@ import CloseIcon from "@mui/icons-material/Close";
 interface DynamicPopupProps {
   open: boolean;
   onClose: () => void;
+  onSubmit?: () => void;
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
+  enableSend?: boolean;
 }
 
 const DynamicPopup = ({
   open,
   onClose,
+  onSubmit,
   title,
   children,
   footer,
   maxWidth = "md",
+  enableSend = false,
 }: DynamicPopupProps) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth>
@@ -52,9 +57,18 @@ const DynamicPopup = ({
 
       <DialogActions sx={{ p: 2, bgcolor: "#f8fafc" }}>
         {footer || (
-          <Button onClick={onClose} color="inherit" variant="outlined">
-            Đóng
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              onClick={onSubmit}
+              variant="contained"
+              sx={{ display: enableSend ? "block" : "none" }}
+            >
+              Gửi
+            </Button>
+            <Button onClick={onClose} color="inherit" variant="outlined">
+              Đóng
+            </Button>
+          </Box>
         )}
       </DialogActions>
     </Dialog>

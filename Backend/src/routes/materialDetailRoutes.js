@@ -1,4 +1,7 @@
-import { createMaterialDetails } from "../controllers/materialDetailController";
+import {
+  createMaterialDetails,
+  getMaterialDetail,
+} from "../controllers/materialDetailController";
 import express from "express";
 import { validate } from "../middlewares/validate.middleware";
 import { authenticate } from "../middlewares/authMiddleware";
@@ -12,4 +15,5 @@ router.post(
   authenticate,
   createMaterialDetails,
 );
+router.get("/", authenticate, getMaterialDetail);
 export default router;
