@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import type { FieldConfig } from "../../../types/FieldConfig";
 import {
   materialReportSchema,
@@ -6,20 +5,41 @@ import {
 } from "../../../schema/materialReport.schema";
 import dayjs from "dayjs";
 import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import { Skeleton } from "@mui/material";
 import api from "../../../apis/axios";
+import { useState } from "react";
+import { Alert, Snackbar } from "@mui/material";
 
-const MaterialReportGeneralSection = () => {
-  const [loading, setLoading] = useState(false);
-  const [editGeneral, setEditGeneral] = useState<MaterialReportDisplay | null>(
-    null,
-  );
-  const [selectedMaterial, setSelectedMaterial] =
-    useState<MaterialReportDisplay | null>(null);
+interface Props {
+  selectedMaterial: MaterialReportDisplay | null;
+  editGeneral: MaterialReportDisplay | null;
+  onEditGeneral: (on: MaterialReportDisplay | null) => void;
+  onSaveSuccess: () => void;
+}
+
+const MaterialReportGeneralSection = ({
+  selectedMaterial,
+  onSaveSuccess,
+  editGeneral,
+  onEditGeneral,
+}: Props) => {
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
   const fieldsDetail: FieldConfig<MaterialReportDisplay>[] = [
-    { ...materialReportSchema.team_name },
+    { ...materialReportSchema.team_name, gridSize: { md: 4 } },
     {
       ...materialReportSchema.report_date,
+      gridSize: { md: 4 },
       render: ((value: string) => {
         if (!value) return "-";
         return dayjs(value).format("DD/MM/YYYY");
@@ -27,18 +47,20 @@ const MaterialReportGeneralSection = () => {
     },
     {
       ...materialReportSchema.shift,
-      inputType: "select",
-      options: [
-        { label: "C1x8", value: "C1x8" },
-        { label: "C1x12", value: "C1x12" },
-        { label: "C2x8", value: "C2x8" },
-        { label: "C2x12", value: "C2x12" },
-        { label: "C3x8", value: "C3x8" },
-      ],
+      gridSize: { md: 4 },
+      // inputType: "select",
+      // options: [
+      //   { label: "C1x8", value: "C1x8" },
+      //   { label: "C1x12", value: "C1x12" },
+      //   { label: "C2x8", value: "C2x8" },
+      //   { label: "C2x12", value: "C2x12" },
+      //   { label: "C3x8", value: "C3x8" },
+      // ],
     },
     {
       ...materialReportSchema.start_time,
       inputType: "datetime-local",
+      gridSize: { md: 6 },
       render: ((value: string) => {
         if (!value) return "-";
         return dayjs(value).add(24, "hour").format("HH:mm");
@@ -47,6 +69,7 @@ const MaterialReportGeneralSection = () => {
     {
       ...materialReportSchema.end_time,
       inputType: "datetime-local",
+      gridSize: { md: 6 },
       render: ((value: string) => {
         if (!value) return "-";
         return dayjs(value).add(24, "hour").format("HH:mm");
@@ -58,41 +81,60 @@ const MaterialReportGeneralSection = () => {
     value: string,
   ) => {
     if (editGeneral) {
-      setEditGeneral({ ...editGeneral, [field]: value });
+      onEditGeneral({ ...editGeneral, [field]: value });
     }
-    console.log(editGeneral);
   };
   const handleSave = async () => {
     try {
-      setLoading(true);
       const payload = {
-        general: editGeneral,
-        ingredients: editIngredients,
+        foreman_check: editGeneral?.foreman_check,
+        start_time: dayjs(editGeneral?.start_time).format("DD-MM-YYYY HH:mm"),
+        end_time: dayjs(editGeneral?.end_time).format("DD-MM-YYYY HH:mm"),
       };
-
+      console.log(payload);
       await api.patch(`/material-report/${editGeneral?.id}`, payload);
-
-      alert("Cập nhật thành công!");
-      setOpenDetail(false);
-      fetchMaterialReport(selectedDate);
+      setSnackbar({
+        open: true,
+        message: "Cập nhật dữ liệu thành công!",
+        severity: "success",
+      });
+      onSaveSuccess();
     } catch (err) {
       console.error("Save error:", err);
-      alert("Lỗi khi lưu dữ liệu");
-    } finally {
-      setLoading(false);
+      onEditGeneral(selectedMaterial);
+      setSnackbar({
+        open: true,
+        message: "Lỗi khi nhập dữ liệu!",
+        severity: "error",
+      });
     }
   };
-  return loading ? (
-    <Skeleton variant="rounded" height={300} />
-  ) : (
-    <GeneralInfoSection
-      title="General"
-      displayFields={fieldsDetail}
-      data={editGeneral ?? selectedMaterial}
-      onGeneralChange={handleGeneralChange}
-      onSave={handleSave}
-      onCancel={() => setEditGeneral(selectedMaterial)}
-    />
+  return (
+    <>
+      <GeneralInfoSection
+        title="General"
+        displayFields={fieldsDetail}
+        data={editGeneral ?? selectedMaterial}
+        onGeneralChange={handleGeneralChange}
+        onSave={handleSave}
+        onCancel={() => onEditGeneral(selectedMaterial)}
+      />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 

@@ -1,3 +1,6 @@
+import type { Theme } from "@emotion/react";
+import type { SxProps } from "@mui/material";
+
 export interface FieldConfig<T> {
   id: keyof T | string;
   label: string;
@@ -11,4 +14,6 @@ export interface FieldConfig<T> {
   isCellEditable?: boolean;
   inputType?: "text" | "number" | "date" | "time" | "select" | "datetime-local";
   options?: { label: string; value: string }[];
+  gridSize?: { xs?: number; sm?: number; md?: number; lg?: number };
+  sx?: SxProps<Theme>;
 }
