@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
@@ -96,9 +96,9 @@ const GeneralInfoSection = <T,>({
         {displayFields.map((col) => {
           const isFieldEditing = isEditing && !col.isReadOnly;
           const rawValue = data[col.id as keyof T] ?? "";
-
+          const currentGridSize = col.gridSize || { xs: 12, sm: 6, md: 3 };
           return (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={col.id.toString()}>
+            <Grid size={currentGridSize} key={col.id.toString()}>
               {isFieldEditing ? (
                 <TextField
                   fullWidth
@@ -115,6 +115,7 @@ const GeneralInfoSection = <T,>({
                     onGeneralChange?.(col.id as keyof T, e.target.value)
                   }
                   slotProps={{ inputLabel: { shrink: true } }}
+                  sx={{ ...col.sx }}
                 >
                   {col.inputType === "select" &&
                     col.options?.map((opt) => (
@@ -143,6 +144,7 @@ const GeneralInfoSection = <T,>({
                       WebkitTextFillColor: "#334155",
                     },
                     bgcolor: "#f8fafc",
+                    ...col.sx,
                   }}
                 />
               )}
