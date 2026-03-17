@@ -14,3 +14,8 @@ export const bulkDetailsSchema = Joi.array()
   .messages({
     "array.min": "Bạn phải nhập ít nhất một dòng nguyên liệu",
   });
+export const updateMaterialDetailSchema = Joi.object({
+  weight: Joi.number().positive().optional(),
+  real_percent: Joi.number().min(0).max(100).allow(null).optional(),
+  note: Joi.string().allow("", null).optional(),
+});

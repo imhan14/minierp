@@ -21,7 +21,7 @@ export const fetchMaterialReportData = async (date?: Dayjs | null) => {
   return formattedData;
 };
 
-export const fetchIngredientData = async (material_id: number) => {
+export const fetchIngredientData = async (material_id: number | null) => {
   const response = await api.get<MaterialDetailType[]>(`/material-detail`, {
     params: { material_id: material_id },
   });

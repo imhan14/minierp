@@ -25,7 +25,7 @@ export interface ActionConfig<T> {
 interface DynamicTableProps<T> {
   columns: FieldConfig<T>[];
   data: T[];
-  actions?: ActionConfig<T>[];
+  actions?: (row: T) => ActionConfig<T>[];
   getRowKey: (row: T) => string | number;
 }
 
@@ -62,10 +62,11 @@ const DataTable = <T,>({
               <TableRow key={getRowKey(row)} hover>
                 {columns.map((column) => {
                   if (column.id === "actions") {
+                    const rowActions = actions ? actions(row) : [];
                     return (
                       <TableCell key="actions" align={column.align || "left"}>
                         <Stack direction="row" spacing={1}>
-                          {actions?.slice(0, 2).map((action, index) => (
+                          {rowActions.map((action, index) => (
                             <Tooltip key={index} title={action.label}>
                               <span>
                                 {action.icon ? (

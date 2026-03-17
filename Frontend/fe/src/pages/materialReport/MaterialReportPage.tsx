@@ -1,11 +1,4 @@
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  Skeleton,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, CircularProgress, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Filters from "../../components/Filters";
@@ -16,17 +9,10 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import DynamicPopup from "../../components/DynamicPopup";
 import type { FieldConfig } from "../../types/FieldConfig";
 import { materialReportSchema } from "../../schema/materialReport.schema";
-import {
-  fetchIngredientData,
-  fetchMaterialReportData,
-} from "./dataMaterialReport";
+import { fetchMaterialReportData } from "./dataMaterialReport";
 import type { MaterialReportDisplay } from "../../schema/materialReport.schema";
-import {
-  materialDetailSchema,
-  type MaterialDetailDisplay,
-} from "../../schema/materialDetail.schema";
 import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import MaterialDetailList from "./components/MaterialDetailList";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -37,6 +23,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const MaterialReportPage = () => {
+  const [rowId, setRowId] = useState<number | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [materialReports, setMaterialReports] = useState<
     MaterialReportDisplay[]
@@ -44,18 +31,12 @@ const MaterialReportPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
-  const [detailLoading, setDetailLoading] = useState(false);
-  // const [materialDetail, setMaterialDetail] = useState<MaterialDetailDisplay[]>(
-  //   [],
-  // );
   const [selectedMaterial, setSelectedMaterial] =
     useState<MaterialReportDisplay | null>(null);
   const [editGeneral, setEditGeneral] = useState<MaterialReportDisplay | null>(
     null,
   );
-  const [editIngredients, setEditIngredients] = useState<
-    MaterialDetailDisplay[]
-  >([]);
+
   const columns = [
     { ...materialReportSchema.id },
     { ...materialReportSchema.team_name },
@@ -81,60 +62,15 @@ const MaterialReportPage = () => {
         return dayjs(value).add(24, "hour").format("HH:mm");
       }) as FieldConfig<MaterialReportDisplay>["render"],
     },
-    { id: "actions", label: "Details" },
-  ] as FieldConfig<MaterialReportDisplay>[];
-
-  const materialDetailColumns = [
-    { ...materialDetailSchema.ingredient_name },
-    {
-      ...materialDetailSchema.weight,
-      render: (value, row) => (
-        <TextField
-          size="small"
-          disabled
-          type="number"
-          value={editIngredients.find((i) => i.id === row.id)?.weight || ""}
-          onChange={(e) =>
-            handleIngredientChange(row.id, "weight", e.target.value)
-          }
-        />
-      ),
-    },
-    {
-      ...materialDetailSchema.real_percent,
-      render: (value, row) => (
-        <TextField
-          size="small"
-          value={
-            editIngredients.find((i) => i.id === row.id)?.real_percent || ""
-          }
-          onChange={(e) =>
-            handleIngredientChange(row.id, "real_percent", e.target.value)
-          }
-        />
-      ),
-    },
-    {
-      ...materialDetailSchema.note,
-      render: (value, row) => (
-        <TextField
-          size="small"
-          fullWidth
-          value={editIngredients.find((i) => i.id === row.id)?.note || ""}
-          onChange={(e) =>
-            handleIngredientChange(row.id, "note", e.target.value)
-          }
-        />
-      ),
-    },
     { id: "actions", label: "Actions" },
-  ] as FieldConfig<MaterialDetailDisplay>[];
+  ] as FieldConfig<MaterialReportDisplay>[];
 
   const handleOpenDetail = (row: MaterialReportDisplay) => {
     setSelectedMaterial(row);
     setEditGeneral(row);
     setOpenDetail(true);
-    fetchIngredient(row.id);
+    // fetchIngredient(row.id);
+    setRowId(row.id);
   };
 
   const handleCloseDetail = () => {
@@ -144,23 +80,16 @@ const MaterialReportPage = () => {
     }, 300);
   };
 
-  const actions: ActionConfig<MaterialReportDisplay>[] = [
-    {
-      label: "Details",
-      color: "primary",
-      icon: <RemoveRedEyeOutlinedIcon />,
-      onClick: (row) => handleOpenDetail(row),
-    },
-  ];
-  const detailActions: ActionConfig<MaterialDetailDisplay>[] = [
-    {
-      label: "Details",
-      color: "primary",
-
-      icon: <EditOutlinedIcon />,
-      onClick: () => console.log(),
-    },
-  ];
+  const actions = (): ActionConfig<MaterialReportDisplay>[] => {
+    return [
+      {
+        label: "Details",
+        color: "primary",
+        icon: <RemoveRedEyeOutlinedIcon />,
+        onClick: (row) => handleOpenDetail(row),
+      },
+    ];
+  };
 
   const fetchMaterialReport = async (date?: Dayjs | null) => {
     try {
@@ -175,30 +104,6 @@ const MaterialReportPage = () => {
     }
   };
 
-  const fetchIngredient = async (material_id: number) => {
-    try {
-      setDetailLoading(true);
-      // setMaterialDetail(await fetchIngredientData(material_id));
-      setEditIngredients(await fetchIngredientData(material_id));
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu.");
-      console.error("API Error:", err);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
-  const handleIngredientChange = (
-    id: number,
-    field: keyof MaterialDetailDisplay,
-    value: string,
-  ) => {
-    setEditIngredients((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    );
-  };
-
   useEffect(() => {
     fetchMaterialReport(selectedDate);
   }, [selectedDate]);
@@ -209,6 +114,7 @@ const MaterialReportPage = () => {
       </Typography>
     );
   }
+
   return (
     <Box>
       <DrawerHeader />
@@ -243,18 +149,12 @@ const MaterialReportPage = () => {
               Ingredient List (Editable)
             </Typography>
           </Divider>
-          <Box>
-            {detailLoading ? (
-              <Skeleton variant="rounded" height={300} />
-            ) : (
-              <DataTable
-                columns={materialDetailColumns}
-                data={editIngredients}
-                actions={detailActions}
-                getRowKey={(row) => row.id}
-              />
-            )}
-          </Box>
+          <MaterialDetailList material_id={rowId} />
+          <Divider sx={{ my: 3 }}>
+            <Typography variant="subtitle1" fontWeight="bold" color="primary">
+              Other Ingredient
+            </Typography>
+          </Divider>
         </DynamicPopup>
       </Box>
     </Box>
