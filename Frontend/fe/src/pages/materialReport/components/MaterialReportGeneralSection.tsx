@@ -12,7 +12,7 @@ import { Alert, Snackbar } from "@mui/material";
 interface Props {
   selectedMaterial: MaterialReportDisplay | null;
   editGeneral: MaterialReportDisplay | null;
-  onEditGeneral: (on: MaterialReportDisplay | null) => void;
+  onEditGeneral: (editGeneral: MaterialReportDisplay | null) => void;
   onSaveSuccess: () => void;
 }
 
@@ -91,7 +91,7 @@ const MaterialReportGeneralSection = ({
         start_time: dayjs(editGeneral?.start_time).format("DD-MM-YYYY HH:mm"),
         end_time: dayjs(editGeneral?.end_time).format("DD-MM-YYYY HH:mm"),
       };
-      console.log(payload);
+
       await api.patch(`/material-report/${editGeneral?.id}`, payload);
       setSnackbar({
         open: true,

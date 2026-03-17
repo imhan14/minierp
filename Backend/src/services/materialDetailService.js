@@ -30,5 +30,6 @@ export const getMaterialDetailService = async (filters) => {
       real_percent: true,
       note: true,
     },
+    orderBy: { id: "asc" },
   });
 };
