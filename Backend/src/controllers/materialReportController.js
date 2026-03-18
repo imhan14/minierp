@@ -19,15 +19,21 @@ export const getMaterialReport = async (req, res) => {
 
 export const updateMaterialReport = async (req, res) => {
   const id = Number(req.params.id);
-  var data = {};
-  // if(req.body.team_id) data.team_id = Number(req.body.team_id);
-  // if(req.body.report_date) data.report_date = req.body.report_date;
-  if (req.body.foreman_check) data.foreman_check = req.body.foreman_check;
-  if (req.body.start_time) data.start_time = req.body.start_time;
-  if (req.body.end_time) data.end_time = req.body.end_time;
-  if (req.body.extral_materials)
-    data.extral_materials = req.body.extral_materials;
-  console.log(data);
-  const materialReport = await updateMaterialReportService(id, data);
+  const fields = [
+    "team_id",
+    "report_date",
+    "foreman_check",
+    "start_time",
+    "end_time",
+    "extral_materials",
+    "shift",
+  ];
+  let updateData = {};
+  fields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      updateData[field] = req.body[field];
+    }
+  });
+  const materialReport = await updateMaterialReportService(id, updateData);
   res.status(200).json(materialReport);
 };

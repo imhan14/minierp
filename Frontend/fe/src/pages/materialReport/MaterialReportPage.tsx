@@ -13,6 +13,7 @@ import { fetchMaterialReportData } from "./dataMaterialReport";
 import type { MaterialReportDisplay } from "../../schema/materialReport.schema";
 import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
 import MaterialDetailList from "./components/MaterialDetailList";
+import OtherIngredient from "./components/OtherIngredient";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -71,6 +72,7 @@ const MaterialReportPage = () => {
     setOpenDetail(true);
     // fetchIngredient(row.id);
     setRowId(row.id);
+    console.log(row.extral_materials);
   };
 
   const handleCloseDetail = () => {
@@ -155,6 +157,7 @@ const MaterialReportPage = () => {
               Other Ingredient
             </Typography>
           </Divider>
+          <OtherIngredient material_id={rowId} />
         </DynamicPopup>
       </Box>
     </Box>

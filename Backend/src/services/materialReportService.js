@@ -49,6 +49,18 @@ export const createMaterialReportService = async (data) => {
 };
 
 export const updateMaterialReportService = async (id, data) => {
+  const existingReport = await prisma.material_reports.findUnique({
+    where: { id: id },
+    select: { extral_materials: true },
+  });
+
+  if (!existingReport) throw new Error("Report không tồn tại");
+  if (data.extral_materials && Array.isArray(data.extral_materials)) {
+    const currentMaterials = Array.isArray(existingReport.extral_materials)
+      ? existingReport.extral_materials
+      : [];
+    data.extral_materials = [...currentMaterials, ...data.extral_materials];
+  }
   return await prisma.material_reports.update({
     where: { id: id },
     data: data,
