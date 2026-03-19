@@ -1,5 +1,11 @@
-import { Box, CircularProgress, Divider, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Filters from "../../components/Filters";
 import type { Dayjs } from "dayjs";
@@ -9,10 +15,14 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import DynamicPopup from "../../components/DynamicPopup";
 import type { FieldConfig } from "../../types/FieldConfig";
 import { materialReportSchema } from "../../schema/materialReport.schema";
-import { fetchMaterialReportData } from "./dataMaterialReport";
+import {
+  fetchAddNewReport,
+  fetchMaterialReportData,
+} from "./dataMaterialReport";
 import type { MaterialReportDisplay } from "../../schema/materialReport.schema";
 import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
 import MaterialDetailList from "./components/MaterialDetailList";
+import OtherIngredient from "./components/OtherIngredient";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -37,39 +47,41 @@ const MaterialReportPage = () => {
     null,
   );
 
-  const columns = [
-    { ...materialReportSchema.id },
-    { ...materialReportSchema.team_name },
-    {
-      ...materialReportSchema.report_date,
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).add(24, "hour").format("DD/MM/YYYY");
-      }) as FieldConfig<MaterialReportDisplay>["render"],
-    },
-    { ...materialReportSchema.shift },
-    {
-      ...materialReportSchema.start_time,
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).add(24, "hour").format("HH:mm");
-      }) as FieldConfig<MaterialReportDisplay>["render"],
-    },
-    {
-      ...materialReportSchema.end_time,
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).add(24, "hour").format("HH:mm");
-      }) as FieldConfig<MaterialReportDisplay>["render"],
-    },
-    { id: "actions", label: "Actions" },
-  ] as FieldConfig<MaterialReportDisplay>[];
+  const columns = useMemo(
+    () => [
+      { ...materialReportSchema.id },
+      { ...materialReportSchema.team_name },
+      {
+        ...materialReportSchema.report_date,
+        render: ((value: string) => {
+          if (!value) return "-";
+          return dayjs(value).format("DD/MM/YYYY");
+        }) as FieldConfig<MaterialReportDisplay>["render"],
+      },
+      { ...materialReportSchema.shift },
+      {
+        ...materialReportSchema.start_time,
+        render: ((value: string) => {
+          if (!value) return "-";
+          return dayjs(value).format("HH:mm");
+        }) as FieldConfig<MaterialReportDisplay>["render"],
+      },
+      {
+        ...materialReportSchema.end_time,
+        render: ((value: string) => {
+          if (!value) return "-";
+          return dayjs(value).format("HH:mm");
+        }) as FieldConfig<MaterialReportDisplay>["render"],
+      },
+      { id: "actions", label: "Actions" },
+    ],
+    [],
+  );
 
   const handleOpenDetail = (row: MaterialReportDisplay) => {
     setSelectedMaterial(row);
     setEditGeneral(row);
     setOpenDetail(true);
-    // fetchIngredient(row.id);
     setRowId(row.id);
   };
 
@@ -91,7 +103,7 @@ const MaterialReportPage = () => {
     ];
   };
 
-  const fetchMaterialReport = async (date?: Dayjs | null) => {
+  const fetchMaterialReport = useCallback(async (date?: Dayjs | null) => {
     try {
       setLoading(true);
       setMaterialReports(await fetchMaterialReportData(date));
@@ -102,11 +114,22 @@ const MaterialReportPage = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+  const handleAddNewReport = async () => {
+    try {
+      setLoading(true);
+      await fetchAddNewReport(selectedDate);
+      await fetchMaterialReport(selectedDate);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchMaterialReport(selectedDate);
-  }, [selectedDate]);
+  }, [selectedDate, fetchMaterialReport]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -120,6 +143,13 @@ const MaterialReportPage = () => {
       <DrawerHeader />
       <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       <Box sx={{}}>
+        <Button
+          variant="contained"
+          sx={{ marginBottom: 1 }}
+          onClick={handleAddNewReport}
+        >
+          Add new Report
+        </Button>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
             <CircularProgress />
@@ -155,6 +185,11 @@ const MaterialReportPage = () => {
               Other Ingredient
             </Typography>
           </Divider>
+          <OtherIngredient
+            material_id={selectedMaterial?.id}
+            extral_material={selectedMaterial}
+            onSaveSuccess={() => fetchMaterialReport(selectedDate)}
+          />
         </DynamicPopup>
       </Box>
     </Box>

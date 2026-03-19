@@ -119,10 +119,7 @@ const GeneralInfoSection = <T,>({
                 >
                   {col.inputType === "select" &&
                     col.options?.map((opt) => (
-                      <MenuItem
-                        key={opt.value.toString()}
-                        value={opt.value.toString()}
-                      >
+                      <MenuItem key={opt.value} value={opt.value}>
                         {opt.label}
                       </MenuItem>
                     ))}

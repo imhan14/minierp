@@ -1,6 +1,7 @@
 import type { TeamType } from "./TeamType";
 
-interface ExtraMaterialsJson {
+export interface ExtraMaterialsJson {
+  id?: number | string;
   ingredient_name: string;
   weight: number;
   real_percent: number;
@@ -14,5 +15,5 @@ export interface MaterialReportType {
   start_time: string;
   end_time: string;
   foreman_check: boolean;
-  extral_materials: ExtraMaterialsJson[];
+  extral_materials: ExtraMaterialsJson[] | null;
 }

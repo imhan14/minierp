@@ -70,9 +70,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
           <TextField
             size="small"
             disabled={editingId !== row.id}
-            value={
-              editIngredients.find((i) => i.id === row.id)?.real_percent || ""
-            }
+            value={row.real_percent || ""}
             onChange={(e) =>
               handleIngredientChange(row.id, "real_percent", e.target.value)
             }
@@ -86,7 +84,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
             size="small"
             fullWidth
             disabled={editingId !== row.id}
-            value={editIngredients.find((i) => i.id === row.id)?.note || ""}
+            value={row.note || ""}
             onChange={(e) =>
               handleIngredientChange(row.id, "note", e.target.value)
             }
@@ -95,7 +93,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
       },
       {
         id: "actions",
-        label: "Thao tác",
+        label: "Actions",
       },
     ],
     [editingId, editIngredients],

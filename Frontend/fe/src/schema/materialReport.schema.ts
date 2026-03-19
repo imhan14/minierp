@@ -26,7 +26,6 @@ export const materialReportSchema: Record<
   shift: {
     id: "shift",
     label: "Shift",
-    isReadOnly: true,
   },
   start_time: {
     id: "start_time",

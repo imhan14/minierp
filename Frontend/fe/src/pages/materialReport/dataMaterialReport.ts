@@ -21,7 +21,9 @@ export const fetchMaterialReportData = async (date?: Dayjs | null) => {
   return formattedData;
 };
 
-export const fetchIngredientData = async (material_id: number | null) => {
+export const fetchIngredientData = async (
+  material_id: number | null | undefined,
+) => {
   const response = await api.get<MaterialDetailType[]>(`/material-detail`, {
     params: { material_id: material_id },
   });
@@ -33,4 +35,13 @@ export const fetchIngredientData = async (material_id: number | null) => {
     };
   });
   return formattedData;
+};
+
+export const fetchAddNewReport = async (date?: Dayjs | null) => {
+  const dateParam = date?.isValid() ? date.format("DD-MM-YYYY") : "";
+  const payload = {
+    team_id: 1,
+    report_date: dateParam,
+  };
+  return await api.post<MaterialReportType[]>(`/material-report`, payload);
 };
