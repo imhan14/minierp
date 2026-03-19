@@ -20,7 +20,7 @@ export const createMaterialReportSchema = Joi.object({
     "date.format": "Ngày báo cáo phải đúng định dạng DD-MM-YYYY",
   }),
   team_id: Joi.number().integer().min(1).required(),
-  shift: Joi.string().required(),
+  shift: Joi.string().optional(),
   start_time: Joi.date().format("DD-MM-YYYY HH:mm").optional().messages({
     "date.format": "Giờ bắt đầu phải đúng định dạng DD-MM-YYYY HH:mm",
   }),

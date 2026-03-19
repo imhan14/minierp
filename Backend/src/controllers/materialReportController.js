@@ -5,13 +5,21 @@ import {
 } from "../services/materialReportService";
 
 export const createMaterialReport = async (req, res) => {
-  const materialReport = await createMaterialReportService(req.body);
+  var fields = ["team_id", "report_date"];
+  let createData = {};
+  fields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      createData[field] = req.body[field];
+    }
+  });
+  const materialReport = await createMaterialReportService(createData);
   res.status(201).json(materialReport);
 };
 
 export const getMaterialReport = async (req, res) => {
   const filters = {
     id: req.query.id ? Number(req.query.id) : undefined,
+    date: req.query.date ? req.query.date : undefined,
   };
   const materialReports = await getMaterialReportService(filters);
   res.status(200).json(materialReports);

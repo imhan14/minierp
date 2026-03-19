@@ -73,14 +73,16 @@ const OrderPage = () => {
     }, 300);
   };
 
-  const actions: ActionConfig<OrderDisplay>[] = [
-    {
-      label: "Details",
-      color: "primary",
-      icon: <RemoveRedEyeOutlinedIcon />,
-      onClick: (row) => handleOpenDetail(row),
-    },
-  ];
+  const actions = (): ActionConfig<OrderDisplay>[] => {
+    return [
+      {
+        label: "Details",
+        color: "primary",
+        icon: <RemoveRedEyeOutlinedIcon />,
+        onClick: (row) => handleOpenDetail(row),
+      },
+    ];
+  };
 
   const displayFields = orderColumns.filter(
     (col) => col.id !== "id" && col.id !== "actions",

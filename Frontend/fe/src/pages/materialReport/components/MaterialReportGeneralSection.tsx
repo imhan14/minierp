@@ -48,14 +48,14 @@ const MaterialReportGeneralSection = ({
     {
       ...materialReportSchema.shift,
       gridSize: { md: 4 },
-      // inputType: "select",
-      // options: [
-      //   { label: "C1x8", value: "C1x8" },
-      //   { label: "C1x12", value: "C1x12" },
-      //   { label: "C2x8", value: "C2x8" },
-      //   { label: "C2x12", value: "C2x12" },
-      //   { label: "C3x8", value: "C3x8" },
-      // ],
+      inputType: "select",
+      options: [
+        { label: "C1x8", value: "C1x8" },
+        { label: "C1x12", value: "C1x12" },
+        { label: "C2x8", value: "C2x8" },
+        { label: "C2x12", value: "C2x12" },
+        { label: "C3x8", value: "C3x8" },
+      ],
     },
     {
       ...materialReportSchema.start_time,
@@ -63,7 +63,7 @@ const MaterialReportGeneralSection = ({
       gridSize: { md: 6 },
       render: ((value: string) => {
         if (!value) return "-";
-        return dayjs(value).add(24, "hour").format("HH:mm");
+        return dayjs(value).format("DD/MM/YYYY HH:mm");
       }) as FieldConfig<MaterialReportDisplay>["render"],
     },
     {
@@ -72,7 +72,7 @@ const MaterialReportGeneralSection = ({
       gridSize: { md: 6 },
       render: ((value: string) => {
         if (!value) return "-";
-        return dayjs(value).add(24, "hour").format("HH:mm");
+        return dayjs(value).format("DD/MM/YYYY HH:mm");
       }) as FieldConfig<MaterialReportDisplay>["render"],
     },
   ];
@@ -86,12 +86,17 @@ const MaterialReportGeneralSection = ({
   };
   const handleSave = async () => {
     try {
+      const isValidDate = (date: string | undefined) => {
+        const d = dayjs(date);
+        return d.isValid() ? d.format("DD-MM-YYYY HH:mm") : undefined;
+      };
       const payload = {
         foreman_check: editGeneral?.foreman_check,
-        start_time: dayjs(editGeneral?.start_time).format("DD-MM-YYYY HH:mm"),
-        end_time: dayjs(editGeneral?.end_time).format("DD-MM-YYYY HH:mm"),
+        start_time: isValidDate(editGeneral?.start_time),
+        end_time: isValidDate(editGeneral?.end_time),
+        shift: editGeneral?.shift,
       };
-
+      console.log(payload);
       await api.patch(`/material-report/${editGeneral?.id}`, payload);
       setSnackbar({
         open: true,
