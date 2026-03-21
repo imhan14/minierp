@@ -9,7 +9,14 @@ import {
 } from "../services/productReportService";
 
 export const createProductReport = async (req, res) => {
-  const productReport = await createProductReportService(req.body);
+  var fields = ["team_id", "report_date"];
+  let createData = {};
+  fields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      createData[field] = req.body[field];
+    }
+  });
+  const productReport = await createProductReportService(createData);
   res.status(201).json(productReport);
 };
 
@@ -19,6 +26,7 @@ export const getProductReport = async (req, res) => {
     search: req.query.search,
     date: req.query.date ? req.query.date : undefined,
   };
+  console.log(filters);
   const productReports = await getProductReportService(filters);
   res.status(200).json(productReports);
 };

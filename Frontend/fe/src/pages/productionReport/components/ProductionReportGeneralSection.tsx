@@ -1,22 +1,22 @@
-import type { FieldConfig } from "../../../types/FieldConfig";
-import {
-  materialReportSchema,
-  type MaterialReportDisplay,
-} from "../../../schema/materialReport.schema";
-import dayjs from "dayjs";
-import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import api from "../../../apis/axios";
 import { useState } from "react";
+import GeneralInfoSection from "../../../components/GeneralInfoSection";
 import { Alert, Snackbar } from "@mui/material";
+import {
+  productionReportSchema,
+  type ProductionReportDisplay,
+} from "../../../schema/productionReport.schema";
+import type { FieldConfig } from "../../../types/FieldConfig";
+import dayjs from "dayjs";
+import api from "../../../apis/axios";
 
 interface Props {
-  selectedMaterial: MaterialReportDisplay | null;
-  editGeneral: MaterialReportDisplay | null;
-  onEditGeneral: (editGeneral: MaterialReportDisplay | null) => void;
+  selectedMaterial: ProductionReportDisplay | null;
+  editGeneral: ProductionReportDisplay | null;
+  onEditGeneral: (editGeneral: ProductionReportDisplay | null) => void;
   onSaveSuccess: () => void;
 }
 
-const MaterialReportGeneralSection = ({
+const ProductionReportGeneralSection = ({
   selectedMaterial,
   onSaveSuccess,
   editGeneral,
@@ -35,19 +35,19 @@ const MaterialReportGeneralSection = ({
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
-  const fieldsDetail: FieldConfig<MaterialReportDisplay>[] = [
-    { ...materialReportSchema.team_name, gridSize: { md: 4 } },
+  const fieldsDetail: FieldConfig<ProductionReportDisplay>[] = [
+    { ...productionReportSchema.team_name, gridSize: { md: 3 } },
     {
-      ...materialReportSchema.report_date,
-      gridSize: { md: 4 },
+      ...productionReportSchema.report_date,
+      gridSize: { md: 3 },
       render: ((value: string) => {
         if (!value) return "-";
         return dayjs(value).format("DD/MM/YYYY");
-      }) as FieldConfig<MaterialReportDisplay>["render"],
+      }) as FieldConfig<ProductionReportDisplay>["render"],
     },
     {
-      ...materialReportSchema.shift,
-      gridSize: { md: 4 },
+      ...productionReportSchema.shift,
+      gridSize: { md: 3 },
       inputType: "select",
       options: [
         { label: "C1x8", value: "C1x8" },
@@ -57,27 +57,28 @@ const MaterialReportGeneralSection = ({
         { label: "C3x8", value: "C3x8" },
       ],
     },
+    { ...productionReportSchema.furnace, gridSize: { md: 3 } },
     {
-      ...materialReportSchema.start_time,
+      ...productionReportSchema.start_time,
       inputType: "datetime-local",
       gridSize: { md: 6 },
       render: ((value: string) => {
         if (!value) return "-";
         return dayjs(value).format("DD/MM/YYYY HH:mm");
-      }) as FieldConfig<MaterialReportDisplay>["render"],
+      }) as FieldConfig<ProductionReportDisplay>["render"],
     },
     {
-      ...materialReportSchema.end_time,
+      ...productionReportSchema.end_time,
       inputType: "datetime-local",
       gridSize: { md: 6 },
       render: ((value: string) => {
         if (!value) return "-";
         return dayjs(value).format("DD/MM/YYYY HH:mm");
-      }) as FieldConfig<MaterialReportDisplay>["render"],
+      }) as FieldConfig<ProductionReportDisplay>["render"],
     },
   ];
   const handleGeneralChange = (
-    field: keyof MaterialReportDisplay,
+    field: keyof ProductionReportDisplay,
     value: string,
   ) => {
     if (editGeneral) {
@@ -91,12 +92,12 @@ const MaterialReportGeneralSection = ({
         return d.isValid() ? d.format("DD-MM-YYYY HH:mm") : undefined;
       };
       const payload = {
-        foreman_check: editGeneral?.foreman_check ?? undefined,
+        furnace: editGeneral?.furnace ?? undefined,
         start_time: isValidDate(editGeneral?.start_time),
         end_time: isValidDate(editGeneral?.end_time),
         shift: editGeneral?.shift ?? undefined,
       };
-      await api.patch(`/material-report/${editGeneral?.id}`, payload);
+      await api.patch(`/product-report/${editGeneral?.id}`, payload);
       setSnackbar({
         open: true,
         message: "Cập nhật dữ liệu thành công!",
@@ -142,4 +143,4 @@ const MaterialReportGeneralSection = ({
   );
 };
 
-export default MaterialReportGeneralSection;
+export default ProductionReportGeneralSection;

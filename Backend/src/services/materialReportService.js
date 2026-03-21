@@ -1,12 +1,17 @@
 import dayjs from "dayjs";
 import { prisma } from "../../lib/prisma.ts";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const getMaterialReportService = async (filters) => {
   const { id, date } = filters;
   let dateFilter = {};
   if (date) {
-    const startOfDay = dayjs(date).startOf("day").toDate();
-    const endOfDay = dayjs(date).endOf("day").toDate();
+    const startOfDay = dayjs.utc(date).startOf("day").toISOString();
+    const endOfDay = dayjs.utc(date).endOf("day").toISOString();
     dateFilter = {
       gte: startOfDay,
       lte: endOfDay,
@@ -39,26 +44,6 @@ export const getMaterialReportService = async (filters) => {
 export const createMaterialReportService = async (data) => {
   return await prisma.material_reports.create({
     data: data,
-    // {
-    //   report_date: data.report_date,
-    //   shift: data.shift,
-    //   team_id: data.team_id,
-    //   foreman_check: data.foreman_check,
-    //   start_time: data.start_time,
-    //   end_time: data.end_time,
-    //   extral_materials: data.extral_materials,
-    //   material_details:
-    //     data.details && data.details.length > 0
-    //       ? {
-    //           create: data.details.map((item) => ({
-    //             ingredient_id: item.ingredient_id,
-    //             weight: item.weight,
-    //             real_percent: item.real_percent,
-    //             note: item.note,
-    //           })),
-    //         }
-    //       : undefined,
-    // },
   });
 };
 

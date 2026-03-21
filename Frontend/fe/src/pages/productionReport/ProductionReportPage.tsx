@@ -7,22 +7,22 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
-import Filters from "../../components/Filters";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
+import Filters from "../../components/Filters";
 import DataTable, { type ActionConfig } from "../../components/DataTable";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import DynamicPopup from "../../components/DynamicPopup";
+import {
+  productionReportSchema,
+  type ProductionReportDisplay,
+} from "../../schema/productionReport.schema";
 import type { FieldConfig } from "../../types/FieldConfig";
-import { materialReportSchema } from "../../schema/materialReport.schema";
 import {
   fetchAddNewReport,
-  fetchMaterialReportData,
-} from "./dataMaterialReport";
-import type { MaterialReportDisplay } from "../../schema/materialReport.schema";
-import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
-import MaterialDetailList from "./components/MaterialDetailList";
-import OtherIngredient from "./components/OtherIngredient";
+  fetchProductionReportData,
+} from "./dataProductionReport";
+import DynamicPopup from "../../components/DynamicPopup";
+import ProductionReportGeneralSection from "./components/ProductionReportGeneralSection";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -32,67 +32,74 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const MaterialReportPage = () => {
-  const [rowId, setRowId] = useState<number | null>(null);
+const ProductionReportPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const [materialReports, setMaterialReports] = useState<
-    MaterialReportDisplay[]
+  const [rowId, setRowId] = useState<number | null>(null);
+  const [productionReports, setProductionReports] = useState<
+    ProductionReportDisplay[]
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] =
-    useState<MaterialReportDisplay | null>(null);
-  const [editGeneral, setEditGeneral] = useState<MaterialReportDisplay | null>(
-    null,
-  );
-
-  const materialReportColumns = useMemo(
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductionReportDisplay | null>(null);
+  const [editGeneral, setEditGeneral] =
+    useState<ProductionReportDisplay | null>(null);
+  const productionReportColumns = useMemo(
     () => [
-      { ...materialReportSchema.id },
-      { ...materialReportSchema.team_name },
+      { ...productionReportSchema.id },
+      { ...productionReportSchema.team_name },
       {
-        ...materialReportSchema.report_date,
+        ...productionReportSchema.report_date,
         render: ((value: string) => {
           if (!value) return "-";
           return dayjs(value).format("DD/MM/YYYY");
-        }) as FieldConfig<MaterialReportDisplay>["render"],
+        }) as FieldConfig<ProductionReportDisplay>["render"],
       },
-      { ...materialReportSchema.shift },
+      { ...productionReportSchema.shift },
+      { ...productionReportSchema.furnace },
       {
-        ...materialReportSchema.start_time,
+        ...productionReportSchema.start_time,
         render: ((value: string) => {
           if (!value) return "-";
           return dayjs(value).format("HH:mm");
-        }) as FieldConfig<MaterialReportDisplay>["render"],
+        }) as FieldConfig<ProductionReportDisplay>["render"],
       },
       {
-        ...materialReportSchema.end_time,
+        ...productionReportSchema.end_time,
         render: ((value: string) => {
           if (!value) return "-";
           return dayjs(value).format("HH:mm");
-        }) as FieldConfig<MaterialReportDisplay>["render"],
+        }) as FieldConfig<ProductionReportDisplay>["render"],
       },
       { id: "actions", label: "Actions" },
     ],
     [],
   );
-
-  const handleOpenDetail = (row: MaterialReportDisplay) => {
-    setSelectedMaterial(row);
+  const handleOpenDetail = (row: ProductionReportDisplay) => {
+    setSelectedProduct(row);
     setEditGeneral(row);
     setOpenDetail(true);
     setRowId(row.id);
   };
-
   const handleCloseDetail = () => {
     setOpenDetail(false);
     setTimeout(() => {
-      setSelectedMaterial(null);
+      setSelectedProduct(null);
     }, 300);
   };
-
-  const actions = (): ActionConfig<MaterialReportDisplay>[] => {
+  const handleAddNewReport = async () => {
+    try {
+      setLoading(true);
+      await fetchAddNewReport(selectedDate);
+      await fetchProductionReport(selectedDate);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const actions = (): ActionConfig<ProductionReportDisplay>[] => {
     return [
       {
         label: "Details",
@@ -102,11 +109,10 @@ const MaterialReportPage = () => {
       },
     ];
   };
-
-  const fetchMaterialReport = useCallback(async (date?: Dayjs | null) => {
+  const fetchProductionReport = useCallback(async (date?: Dayjs | null) => {
     try {
       setLoading(true);
-      setMaterialReports(await fetchMaterialReportData(date));
+      setProductionReports(await fetchProductionReportData(date));
       setError(null);
     } catch (err) {
       setError("Không thể tải dữ liệu.");
@@ -115,21 +121,9 @@ const MaterialReportPage = () => {
       setLoading(false);
     }
   }, []);
-  const handleAddNewReport = async () => {
-    try {
-      setLoading(true);
-      await fetchAddNewReport(selectedDate);
-      await fetchMaterialReport(selectedDate);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchMaterialReport(selectedDate);
-  }, [selectedDate, fetchMaterialReport]);
+    fetchProductionReport(selectedDate);
+  }, [selectedDate, fetchProductionReport]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -137,12 +131,11 @@ const MaterialReportPage = () => {
       </Typography>
     );
   }
-
   return (
     <Box>
       <DrawerHeader />
       <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-      <Box>
+      <Box sx={{}}>
         <Button
           variant="contained"
           sx={{ marginBottom: 1 }}
@@ -156,8 +149,8 @@ const MaterialReportPage = () => {
           </Box>
         ) : (
           <DataTable
-            columns={materialReportColumns}
-            data={materialReports}
+            columns={productionReportColumns}
+            data={productionReports}
             actions={actions}
             getRowKey={(row) => row.id}
           />
@@ -165,12 +158,12 @@ const MaterialReportPage = () => {
         <DynamicPopup
           open={openDetail}
           onClose={handleCloseDetail}
-          title={`Details: #${selectedMaterial?.id}`}
-          // enableSend={true}
+          title={`Details: #${selectedProduct?.id}`}
+          enableSend={true}
         >
-          <MaterialReportGeneralSection
-            selectedMaterial={selectedMaterial}
-            onSaveSuccess={() => fetchMaterialReport(selectedDate)}
+          <ProductionReportGeneralSection
+            selectedMaterial={selectedProduct}
+            onSaveSuccess={() => fetchProductionReport(selectedDate)}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
@@ -179,7 +172,7 @@ const MaterialReportPage = () => {
               Ingredient List (Editable)
             </Typography>
           </Divider>
-          <MaterialDetailList material_id={rowId} />
+          {/* <MaterialDetailList material_id={rowId} />
           <Divider sx={{ my: 3 }}>
             <Typography variant="subtitle1" fontWeight="bold" color="primary">
               Other Ingredient
@@ -189,11 +182,11 @@ const MaterialReportPage = () => {
             material_id={selectedMaterial?.id}
             extral_material={selectedMaterial}
             onSaveSuccess={() => fetchMaterialReport(selectedDate)}
-          />
+          /> */}
         </DynamicPopup>
       </Box>
     </Box>
   );
 };
 
-export default MaterialReportPage;
+export default ProductionReportPage;

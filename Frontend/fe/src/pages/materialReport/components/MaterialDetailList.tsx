@@ -96,7 +96,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
         label: "Actions",
       },
     ],
-    [editingId, editIngredients],
+    [editingId],
   );
 
   const getDetailActions = (

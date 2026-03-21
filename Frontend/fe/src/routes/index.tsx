@@ -6,7 +6,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import Dashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
 import AuthLayout from "../layouts/AuthLayout";
-import ProductionReportPage from "../pages/ProductionReportPage";
+import ProductionReportPage from "../pages/productionReport";
 import ProductionLogPage from "../pages/ProductionLogPage";
 import MaterialReportPage from "../pages/materialReport";
 import ProtectedRoute from "../components/ProtectedRoute";

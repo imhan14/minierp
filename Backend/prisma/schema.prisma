@@ -58,28 +58,29 @@ model material_details {
 model material_reports {
   id               Int                @id @default(autoincrement())
   team_id          Int?
-  report_date      DateTime?          @db.Date
+  report_date      DateTime?          @db.Timestamptz(6)
   shift            shift_type?
   extral_materials Json?              @default("[]")
   foreman_check    Boolean?
-  start_time       DateTime?          @db.Timestamp(6)
-  end_time         DateTime?          @db.Timestamp(6)
+  start_time       DateTime?          @db.Timestamptz(6)
+  end_time         DateTime?          @db.Timestamptz(6)
   material_details material_details[]
   teams            teams?             @relation(fields: [team_id], references: [id], onUpdate: NoAction, map: "fk_material_team")
 }
 
 model product_reports {
-  id                Int                @id @default(autoincrement())
-  report_date       DateTime?          @db.Date
-  team_id           Int?
-  furnace           Int?
-  shift             shift_type?
-  warehouse_check   Boolean?           @default(false)
-  producttion_check Boolean?           @default(false)
-  start_time        DateTime?          @db.Timestamp(6)
-  end_time          DateTime?          @db.Timestamp(6)
-  teams             teams?             @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productreport_team")
-  reports_products  reports_products[]
+  id               Int                @id @default(autoincrement())
+  report_date      DateTime?          @db.Timestamptz(6)
+  team_id          Int?
+  furnace          Int?
+  shift            shift_type?
+  warehouse_check  Boolean?           @default(false)
+  start_time       DateTime?          @db.Timestamptz(6)
+  end_time         DateTime?          @db.Timestamptz(6)
+  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  production_check Boolean?           @default(false)
+  teams            teams?             @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productreport_team")
+  reports_products reports_products[]
 }
 
 model production_logs {
