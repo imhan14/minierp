@@ -18,7 +18,7 @@ const UserLayout = () => {
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="vi">
       <Box
         sx={{
           display: "flex",

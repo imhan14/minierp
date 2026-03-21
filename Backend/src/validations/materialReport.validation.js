@@ -16,9 +16,7 @@ const materialDetailSchema = Joi.object({
 });
 
 export const createMaterialReportSchema = Joi.object({
-  report_date: Joi.date().format("DD-MM-YYYY").required().messages({
-    "date.format": "Ngày báo cáo phải đúng định dạng DD-MM-YYYY",
-  }),
+  report_date: Joi.date().required(),
   team_id: Joi.number().integer().min(1).required(),
   shift: Joi.string().optional(),
   start_time: Joi.date().format("DD-MM-YYYY HH:mm").optional().messages({
@@ -41,9 +39,7 @@ export const createMaterialReportSchema = Joi.object({
 });
 
 export const updateMaterialReportSchema = Joi.object({
-  report_date: Joi.date().format("DD-MM-YYYY").optional().messages({
-    "date.format": "Ngày báo cáo phải đúng định dạng DD-MM-YYYY",
-  }),
+  report_date: Joi.date().optional(),
   team_id: Joi.number().integer().min(1).optional(),
   shift: Joi.string().optional(),
   start_time: Joi.date().format("DD-MM-YYYY HH:mm").optional().messages({

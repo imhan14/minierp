@@ -12,6 +12,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import type { FieldConfig } from "../types/FieldConfig";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import "dayjs/locale/vi";
+import dayjs from "dayjs";
 interface GeneralInfoSectionProps<T> {
   title: string;
   displayFields: FieldConfig<T>[];
@@ -100,30 +103,47 @@ const GeneralInfoSection = <T,>({
           return (
             <Grid size={currentGridSize} key={col.id.toString()}>
               {isFieldEditing ? (
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={col.label}
-                  type={
-                    col.inputType === "datetime-local"
-                      ? "datetime-local"
-                      : "text"
-                  }
-                  select={col.inputType === "select"}
-                  value={rawValue}
-                  onChange={(e) =>
-                    onGeneralChange?.(col.id as keyof T, e.target.value)
-                  }
-                  slotProps={{ inputLabel: { shrink: true } }}
-                  sx={{ ...col.sx }}
-                >
-                  {col.inputType === "select" &&
-                    col.options?.map((opt) => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                </TextField>
+                col.inputType === "datetime-local" ? (
+                  <DateTimePicker
+                    label={col.label}
+                    value={rawValue ? dayjs(rawValue as string) : null}
+                    onChange={(newValue) => {
+                      onGeneralChange?.(
+                        col.id as keyof T,
+                        newValue ? newValue.toISOString() : "",
+                      );
+                    }}
+                    format="DD/MM/YYYY HH:mm"
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        size: "small",
+                        placeholder: "dd/mm/yyyy --:--",
+                        sx: { ...col.sx },
+                      },
+                    }}
+                  />
+                ) : (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label={col.label}
+                    select={col.inputType === "select"}
+                    value={rawValue}
+                    onChange={(e) =>
+                      onGeneralChange?.(col.id as keyof T, e.target.value)
+                    }
+                    slotProps={{ inputLabel: { shrink: true } }}
+                    sx={{ ...col.sx }}
+                  >
+                    {col.inputType === "select" &&
+                      col.options?.map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                )
               ) : (
                 <TextField
                   fullWidth

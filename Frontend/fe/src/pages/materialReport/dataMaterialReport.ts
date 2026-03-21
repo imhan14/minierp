@@ -38,7 +38,7 @@ export const fetchIngredientData = async (
 };
 
 export const fetchAddNewReport = async (date?: Dayjs | null) => {
-  const dateParam = date?.isValid() ? date.format("DD-MM-YYYY") : "";
+  const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
   const payload = {
     team_id: 1,
     report_date: dateParam,

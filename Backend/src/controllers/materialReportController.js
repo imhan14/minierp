@@ -22,6 +22,7 @@ export const getMaterialReport = async (req, res) => {
     date: req.query.date ? req.query.date : undefined,
   };
   const materialReports = await getMaterialReportService(filters);
+
   res.status(200).json(materialReports);
 };
 
