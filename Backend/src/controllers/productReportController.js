@@ -26,7 +26,7 @@ export const getProductReport = async (req, res) => {
     search: req.query.search,
     date: req.query.date ? req.query.date : undefined,
   };
-  console.log(filters);
+
   const productReports = await getProductReportService(filters);
   res.status(200).json(productReports);
 };

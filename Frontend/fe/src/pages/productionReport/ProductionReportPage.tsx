@@ -23,6 +23,7 @@ import {
 } from "./dataProductionReport";
 import DynamicPopup from "../../components/DynamicPopup";
 import ProductionReportGeneralSection from "./components/ProductionReportGeneralSection";
+import ProductListDetail from "./components/ProductListDetail";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -169,9 +170,13 @@ const ProductionReportPage = () => {
           />
           <Divider sx={{ my: 3 }}>
             <Typography variant="subtitle1" fontWeight="bold" color="primary">
-              Ingredient List (Editable)
+              Products List
             </Typography>
           </Divider>
+          <ProductListDetail
+            product_id={rowId}
+            onSaveSuccess={() => console.log("")}
+          />
           {/* <MaterialDetailList material_id={rowId} />
           <Divider sx={{ my: 3 }}>
             <Typography variant="subtitle1" fontWeight="bold" color="primary">

@@ -117,14 +117,14 @@ model reports_products {
   id                    Int              @id @default(autoincrement())
   product_id            Int?
   report_id             Int?
-  weight_               Float?
   is_finish             Boolean?
   type_of_specification String?          @db.VarChar(20)
   product_line          String?
   specification         String?
-  start_time            DateTime?        @db.Time(6)
-  end_time              DateTime?        @db.Time(6)
-  note_                 String?
+  start_time            DateTime?        @db.Timestamptz(6)
+  end_time              DateTime?        @db.Timestamptz(6)
+  weight                Float?
+  note                  String?
   products              products?        @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reportproduct_products")
   product_reports       product_reports? @relation(fields: [report_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reportproduct_report")
 }
