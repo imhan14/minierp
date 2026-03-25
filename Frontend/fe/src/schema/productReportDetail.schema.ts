@@ -6,6 +6,8 @@ export interface ProductionReportDetailDisplay extends Omit<
   "products"
 > {
   product_name: string;
+  isNew?: boolean;
+  product_id: number;
 }
 
 export const productionReportDetailSchema: Record<
