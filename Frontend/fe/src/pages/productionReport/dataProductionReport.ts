@@ -18,14 +18,13 @@ export const fetchProductionReportData = async (date?: Dayjs | null) => {
       team_name: teams?.team_name || "N/A",
     };
   });
-  console.log(formattedData);
   return formattedData;
 };
-export const getProductionReportDetail = async (product_id: number | null) => {
+export const getProductionReportDetail = async (report_id: number | null) => {
   const response = await api.get<ProductReportDetailType[]>(
     `/product-report-detail`,
     {
-      params: { date: product_id },
+      params: { report_id: report_id },
     },
   );
   const formattedData: ProductionReportDetailDisplay[] = response.data.map(
@@ -33,12 +32,11 @@ export const getProductionReportDetail = async (product_id: number | null) => {
       const { products, ...rest } = item;
       return {
         ...rest,
-        team_id: products?.id,
-        team_name: products?.product_name || "N/A",
+        product_id: products?.id,
+        product_name: products?.product_name || "N/A",
       };
     },
   );
-  console.log(formattedData);
   return formattedData;
 };
 export const fetchAddNewReport = async (date?: Dayjs | null) => {

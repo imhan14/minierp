@@ -46,6 +46,7 @@ const ProductionReportPage = () => {
     useState<ProductionReportDisplay | null>(null);
   const [editGeneral, setEditGeneral] =
     useState<ProductionReportDisplay | null>(null);
+
   const productionReportColumns = useMemo(
     () => [
       { ...productionReportSchema.id },
@@ -160,7 +161,6 @@ const ProductionReportPage = () => {
           open={openDetail}
           onClose={handleCloseDetail}
           title={`Details: #${selectedProduct?.id}`}
-          enableSend={true}
         >
           <ProductionReportGeneralSection
             selectedMaterial={selectedProduct}
@@ -174,20 +174,9 @@ const ProductionReportPage = () => {
             </Typography>
           </Divider>
           <ProductListDetail
-            product_id={rowId}
-            onSaveSuccess={() => console.log("")}
+            report_id={rowId}
+            onSaveSuccess={() => fetchProductionReport(selectedDate)}
           />
-          {/* <MaterialDetailList material_id={rowId} />
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="subtitle1" fontWeight="bold" color="primary">
-              Other Ingredient
-            </Typography>
-          </Divider>
-          <OtherIngredient
-            material_id={selectedMaterial?.id}
-            extral_material={selectedMaterial}
-            onSaveSuccess={() => fetchMaterialReport(selectedDate)}
-          /> */}
         </DynamicPopup>
       </Box>
     </Box>
