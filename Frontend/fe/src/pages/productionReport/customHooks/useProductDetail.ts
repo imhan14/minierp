@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
 import { getProductionReportDetail } from "../dataProductionReport";
 import api from "../../../apis/axios";
+import dayjs from "dayjs";
 
 export const useProductDetail = (
   report_id: number | null,
@@ -32,10 +33,10 @@ export const useProductDetail = (
 
   const guardAction = (action: () => void) => {
     if (isDirty()) {
-      setPendingAction(() => action); // Lưu lại hành động định làm
-      setShowConfirmDialog(true); // Mở Dialog hỏi người dùng
+      setPendingAction(() => action);
+      setShowConfirmDialog(true);
     } else {
-      action(); // Không có thay đổi thì làm luôn
+      action();
     }
   };
 
@@ -138,15 +139,19 @@ export const useProductDetail = (
   };
   const saveEditing = async (row: ProductionReportDetailDisplay) => {
     try {
+      const isValidDate = (date: string | undefined) => {
+        const d = dayjs(date);
+        return d.isValid() ? d.format("DD-MM-YYYY HH:mm") : undefined;
+      };
       const payload = {
         product_id: Number(row.product_id) || undefined,
         report_id: report_id || undefined,
-        is_finish: String(row.is_finish) === "true" || undefined,
+        is_finish: String(row.is_finish) || undefined,
         type_of_specification: row.type_of_specification || undefined,
         product_line: row.product_line || undefined,
         specification: row.specification || undefined,
-        start_time: row.start_time || undefined,
-        end_time: row.end_time || undefined,
+        start_time: isValidDate(row.start_time),
+        end_time: isValidDate(row.end_time),
         weight: Number(row.weight) || undefined,
         note: row.note || undefined,
       };

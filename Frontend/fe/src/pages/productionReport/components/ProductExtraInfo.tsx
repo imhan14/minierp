@@ -34,7 +34,7 @@ export const ProductExtraInfo = ({
             size="small"
             type="text"
             disabled={!isEditing}
-            value={row.type_of_specification || 0}
+            value={row.type_of_specification || ""}
             onChange={(e) =>
               onChange(row.id, "type_of_specification", e.target.value)
             }
@@ -46,7 +46,7 @@ export const ProductExtraInfo = ({
             fullWidth
             size="small"
             disabled={!isEditing}
-            value={row.product_line || 0}
+            value={row.product_line || ""}
             onChange={(e) => onChange(row.id, "product_line", e.target.value)}
           />
         </Grid>
@@ -56,7 +56,7 @@ export const ProductExtraInfo = ({
             fullWidth
             size="small"
             disabled={!isEditing}
-            value={row.specification || 0}
+            value={row.specification || ""}
             onChange={(e) => onChange(row.id, "specification", e.target.value)}
           />
         </Grid>

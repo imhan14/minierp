@@ -55,8 +55,8 @@ export const productDetailColumns = (
     render: (_: unknown, row: ProductionReportDetailDisplay) => {
       const isEditing = editingId === row.id;
       const isFinish = [
-        { label: "Đạt", value: "true" },
-        { label: "Không đạt", value: "false" },
+        { label: "Đạt", value: true },
+        { label: "Không đạt", value: false },
       ];
       return isEditing ? (
         <TextField

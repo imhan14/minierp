@@ -25,6 +25,7 @@ export const getProductReportDetailSercive = async (filters) => {
       weight: true,
       note: true,
     },
+    orderBy: { id: "asc" },
   });
 };
 
