@@ -1,13 +1,14 @@
-import { useState } from "react";
 import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import { Alert, Snackbar } from "@mui/material";
 import {
   productionReportSchema,
   type ProductionReportDisplay,
 } from "../../../schema/productionReport.schema";
 import type { FieldConfig } from "../../../types/FieldConfig";
 import dayjs from "dayjs";
-import api from "../../../apis/axios";
+import { useNotify } from "../../../hooks/useNotify";
+import productionReportApi from "../../../apis/productionReportApi";
+import { updateGeneralSchema } from "../../../validate/productionReport.validate";
+import { validatePayload } from "../../../utils/validate";
 
 interface Props {
   selectedMaterial: ProductionReportDisplay | null;
@@ -22,19 +23,8 @@ const ProductionReportGeneralSection = ({
   editGeneral,
   onEditGeneral,
 }: Props) => {
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const notify = useNotify();
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
   const fieldsDetail: FieldConfig<ProductionReportDisplay>[] = [
     { ...productionReportSchema.team_name, gridSize: { md: 3 } },
     {
@@ -86,6 +76,15 @@ const ProductionReportGeneralSection = ({
     }
   };
   const handleSave = async () => {
+    if (!editGeneral) return;
+    const { isValid, message } = validatePayload(
+      updateGeneralSchema,
+      editGeneral,
+    );
+    if (!isValid) {
+      onEditGeneral(selectedMaterial);
+      return notify(message || "Dữ liệu không hợp lệ", "error");
+    }
     try {
       const isValidDate = (date: string | undefined) => {
         const d = dayjs(date);
@@ -97,21 +96,14 @@ const ProductionReportGeneralSection = ({
         end_time: isValidDate(editGeneral?.end_time),
         shift: editGeneral?.shift ?? undefined,
       };
-      await api.patch(`/product-report/${editGeneral?.id}`, payload);
-      setSnackbar({
-        open: true,
-        message: "Cập nhật dữ liệu thành công!",
-        severity: "success",
-      });
+
+      await productionReportApi.updateProductReport(editGeneral?.id, payload);
+      notify("Cập nhật dữ liệu thành công!", "success");
       onSaveSuccess();
     } catch (err) {
       console.error("Save error:", err);
       onEditGeneral(selectedMaterial);
-      setSnackbar({
-        open: true,
-        message: "Lỗi khi nhập dữ liệu!",
-        severity: "error",
-      });
+      notify("Lỗi khi nhập dữ liệu!", "error");
     }
   };
   return (
@@ -124,21 +116,6 @@ const ProductionReportGeneralSection = ({
         onSave={handleSave}
         onCancel={() => onEditGeneral(selectedMaterial)}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { Box, Grid, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Grid, TextField, Typography } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import type { ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
@@ -14,6 +14,23 @@ export const ProductExtraInfo = ({
   isEditing,
   onChange,
 }: ProductExtraInfoProps) => {
+  const typeOfSpecOptions = ["25Kg", "50Kg"];
+  const productLineOptions = ["Trộn", "1 hạt", "Sang bao"];
+  const specificationOptions = ["Đen", "Thành phẩm"];
+
+  const textFields = [
+    {
+      label: "Type of specification",
+      key: "type_of_specification",
+      type: "select",
+    },
+    { label: "Product Line", key: "product_line", type: "select" },
+    { label: "Specification", key: "specification", type: "select" },
+    { label: "Start Time", key: "start_time", type: "date" },
+    { label: "End Time", key: "end_time", type: "date" },
+    { label: "Ghi chú chính", key: "note", type: "text" },
+  ];
+
   return (
     <Box
       sx={{
@@ -27,93 +44,77 @@ export const ProductExtraInfo = ({
         Thông tin chi tiết sản phẩm
       </Typography>
       <Grid container spacing={2}>
-        <Grid size={4}>
-          <TextField
-            label="Type of specification"
-            fullWidth
-            size="small"
-            type="text"
-            disabled={!isEditing}
-            value={row.type_of_specification || ""}
-            onChange={(e) =>
-              onChange(row.id, "type_of_specification", e.target.value)
-            }
-          />
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            label="Product Line"
-            fullWidth
-            size="small"
-            disabled={!isEditing}
-            value={row.product_line || ""}
-            onChange={(e) => onChange(row.id, "product_line", e.target.value)}
-          />
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            label="Specification"
-            fullWidth
-            size="small"
-            disabled={!isEditing}
-            value={row.specification || ""}
-            onChange={(e) => onChange(row.id, "specification", e.target.value)}
-          />
-        </Grid>
-        <Grid size={4}>
-          <DateTimePicker
-            label="Start Time"
-            value={row.start_time ? dayjs(row.start_time as string) : null}
-            disabled={!isEditing}
-            onChange={(newValue) => {
-              onChange?.(
-                row.id,
-                "start_time",
-                newValue ? newValue.toISOString() : "",
-              );
-            }}
-            format="DD/MM/YYYY HH:mm"
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                size: "small",
-                placeholder: "dd/mm/yyyy --:--",
-              },
-            }}
-          />
-        </Grid>
-        <Grid size={4}>
-          <DateTimePicker
-            label="End Time"
-            value={row.end_time ? dayjs(row.end_time as string) : null}
-            disabled={!isEditing}
-            onChange={(newValue) => {
-              onChange?.(
-                row.id,
-                "end_time",
-                newValue ? newValue.toISOString() : "",
-              );
-            }}
-            format="DD/MM/YYYY HH:mm"
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                size: "small",
-                placeholder: "dd/mm/yyyy --:--",
-              },
-            }}
-          />
-        </Grid>
-        <Grid size={4}>
-          <TextField
-            label="Ghi chú chính"
-            fullWidth
-            size="small"
-            disabled={!isEditing}
-            value={row.note || ""}
-            onChange={(e) => onChange(row.id, "note", e.target.value)}
-          />
-        </Grid>
+        {textFields.map((field) => (
+          <Grid size={4} key={field.key}>
+            {field.type === "text" && (
+              <TextField
+                label={field.label}
+                fullWidth
+                size="small"
+                disabled={!isEditing}
+                value={
+                  row[field.key as keyof ProductionReportDetailDisplay] || ""
+                }
+                onChange={(e) => onChange(row.id, field.key, e.target.value)}
+              />
+            )}
+            {field.type === "select" && (
+              <Autocomplete
+                freeSolo
+                fullWidth
+                size="small"
+                disabled={!isEditing}
+                options={
+                  (field.key === "type_of_specification" &&
+                    typeOfSpecOptions) ||
+                  (field.key === "product_line" && productLineOptions) ||
+                  (field.key === "specification" && specificationOptions) ||
+                  []
+                }
+                value={
+                  (row[
+                    field.key as keyof ProductionReportDetailDisplay
+                  ] as string) || ""
+                }
+                onInputChange={(_, newValue) => {
+                  onChange(row.id, field.key, newValue);
+                }}
+                onChange={(_, newValue) => {
+                  onChange(row.id, field.key, newValue || "");
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label={field.label} />
+                )}
+              />
+            )}
+            {field.type === "date" && (
+              <DateTimePicker
+                label={field.label}
+                value={
+                  row[field.key as keyof ProductionReportDetailDisplay]
+                    ? dayjs(
+                        row[
+                          field.key as keyof ProductionReportDetailDisplay
+                        ] as string,
+                      )
+                    : null
+                }
+                disabled={!isEditing}
+                format="DD/MM/YYYY HH:mm"
+                onChange={(val) =>
+                  onChange(row.id, field.key, val ? val.toISOString() : "")
+                }
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "small",
+                    placeholder: "dd/mm/yyyy --:--",
+                  },
+                }}
+              />
+            )}
+          </Grid>
+        ))}
       </Grid>
     </Box>
   );

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import type { ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
-import { getProductionReportDetail } from "../dataProductionReport";
-import api from "../../../apis/axios";
 import dayjs from "dayjs";
+import { useNotify } from "../../../hooks/useNotify";
+import productionReportDetailApi from "../../../apis/productionReportDetailApi";
+import productionApi from "../../../apis/productionApi";
+import type { ProductType } from "../../../types/ProductType";
 
 export const useProductDetail = (
   report_id: number | null,
@@ -14,16 +16,12 @@ export const useProductDetail = (
   const [error, setError] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | string | null>(null);
-  const [productOptions, setProductOptions] = useState([]);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success" as "success" | "error",
-  });
+  const [productOptions, setProductOptions] = useState<ProductType[]>([]);
   const [originalData, setOriginalData] =
     useState<ProductionReportDetailDisplay | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+  const notify = useNotify();
 
   const isDirty = () => {
     if (!editingId) return false;
@@ -39,18 +37,36 @@ export const useProductDetail = (
       action();
     }
   };
+  const getAllProductionReportDetail = async (report_id: number | null) => {
+    const detail = await productionReportDetailApi.getAllProductionReportDetail(
+      {
+        report_id,
+      },
+    );
+    const formattedData: ProductionReportDetailDisplay[] = detail.data.map(
+      (item) => {
+        const { products, ...rest } = item;
+        return {
+          ...rest,
+          product_id: products?.id,
+          product_name: products?.product_name || "N/A",
+        };
+      },
+    );
+    return formattedData;
+  };
 
   const fetchData = async () => {
     if (!report_id) return;
     try {
-      const [details, products] = await Promise.all([
-        getProductionReportDetail(report_id),
-        api.get("/product").then((res) => res.data),
+      const [detail, options] = await Promise.all([
+        getAllProductionReportDetail(report_id),
+        productionApi.getAllProducts(),
       ]);
-      setEditProducts(details);
-      setProductOptions(products);
+      setEditProducts(detail);
+      setProductOptions(options.data);
     } catch (err) {
-      showSnackbar("Không thể tải dữ liệu", "error");
+      notify("Không thể tải dữ liệu", "error");
       console.error(err);
     }
   };
@@ -107,19 +123,16 @@ export const useProductDetail = (
     guardAction(async () => {
       if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) return;
       try {
-        await api.delete(`/product-report-detail/${row.id}`);
+        await productionReportDetailApi.deleteProductionReportDetailApi(row.id);
         setEditProducts((prev) => prev.filter((item) => item.id !== row.id));
-        showSnackbar("Xóa thành công!", "success");
+        notify("Xóa thành công!", "success");
         onSaveSuccess();
       } catch (error) {
-        showSnackbar("Lỗi khi xóa!", "error");
+        notify("Lỗi khi xóa!", "error");
         console.error(error);
       }
     });
   };
-
-  const showSnackbar = (message: string, severity: "success" | "error") =>
-    setSnackbar({ open: true, message, severity });
 
   const handleDetailChange = (
     id: number | string,
@@ -155,14 +168,19 @@ export const useProductDetail = (
         weight: Number(row.weight) || undefined,
         note: row.note || undefined,
       };
-      if (row.isNew) await api.post("/product-report-detail", payload);
-      else await api.patch(`/product-report-detail/${row.id}`, payload);
-
+      console.log(payload);
+      if (row.isNew)
+        await productionReportDetailApi.createProductionReportDetail(payload);
+      else
+        await productionReportDetailApi.updateProductionReportDetail(
+          row.id,
+          payload,
+        );
       setEditingId(null);
-      showSnackbar("Cập nhật thành công!", "success");
+      notify("Cập nhật thành công!", "success");
       onSaveSuccess();
     } catch (error) {
-      showSnackbar("Lỗi khi lưu dữ liệu!", "error");
+      notify("Lỗi khi lưu dữ liệu!", "error");
       console.error(error);
     }
   };
@@ -170,7 +188,7 @@ export const useProductDetail = (
   const getProductList = async () => {
     try {
       setDetailLoading(true);
-      setEditProducts(await getProductionReportDetail(report_id));
+      setEditProducts(await getAllProductionReportDetail(report_id));
       setError(null);
     } catch (err) {
       setError("Không thể tải dữ liệu.");
@@ -179,23 +197,6 @@ export const useProductDetail = (
       setDetailLoading(false);
     }
   };
-  // const handleDeleteRow = async (row: ProductionReportDetailDisplay) => {
-  //   if (!window.confirm("Bạn có chắc chắn muốn xóa nguyên liệu này?")) return;
-  //   try {
-  //     const updatedList = editProducts.filter((item) => item.id !== row.id);
-  //     await api.delete(`/product-report-detail/${row.id}`);
-  //     setEditProducts(updatedList);
-  //     setSnackbar({
-  //       open: true,
-  //       message: "Xóa thành công!",
-  //       severity: "success",
-  //     });
-  //     onSaveSuccess();
-  //   } catch (error) {
-  //     setSnackbar({ open: true, message: "Lỗi khi xóa!", severity: "error" });
-  //     console.error(error);
-  //   }
-  // };
   return {
     showConfirmDialog,
     setShowConfirmDialog,
@@ -211,8 +212,6 @@ export const useProductDetail = (
     editingId,
     setEditingId,
     productOptions,
-    snackbar,
-    setSnackbar,
     handleDetailChange,
     saveEditing,
     handleDeleteRow: deleteRowWithGuard,

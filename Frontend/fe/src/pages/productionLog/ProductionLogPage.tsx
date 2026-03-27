@@ -5,7 +5,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -17,11 +17,8 @@ import {
   type ProductionReportDisplay,
 } from "../../schema/productionReport.schema";
 import type { FieldConfig } from "../../types/FieldConfig";
+
 import DynamicPopup from "../../components/DynamicPopup";
-import ProductionReportGeneralSection from "./components/ProductionReportGeneralSection";
-import ProductListDetail from "./components/ProductListDetail";
-import { useProductionReportData } from "./customHooks/useProductionReportData";
-import { useProductionReportForm } from "./customHooks/useProductionReportForm";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -31,22 +28,19 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const ProductionReportPage = () => {
+const ProductionLogPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const { productionReports, error, loading, fetchProductionReport } =
-    useProductionReportData(selectedDate);
-  const { isSubmitting, handleAddNewReport } = useProductionReportForm(
-    selectedDate,
-    () => fetchProductionReport(selectedDate),
-  );
-
   const [rowId, setRowId] = useState<number | null>(null);
+  const [productionReports, setProductionReports] = useState<
+    ProductionReportDisplay[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedProduct, setSelectedProduct] =
     useState<ProductionReportDisplay | null>(null);
   const [editGeneral, setEditGeneral] =
     useState<ProductionReportDisplay | null>(null);
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   const productionReportColumns = useMemo(
     () => [
@@ -91,6 +85,17 @@ const ProductionReportPage = () => {
       setSelectedProduct(null);
     }, 300);
   };
+  const handleAddNewReport = async () => {
+    try {
+      setLoading(true);
+      //   await fetchAddNewReport(selectedDate);
+      await fetchProductionReport(selectedDate);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   const actions = (): ActionConfig<ProductionReportDisplay>[] => {
     return [
       {
@@ -101,6 +106,21 @@ const ProductionReportPage = () => {
       },
     ];
   };
+  const fetchProductionReport = useCallback(async (date?: Dayjs | null) => {
+    try {
+      setLoading(true);
+      //   setProductionReports(await fetchProductionReportData(date));
+      setError(null);
+    } catch (err) {
+      setError("Không thể tải dữ liệu.");
+      console.error("API Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useEffect(() => {
+    fetchProductionReport(selectedDate);
+  }, [selectedDate, fetchProductionReport]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -113,16 +133,14 @@ const ProductionReportPage = () => {
       <DrawerHeader />
       <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       <Box sx={{}}>
-        {currentUser.role < 8 && (
-          <Button
-            variant="contained"
-            sx={{ marginBottom: 1 }}
-            onClick={handleAddNewReport}
-          >
-            Add new Report
-          </Button>
-        )}
-        {loading || isSubmitting ? (
+        <Button
+          variant="contained"
+          sx={{ marginBottom: 1 }}
+          onClick={handleAddNewReport}
+        >
+          Add new Report
+        </Button>
+        {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
             <CircularProgress />
           </Box>
@@ -134,7 +152,7 @@ const ProductionReportPage = () => {
             getRowKey={(row) => row.id}
           />
         )}
-        <DynamicPopup
+        {/* <DynamicPopup
           open={openDetail}
           onClose={handleCloseDetail}
           title={`Details: #${selectedProduct?.id}`}
@@ -154,10 +172,10 @@ const ProductionReportPage = () => {
             report_id={rowId}
             onSaveSuccess={() => fetchProductionReport(selectedDate)}
           />
-        </DynamicPopup>
+        </DynamicPopup> */}
       </Box>
     </Box>
   );
 };
 
-export default ProductionReportPage;
+export default ProductionLogPage;

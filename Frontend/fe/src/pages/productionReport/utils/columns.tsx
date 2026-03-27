@@ -33,7 +33,7 @@ export const productDetailColumns = (
           }}
           onChange={(_, newValue) => {
             if (newValue && typeof newValue !== "string") {
-              onFieldChange(row.id, "product_id", newValue.id);
+              onFieldChange(row.id, "product_id", String(newValue.id));
               onFieldChange(row.id, "product_name", newValue.product_name);
             } else {
               onFieldChange(row.id, "product_id", null);
@@ -55,16 +55,22 @@ export const productDetailColumns = (
     render: (_: unknown, row: ProductionReportDetailDisplay) => {
       const isEditing = editingId === row.id;
       const isFinish = [
-        { label: "Đạt", value: true },
-        { label: "Không đạt", value: false },
+        { label: "Đạt", value: "true" },
+        { label: "Không đạt", value: "false" },
       ];
+      const currentValue =
+        row.is_finish === true || String(row.is_finish) === "true"
+          ? "true"
+          : row.is_finish === false || row.is_finish === "false"
+            ? "false"
+            : "";
       return isEditing ? (
         <TextField
           size="small"
           select
           fullWidth
           disabled={editingId !== row.id}
-          value={String(row.is_finish) || ""}
+          value={currentValue}
           onChange={(e) => onFieldChange(row.id, "is_finish", e.target.value)}
         >
           {isFinish.map((opt) => (
@@ -75,9 +81,9 @@ export const productDetailColumns = (
         </TextField>
       ) : (
         <span>
-          {row.is_finish === true
+          {currentValue === "true"
             ? "Đạt"
-            : row.is_finish === false
+            : currentValue === "false"
               ? "Không đạt"
               : "-"}
         </span>
@@ -90,6 +96,7 @@ export const productDetailColumns = (
       const isEditing = editingId === row.id;
       return isEditing ? (
         <TextField
+          type="number"
           size="small"
           fullWidth
           value={row.weight || ""}

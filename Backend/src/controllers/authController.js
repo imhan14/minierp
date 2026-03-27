@@ -22,6 +22,7 @@ export const login = async (req, res) => {
       username: user.username,
       full_name: user.full_name,
       role: user.role_id,
+      is_active: user.is_active,
       team_id: user.team_id,
     },
   });
