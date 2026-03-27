@@ -13,7 +13,6 @@ import { styled } from "@mui/material/styles";
 import dayjs, { Dayjs } from "dayjs";
 import DataTable, { type ActionConfig } from "../components/DataTable";
 import type { FieldConfig } from "../types/FieldConfig";
-import api from "../apis/axios";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import Filters from "../components/Filters";
 import type { ProductOrderType } from "../types/ProductOrderType";
@@ -22,6 +21,8 @@ import DynamicPopup from "../components/DynamicPopup";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import { orderColumns } from "../schema/orders.schema";
+import productOrderApi from "../apis/productOrderApi";
+import formulaDetailApi from "../apis/formulaDetailApi";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -92,9 +93,7 @@ const OrderPage = () => {
     try {
       setLoading(true);
       const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
-      const response = await api.get<ProductOrderType[]>(`/product-order`, {
-        params: { date: dateParam },
-      });
+      const response = await productOrderApi.getAllOrders({ date: dateParam });
       const formattedData: OrderDisplay[] = response.data.map((item) => {
         const { teams, formulas, ...rest } = item;
         return {
@@ -119,8 +118,8 @@ const OrderPage = () => {
   const fetchFormulaDetail = async (formulaId: number) => {
     try {
       setDetailLoading(true);
-      const response = await api.get<FormulaDetailType[]>(`/formula-detail`, {
-        params: { formula_id: formulaId },
+      const response = await formulaDetailApi.getAllFormulaDetails({
+        formula_id: formulaId,
       });
       const formattedData: FormulaDetailDisplay[] = response.data.map(
         (item) => {

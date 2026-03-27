@@ -1,11 +1,4 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Skeleton,
-  Snackbar,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Skeleton, Typography } from "@mui/material";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import DataTable, { type ActionConfig } from "../../../components/DataTable";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -43,8 +36,6 @@ const ProductListDetail = ({
     editingId,
     setEditingId,
     productOptions,
-    snackbar,
-    setSnackbar,
     handleDetailChange,
     saveEditing,
     handleDeleteRow,
@@ -55,9 +46,6 @@ const ProductListDetail = ({
     handleDetailChange,
   );
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
   const getDetailActions = (
     row: ProductionReportDetailDisplay,
   ): ActionConfig<ProductionReportDetailDisplay>[] => {
@@ -96,7 +84,7 @@ const ProductListDetail = ({
   const handleAddNewRow = () => {
     guardAction(() => {
       const newRow: ProductionReportDetailDisplay = {
-        product_id: -1,
+        product_id: 0,
         isNew: true,
         id: `new-${Date.now()}`,
         product_name: "",
@@ -163,21 +151,6 @@ const ProductListDetail = ({
         onDiscard={handleDiscardChanges}
         onSave={handleSaveAndContinue}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

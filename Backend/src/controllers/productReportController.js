@@ -9,23 +9,31 @@ import {
 } from "../services/productReportService";
 
 export const createProductReport = async (req, res) => {
-  var fields = ["team_id", "report_date"];
+  const { role } = req.users;
+  console.log(req.users);
+  const fields = ["team_id", "report_date"];
   let createData = {};
   fields.forEach((field) => {
     if (req.body[field] !== undefined) {
       createData[field] = req.body[field];
     }
   });
+  if (role > 7) throw new Error("Your role are not allowed.");
   const productReport = await createProductReportService(createData);
   res.status(201).json(productReport);
 };
 
 export const getProductReport = async (req, res) => {
+  const { role, team_id: userTeamId } = req.users;
+  const { id, search, date, team_id: queryTeamId } = req.query;
   const filters = {
-    id: req.query.id ? Number(req.query.id) : undefined,
-    search: req.query.search,
-    date: req.query.date ? req.query.date : undefined,
+    id: id ? Number(id) : undefined,
+    search: search ? search : undefined,
+    date: date ? date : undefined,
+    team_id: undefined,
   };
+  if (role >= 7) filters.team_id = Number(userTeamId);
+  else filters.team_id = queryTeamId ? Number(queryTeamId) : undefined;
 
   const productReports = await getProductReportService(filters);
   res.status(200).json(productReports);
@@ -34,14 +42,6 @@ export const getProductReport = async (req, res) => {
 export const updateProductReport = async (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) throw new Error("Invalid id.");
-  // const data = {};
-  // if(req.body.report_date) data.report_date = dayjs(req.body.report_date, "DD-MM-YYYY").toDate();
-  // if(req.body.team_id) data.team_id = Number(req.body.team_id)
-  // if(req.body.furnace) data.furnace = Number(req.body.furnace)
-  // if(req.body.shift) data.shift = req.body.shift
-  // if(req.body.start_time) data.start_time = dayjs(req.body.start_time, "DD-MM-YYYY HH:mm").toDate();
-  // if(req.body.end_time) data.end_time =dayjs(req.body.end_time, "DD-MM-YYYY HH:mm").toDate();
-
   const productReport = await updateProductReportService(id, req.body);
   res.status(200).json(productReport);
 };
