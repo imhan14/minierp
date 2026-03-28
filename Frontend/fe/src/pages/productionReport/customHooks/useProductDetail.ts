@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
 import dayjs from "dayjs";
 import { useNotify } from "../../../hooks/useNotify";
@@ -56,7 +56,7 @@ export const useProductDetail = (
     return formattedData;
   };
 
-  const fetchData = async () => {
+  const fetchProductDetailData = useCallback(async () => {
     if (!report_id) return;
     try {
       const [detail, options] = await Promise.all([
@@ -69,10 +69,10 @@ export const useProductDetail = (
       notify("Không thể tải dữ liệu", "error");
       console.error(err);
     }
-  };
+  }, [report_id, notify]);
   useEffect(() => {
-    fetchData();
-  }, [report_id]);
+    fetchProductDetailData();
+  }, [fetchProductDetailData]);
 
   const startEditing = (row: ProductionReportDetailDisplay) => {
     guardAction(() => {

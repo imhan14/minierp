@@ -5,7 +5,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Filters from "../../components/Filters";
 import type { Dayjs } from "dayjs";
@@ -15,14 +15,12 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import DynamicPopup from "../../components/DynamicPopup";
 import type { FieldConfig } from "../../types/FieldConfig";
 import { materialReportSchema } from "../../schema/materialReport.schema";
-import {
-  fetchAddNewReport,
-  fetchMaterialReportData,
-} from "./dataMaterialReport";
 import type { MaterialReportDisplay } from "../../schema/materialReport.schema";
 import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
 import MaterialDetailList from "./components/MaterialDetailList";
 import OtherIngredient from "./components/OtherIngredient";
+import { useMaterialReportData } from "./customHooks/useMaterialReportData";
+import useMaterialReportForm from "./customHooks/useMaterialReportForm";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -35,16 +33,16 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 const MaterialReportPage = () => {
   const [rowId, setRowId] = useState<number | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const [materialReports, setMaterialReports] = useState<
-    MaterialReportDisplay[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedMaterial, setSelectedMaterial] =
     useState<MaterialReportDisplay | null>(null);
   const [editGeneral, setEditGeneral] = useState<MaterialReportDisplay | null>(
     null,
+  );
+  const { loading, error, materialReports, getMaterialReport } =
+    useMaterialReportData(selectedDate);
+  const { handleAddNewReport } = useMaterialReportForm(selectedDate, () =>
+    getMaterialReport(selectedDate),
   );
 
   const materialReportColumns = useMemo(
@@ -103,33 +101,6 @@ const MaterialReportPage = () => {
     ];
   };
 
-  const fetchMaterialReport = useCallback(async (date?: Dayjs | null) => {
-    try {
-      setLoading(true);
-      setMaterialReports(await fetchMaterialReportData(date));
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu.");
-      console.error("API Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  const handleAddNewReport = async () => {
-    try {
-      setLoading(true);
-      await fetchAddNewReport(selectedDate);
-      await fetchMaterialReport(selectedDate);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMaterialReport(selectedDate);
-  }, [selectedDate, fetchMaterialReport]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -170,7 +141,7 @@ const MaterialReportPage = () => {
         >
           <MaterialReportGeneralSection
             selectedMaterial={selectedMaterial}
-            onSaveSuccess={() => fetchMaterialReport(selectedDate)}
+            onSaveSuccess={() => getMaterialReport(selectedDate)}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
@@ -188,7 +159,7 @@ const MaterialReportPage = () => {
           <OtherIngredient
             material_id={selectedMaterial?.id}
             extral_material={selectedMaterial}
-            onSaveSuccess={() => fetchMaterialReport(selectedDate)}
+            onSaveSuccess={() => getMaterialReport(selectedDate)}
           />
         </DynamicPopup>
       </Box>
