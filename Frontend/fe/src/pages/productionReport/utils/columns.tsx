@@ -41,8 +41,9 @@ export const productDetailColumns = (
             }
           }}
           value={
-            productOptions.find((p) => p.id === row.product_id) ||
-            row.product_name
+            (productOptions.find(
+              (p) => p.id === row.product_id,
+            ) as ProductType) || row.product_name
           }
         />
       ) : (

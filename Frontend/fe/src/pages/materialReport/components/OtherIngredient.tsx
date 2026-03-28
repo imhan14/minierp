@@ -120,7 +120,7 @@ const OtherIngredient = ({
         label: "Actions",
       },
     ],
-    [editingId, editIngredients],
+    [editingId],
   );
 
   const getDetailActions = (

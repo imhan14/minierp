@@ -47,11 +47,9 @@ const CollapsibleRow = <T,>({
   renderDetail?: (row: T) => React.ReactNode;
 }) => {
   const [open, setOpen] = useState(false);
-
   return (
     <>
       <TableRow hover key={getRowKey(row)}>
-        {/* Nút đóng mở ở đầu dòng */}
         {renderDetail && (
           <TableCell sx={{ width: 50 }}>
             <IconButton size="small" onClick={() => setOpen(!open)}>
@@ -59,7 +57,6 @@ const CollapsibleRow = <T,>({
             </IconButton>
           </TableCell>
         )}
-
         {columns.map((column) => {
           if (column.id === "actions") {
             const rowActions = actions ? actions(row) : [];
@@ -94,7 +91,6 @@ const CollapsibleRow = <T,>({
               </TableCell>
             );
           }
-
           const value = row[column.id as keyof T];
           return (
             <TableCell
@@ -110,8 +106,6 @@ const CollapsibleRow = <T,>({
           );
         })}
       </TableRow>
-
-      {/* Phần hiển thị chi tiết 10 trường khi nhấn mở rộng */}
       {renderDetail && (
         <TableRow>
           <TableCell
@@ -171,62 +165,6 @@ const DataTable = <T,>({
                 getRowKey={getRowKey}
                 renderDetail={renderDetail}
               />
-              // <TableRow key={getRowKey(row)} hover>
-              //   {columns.map((column) => {
-              //     if (column.id === "actions") {
-              //       const rowActions = actions ? actions(row) : [];
-              //       return (
-              //         <TableCell key="actions" align={column.align || "left"}>
-              //           <Stack direction="row" spacing={1}>
-              //             {rowActions.map((action, index) => (
-              //               <Tooltip key={index} title={action.label}>
-              //                 <span>
-              //                   {action.icon ? (
-              //                     <IconButton
-              //                       size="small"
-              //                       color={action.color || "primary"}
-              //                       onClick={() => action.onClick(row)}
-              //                     >
-              //                       {action.icon}
-              //                     </IconButton>
-              //                   ) : (
-              //                     <Button
-              //                       variant="contained"
-              //                       size="small"
-              //                       color={action.color || "primary"}
-              //                       onClick={() => action.onClick(row)}
-              //                     >
-              //                       {action.label}
-              //                     </Button>
-              //                   )}
-              //                 </span>
-              //               </Tooltip>
-              //             ))}
-              //           </Stack>
-              //         </TableCell>
-              //       );
-              //     }
-
-              //     const value = row[column.id as keyof T];
-              //     return (
-              //       <TableCell
-              //         key={column.id.toString()}
-              //         align={column.align || "left"}
-              //         sx={{
-              //           whiteSpace: column.noWrap ? "nowrap" : "normal",
-              //           overflow: column.noWrap ? "hidden" : "visible",
-              //           textOverflow: column.noWrap ? "ellipsis" : "clip",
-              //           maxWidth: column.width,
-              //         }}
-              //         title={String(value)}
-              //       >
-              //         {column.render
-              //           ? column.render(value, row)
-              //           : String(value ?? "")}
-              //       </TableCell>
-              //     );
-              //   })}
-              // </TableRow>
             ))
           ) : (
             <TableRow>

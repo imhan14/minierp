@@ -5,9 +5,8 @@ import {
 } from "../../../schema/materialReport.schema";
 import dayjs from "dayjs";
 import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import api from "../../../apis/axios";
-import { useState } from "react";
-import { Alert, Snackbar } from "@mui/material";
+import { useNotify } from "../../../hooks/useNotify";
+import materialReportApi from "../../../apis/materialReportApi";
 
 interface Props {
   selectedMaterial: MaterialReportDisplay | null;
@@ -22,19 +21,7 @@ const MaterialReportGeneralSection = ({
   editGeneral,
   onEditGeneral,
 }: Props) => {
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const notify = useNotify();
   const fieldsDetail: FieldConfig<MaterialReportDisplay>[] = [
     { ...materialReportSchema.team_name, gridSize: { md: 4 } },
     {
@@ -96,21 +83,14 @@ const MaterialReportGeneralSection = ({
         end_time: isValidDate(editGeneral?.end_time),
         shift: editGeneral?.shift ?? undefined,
       };
-      await api.patch(`/material-report/${editGeneral?.id}`, payload);
-      setSnackbar({
-        open: true,
-        message: "Cập nhật dữ liệu thành công!",
-        severity: "success",
-      });
+      await materialReportApi.updateMaterialReport(editGeneral?.id, payload);
+
+      notify("Cập nhật thành công", "success");
       onSaveSuccess();
     } catch (err) {
       console.error("Save error:", err);
       onEditGeneral(selectedMaterial);
-      setSnackbar({
-        open: true,
-        message: "Lỗi khi nhập dữ liệu!",
-        severity: "error",
-      });
+      notify("Cập nhật thất bại!", "error");
     }
   };
   return (
@@ -123,21 +103,6 @@ const MaterialReportGeneralSection = ({
         onSave={handleSave}
         onCancel={() => onEditGeneral(selectedMaterial)}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

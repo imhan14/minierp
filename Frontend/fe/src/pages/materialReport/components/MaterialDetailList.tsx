@@ -1,53 +1,48 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import DataTable, { type ActionConfig } from "../../../components/DataTable";
 import {
   materialDetailSchema,
   type MaterialDetailDisplay,
 } from "../../../schema/materialDetail.schema";
-import {
-  Alert,
-  Skeleton,
-  Snackbar,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Skeleton, TextField, Typography } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { fetchIngredientData } from "../dataMaterialReport";
-import api from "../../../apis/axios";
+import useMaterialReportDetailData from "../customHooks/useMaterialReportDetailData";
+import useMaterialReportDetailForm from "../customHooks/useMaterialReportDetailForm";
 
 interface MaterialDetailListProps {
   material_id: number | null;
 }
 
 const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
-  const [error, setError] = useState<string | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [originalData, setOriginalData] =
-    useState<MaterialDetailDisplay | null>(null);
-  const [editIngredients, setEditIngredients] = useState<
-    MaterialDetailDisplay[]
-  >([]);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const {
+    detailLoading,
+    error,
+    editIngredients,
+    fetchMaterialReportDetail,
+    setEditIngredients,
+  } = useMaterialReportDetailData();
+  const { editingId, saveEditing, startEditing, cancelEditing } =
+    useMaterialReportDetailForm(setEditIngredients);
+
+  const handleIngredientChange = useCallback(
+    (id: number, field: keyof MaterialDetailDisplay, value: string) => {
+      setEditIngredients((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, [field]: value } : item,
+        ),
+      );
+    },
+    [setEditIngredients],
+  );
+
   const materialDetailColumns = useMemo(
     () => [
       { ...materialDetailSchema.ingredient_name },
       {
         ...materialDetailSchema.weight,
-        render: (_, row) => (
+        render: (_: unknown, row: MaterialDetailDisplay) => (
           <TextField
             size="small"
             type="number"
@@ -66,7 +61,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
       },
       {
         ...materialDetailSchema.real_percent,
-        render: (_, row) => (
+        render: (_: unknown, row: MaterialDetailDisplay) => (
           <TextField
             size="small"
             disabled={editingId !== row.id}
@@ -79,7 +74,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
       },
       {
         ...materialDetailSchema.note,
-        render: (_, row) => (
+        render: (_: unknown, row: MaterialDetailDisplay) => (
           <TextField
             size="small"
             fullWidth
@@ -96,107 +91,42 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
         label: "Actions",
       },
     ],
-    [editingId],
+    [editingId, handleIngredientChange],
   );
 
-  const getDetailActions = (
-    row: MaterialDetailDisplay,
-  ): ActionConfig<MaterialDetailDisplay>[] => {
-    if (editingId === row.id) {
+  const getDetailActions = useCallback(
+    (row: MaterialDetailDisplay): ActionConfig<MaterialDetailDisplay>[] => {
+      if (editingId === row.id) {
+        return [
+          {
+            label: "Save",
+            icon: <DoneOutlinedIcon />,
+            color: "success",
+            onClick: (row) => saveEditing(row),
+          },
+          {
+            label: "Cancel",
+            icon: <CloseOutlinedIcon />,
+            color: "error",
+            onClick: () => cancelEditing(),
+          },
+        ];
+      }
       return [
         {
-          label: "Save",
-          icon: <DoneOutlinedIcon />,
-          color: "success",
-          onClick: (row) => saveEditing(row),
-        },
-        {
-          label: "Cancel",
-          icon: <CloseOutlinedIcon />,
-          color: "error",
-          onClick: () => cancelEditing(),
+          label: "Edit",
+          icon: <EditOutlinedIcon />,
+          color: "primary",
+          onClick: (row) => startEditing(row),
         },
       ];
-    }
-    return [
-      {
-        label: "Edit",
-        icon: <EditOutlinedIcon />,
-        color: "primary",
-        onClick: (row) => startEditing(row),
-      },
-    ];
-  };
+    },
+    [saveEditing, startEditing, cancelEditing, editingId],
+  );
 
-  const handleIngredientChange = (
-    id: number,
-    field: keyof MaterialDetailDisplay,
-    value: string,
-  ) => {
-    setEditIngredients((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    );
-  };
-
-  const startEditing = (row: MaterialDetailDisplay) => {
-    if (editingId !== null && editingId !== row.id && originalData) {
-      setEditIngredients((prev) =>
-        prev.map((item) => (item.id === originalData.id ? originalData : item)),
-      );
-    }
-    setEditingId(row.id);
-    setOriginalData({ ...row });
-  };
-
-  const cancelEditing = () => {
-    if (originalData) {
-      setEditIngredients((prev) =>
-        prev.map((item) => (item.id === originalData.id ? originalData : item)),
-      );
-    }
-    setEditingId(null);
-    setOriginalData(null);
-  };
-
-  const saveEditing = async (row: MaterialDetailDisplay) => {
-    try {
-      const payload = {
-        weight: row?.weight,
-        real_percent: row?.real_percent,
-        note: row?.note,
-      };
-      await api.patch(`/material-detail/${row?.id}`, payload);
-      setEditingId(null);
-      setOriginalData(null);
-      setSnackbar({
-        open: true,
-        message: "Cập nhật dữ liệu thành công!",
-        severity: "success",
-      });
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "Lỗi khi nhập dữ liệu!",
-        severity: "error",
-      });
-      console.error("Update failed", error);
-    }
-  };
-  const fetchIngredient = async (material_id: number | null) => {
-    try {
-      setDetailLoading(true);
-      setEditIngredients(await fetchIngredientData(material_id));
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu.");
-      console.error("API Error:", err);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
   useEffect(() => {
-    fetchIngredient(material_id);
-  }, [material_id]);
+    fetchMaterialReportDetail(material_id);
+  }, [material_id, fetchMaterialReportDetail]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -214,21 +144,6 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
         actions={getDetailActions}
         getRowKey={(row) => row.id}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };
