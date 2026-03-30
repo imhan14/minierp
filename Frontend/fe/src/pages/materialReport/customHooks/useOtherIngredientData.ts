@@ -1,46 +1,38 @@
 import { useCallback, useState } from "react";
-import mateiralDetailApi from "../../../apis/materialDetailApi";
-import type { MaterialDetailDisplay } from "../../../schema/materialDetail.schema";
+// import mateiralDetailApi from "../../../apis/materialDetailApi";
+// import type { MaterialDetailDisplay } from "../../../schema/materialDetail.schema";
+import type { MaterialReportDisplay } from "../../../schema/materialReport.schema";
+import type { ExtraMaterialsJson } from "../../../types/MaterialReportType";
 
-const useOtherIngredientData = () => {
+const useOtherIngredientData = (
+  extral_material: MaterialReportDisplay | null,
+) => {
   const [error, setError] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [editIngredients, setEditIngredients] = useState<
-    MaterialDetailDisplay[]
-  >([]);
-
-  const getMaterialReportDetail = async (
-    material_id: number | null | undefined,
-  ) => {
-    const response = await mateiralDetailApi.getAllMaterialDetails({
-      material_id: material_id,
-    });
-    const formattedData: MaterialDetailDisplay[] = response.data.map((item) => {
-      const { ingredients, ...rest } = item;
-      return {
-        ...rest,
-        ingredient_name: ingredients?.ingredient_name,
-      };
-    });
-    return formattedData;
-  };
-  const fetchMaterialReportDetail = useCallback(
-    async (material_id: number | null | undefined) => {
-      try {
-        setDetailLoading(true);
-        setEditIngredients(await getMaterialReportDetail(material_id));
-        setError(null);
-      } catch (err) {
-        setError("Không thể tải dữ liệu.");
-        console.error("API Error:", err);
-      } finally {
-        setDetailLoading(false);
-      }
-    },
+  const [editIngredients, setEditIngredients] = useState<ExtraMaterialsJson[]>(
     [],
   );
+
+  const getOtherIngredients = useCallback(() => {
+    try {
+      setDetailLoading(true);
+      const materialsWithIds = (extral_material?.extral_materials || []).map(
+        (item, index) => ({
+          ...item,
+          id: item.id || `${extral_material?.id}-${index}`,
+        }),
+      );
+      setEditIngredients(materialsWithIds);
+      setError(null);
+    } catch (err) {
+      setError("Không thể tải dữ liệu.");
+      console.error("API Error:", err);
+    } finally {
+      setDetailLoading(false);
+    }
+  }, [extral_material]);
   return {
-    fetchMaterialReportDetail,
+    getOtherIngredients,
     error,
     detailLoading,
     editIngredients,
