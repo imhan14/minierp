@@ -1,4 +1,7 @@
-import type { MaterialReportType } from "../types/MaterialReportType";
+import type {
+  ExtraMaterialsJson,
+  MaterialReportType,
+} from "../types/MaterialReportType";
 import instance from "./axios";
 export interface MaterialReportFilters {
   date?: string;
@@ -10,6 +13,7 @@ export interface MaterialReportData {
   start_time?: string | undefined;
   end_time?: string | undefined;
   shift?: string | undefined;
+  extral_materials?: ExtraMaterialsJson[];
 }
 
 const materialReportApi = {
