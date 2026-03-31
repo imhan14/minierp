@@ -12,13 +12,17 @@ import dayjs from "dayjs";
 import Filters from "../../components/Filters";
 import DataTable, { type ActionConfig } from "../../components/DataTable";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import {
-  productionReportSchema,
-  type ProductionReportDisplay,
-} from "../../schema/productionReport.schema";
 import type { FieldConfig } from "../../types/FieldConfig";
 
 import DynamicPopup from "../../components/DynamicPopup";
+import type {
+  ProductionLogDisplay,
+  ProductionLogType,
+} from "../../types/ProductionLogType";
+import productionLogApi from "../../apis/productionLogApi";
+import { useProductionLogData } from "./customHooks/useProductionLogData";
+import { productionLogSchema } from "../../schema/productionLog.schema";
+import { useProductionLogForm } from "./customHooks/useProductionLogForm";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -31,49 +35,55 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 const ProductionLogPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [rowId, setRowId] = useState<number | null>(null);
-  const [productionReports, setProductionReports] = useState<
-    ProductionReportDisplay[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [productionReports, setProductionLog] = useState<
+  //   ProductionLogType[]
+  // >([]);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedProduct, setSelectedProduct] =
-    useState<ProductionReportDisplay | null>(null);
-  const [editGeneral, setEditGeneral] =
-    useState<ProductionReportDisplay | null>(null);
+    useState<ProductionLogDisplay | null>(null);
+  const [editGeneral, setEditGeneral] = useState<ProductionLogDisplay | null>(
+    null,
+  );
+  const { error, loading, productionLog, fetchProductionLog } =
+    useProductionLogData();
+  const { handleAddNewReport } = useProductionLogForm(selectedDate, () =>
+    fetchProductionLog(selectedDate),
+  );
 
-  const productionReportColumns = useMemo(
+  const productionLogColumns = useMemo(
     () => [
-      { ...productionReportSchema.id },
-      { ...productionReportSchema.team_name },
+      { ...productionLogSchema.id },
+      { ...productionLogSchema.team_name },
       {
-        ...productionReportSchema.report_date,
+        ...productionLogSchema.log_date,
         render: ((value: string) => {
           if (!value) return "-";
           return dayjs(value).format("DD/MM/YYYY");
-        }) as FieldConfig<ProductionReportDisplay>["render"],
+        }) as FieldConfig<ProductionLogDisplay>["render"],
       },
-      { ...productionReportSchema.shift },
-      { ...productionReportSchema.furnace },
+      { ...productionLogSchema.on_work },
       {
-        ...productionReportSchema.start_time,
+        ...productionLogSchema.log_start,
         render: ((value: string) => {
           if (!value) return "-";
           return dayjs(value).format("HH:mm");
-        }) as FieldConfig<ProductionReportDisplay>["render"],
+        }) as FieldConfig<ProductionLogDisplay>["render"],
       },
       {
-        ...productionReportSchema.end_time,
+        ...productionLogSchema.log_end,
         render: ((value: string) => {
           if (!value) return "-";
           return dayjs(value).format("HH:mm");
-        }) as FieldConfig<ProductionReportDisplay>["render"],
+        }) as FieldConfig<ProductionLogDisplay>["render"],
       },
       { id: "actions", label: "Actions" },
     ],
     [],
   );
-  const handleOpenDetail = (row: ProductionReportDisplay) => {
+
+  const handleOpenDetail = (row: ProductionLogDisplay) => {
     setSelectedProduct(row);
     setEditGeneral(row);
     setOpenDetail(true);
@@ -85,18 +95,8 @@ const ProductionLogPage = () => {
       setSelectedProduct(null);
     }, 300);
   };
-  const handleAddNewReport = async () => {
-    try {
-      setLoading(true);
-      //   await fetchAddNewReport(selectedDate);
-      await fetchProductionReport(selectedDate);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const actions = (): ActionConfig<ProductionReportDisplay>[] => {
+
+  const actions = (): ActionConfig<ProductionLogDisplay>[] => {
     return [
       {
         label: "Details",
@@ -106,21 +106,10 @@ const ProductionLogPage = () => {
       },
     ];
   };
-  const fetchProductionReport = useCallback(async (date?: Dayjs | null) => {
-    try {
-      setLoading(true);
-      //   setProductionReports(await fetchProductionReportData(date));
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu.");
-      console.error("API Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+
   useEffect(() => {
-    fetchProductionReport(selectedDate);
-  }, [selectedDate, fetchProductionReport]);
+    fetchProductionLog(selectedDate);
+  }, [selectedDate, fetchProductionLog]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -146,8 +135,8 @@ const ProductionLogPage = () => {
           </Box>
         ) : (
           <DataTable
-            columns={productionReportColumns}
-            data={productionReports}
+            columns={productionLogColumns}
+            data={productionLog}
             actions={actions}
             getRowKey={(row) => row.id}
           />
