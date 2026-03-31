@@ -1,8 +1,27 @@
+import dayjs from "dayjs";
 import { prisma } from "../../lib/prisma.ts";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const getProductionLogService = async (filters) => {
-  const {} = filters;
+  const { id, date } = filters;
+  let dateFilter = {};
+  if (date) {
+    const startOfDay = dayjs.utc(date).startOf("day").toISOString();
+    const endOfDay = dayjs.utc(date).endOf("day").toISOString();
+    dateFilter = {
+      gte: startOfDay,
+      lte: endOfDay,
+    };
+  }
   return await prisma.production_logs.findMany({
+    where: {
+      ...(id && { id: id }),
+      ...(date && { log_date: dateFilter }),
+    },
     select: {
       id: true,
       number_of_employee: true,
@@ -27,5 +46,11 @@ export const getProductionLogService = async (filters) => {
       },
     },
     orderBy: { id: "asc" },
+  });
+};
+
+export const createProductionLogService = async (data) => {
+  return await prisma.production_logs.create({
+    data: data,
   });
 };
