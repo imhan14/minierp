@@ -168,7 +168,6 @@ export const useProductDetail = (
         weight: Number(row.weight) || undefined,
         note: row.note || undefined,
       };
-      console.log(payload);
       if (row.isNew)
         await productionReportDetailApi.createProductionReportDetail(payload);
       else
