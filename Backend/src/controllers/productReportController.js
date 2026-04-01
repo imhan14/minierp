@@ -10,7 +10,6 @@ import {
 
 export const createProductReport = async (req, res) => {
   const { role } = req.users;
-  console.log(req.users);
   const fields = ["team_id", "report_date"];
   let createData = {};
   fields.forEach((field) => {

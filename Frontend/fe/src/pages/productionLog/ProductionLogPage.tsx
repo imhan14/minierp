@@ -5,7 +5,7 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
@@ -15,14 +15,11 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import type { FieldConfig } from "../../types/FieldConfig";
 
 import DynamicPopup from "../../components/DynamicPopup";
-import type {
-  ProductionLogDisplay,
-  ProductionLogType,
-} from "../../types/ProductionLogType";
-import productionLogApi from "../../apis/productionLogApi";
+import type { ProductionLogDisplay } from "../../types/ProductionLogType";
 import { useProductionLogData } from "./customHooks/useProductionLogData";
 import { productionLogSchema } from "../../schema/productionLog.schema";
 import { useProductionLogForm } from "./customHooks/useProductionLogForm";
+import ProductionLogGeneral from "./components/ProductionLogGeneral";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -35,11 +32,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 const ProductionLogPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [rowId, setRowId] = useState<number | null>(null);
-  // const [productionReports, setProductionLog] = useState<
-  //   ProductionLogType[]
-  // >([]);
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedProduct, setSelectedProduct] =
     useState<ProductionLogDisplay | null>(null);
@@ -141,27 +133,28 @@ const ProductionLogPage = () => {
             getRowKey={(row) => row.id}
           />
         )}
-        {/* <DynamicPopup
+        <DynamicPopup
           open={openDetail}
           onClose={handleCloseDetail}
           title={`Details: #${selectedProduct?.id}`}
         >
-          <ProductionReportGeneralSection
-            selectedMaterial={selectedProduct}
-            onSaveSuccess={() => fetchProductionReport(selectedDate)}
+          <ProductionLogGeneral
+            selectedLog={selectedProduct}
+            onSaveSuccess={() => fetchProductionLog(selectedDate)}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
+
           <Divider sx={{ my: 3 }}>
             <Typography variant="subtitle1" fontWeight="bold" color="primary">
               Products List
             </Typography>
           </Divider>
-          <ProductListDetail
+          {/* <ProductListDetail
             report_id={rowId}
             onSaveSuccess={() => fetchProductionReport(selectedDate)}
-          />
-        </DynamicPopup> */}
+          /> */}
+        </DynamicPopup>
       </Box>
     </Box>
   );

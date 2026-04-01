@@ -4,8 +4,12 @@ import { validate } from "../middlewares/validate.middleware";
 import {
   createProductionLog,
   getProductionLog,
+  updateProductionLog,
 } from "../controllers/productionLogController";
-import { createProductLogSchema } from "../validations/productionLog.validation";
+import {
+  createProductLogSchema,
+  updateProductLogSchema,
+} from "../validations/productionLog.validation";
 
 const router = express.Router();
 
@@ -15,6 +19,12 @@ router.post(
   authenticate,
   validate(createProductLogSchema),
   createProductionLog,
+);
+router.patch(
+  "/:id",
+  authenticate,
+  validate(updateProductLogSchema),
+  updateProductionLog,
 );
 
 export default router;

@@ -54,3 +54,10 @@ export const createProductionLogService = async (data) => {
     data: data,
   });
 };
+
+export const updateProductionLogService = async (id, data) => {
+  return await prisma.production_logs.update({
+    where: { id },
+    data: { data },
+  });
+};
