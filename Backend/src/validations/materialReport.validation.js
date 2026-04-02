@@ -42,9 +42,13 @@ export const updateMaterialReportSchema = Joi.object({
   report_date: Joi.date().optional(),
   team_id: Joi.number().integer().min(1).optional(),
   shift: Joi.string().optional(),
-  start_time: Joi.date().format("DD-MM-YYYY HH:mm").optional().messages({
-    "date.format": "Giờ bắt đầu phải đúng định dạng DD-MM-YYYY HH:mm",
-  }),
+  start_time: Joi.date()
+    .format("DD-MM-YYYY HH:mm")
+    .optional()
+    .messages({
+      "date.format": "Giờ bắt đầu phải đúng định dạng DD-MM-YYYY HH:mm",
+    })
+    .allow(null),
   end_time: Joi.date()
     .format("DD-MM-YYYY HH:mm")
     .greater(Joi.ref("start_time"))
@@ -52,7 +56,8 @@ export const updateMaterialReportSchema = Joi.object({
     .messages({
       "date.format": "Giờ kết thúc phải đúng định dạng DD-MM-YYYY HH:mm",
       "date.greater": "Giờ kết thúc phải lớn hơn giờ bắt đầu",
-    }),
+    })
+    .allow(null),
   extral_materials: Joi.array()
     .items(extraMaterialItemSchema)
     .allow(null)

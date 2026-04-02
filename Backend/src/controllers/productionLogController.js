@@ -14,6 +14,19 @@ export const getProductionLog = async (req, res) => {
 };
 
 export const createProductionLog = async (req, res) => {
+  const fields = ["team_id", "log_date"];
+  let createData = {};
+  fields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      createData[field] = req.body[field];
+    }
+  });
+  const productionLog = await createProductionLogService(createData);
+  res.status(201).json(productionLog);
+};
+
+export const updateProductionLog = async (req, res) => {
+  const id = Number(req.params.id);
   const fields = [
     "team_id",
     "log_date",
@@ -32,19 +45,6 @@ export const createProductionLog = async (req, res) => {
     "forklift",
     "shift_leader",
   ];
-  let createData = {};
-  fields.forEach((field) => {
-    if (req.body[field] !== undefined) {
-      createData[field] = req.body[field];
-    }
-  });
-  const productionLog = await createProductionLogService(createData);
-  res.status(201).json(productionLog);
-};
-
-export const updateProductionLog = async (req, res) => {
-  const id = Number(req.params.id);
-  const fields = ["team_id", "log_date"];
   let updateData = {};
   fields.forEach((field) => {
     if (req.body[field] !== undefined) {
