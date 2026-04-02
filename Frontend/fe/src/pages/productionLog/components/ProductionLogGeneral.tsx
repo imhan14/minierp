@@ -90,8 +90,8 @@ const ProductionLogGeneral = ({
       const payload = {
         electric_production: data?.electric_production ?? undefined,
         electric_mix: data?.electric_mix ?? undefined,
-        log_start: isValidDate(data?.log_start),
-        log_end: isValidDate(data?.log_end),
+        log_start: isValidDate(editGeneral?.log_start),
+        log_end: isValidDate(editGeneral?.log_end),
         number_of_employee: data?.number_of_employee ?? undefined,
         on_work: data?.on_work ?? undefined,
         unauthorized_absence: data?.unauthorized_absence ?? undefined,

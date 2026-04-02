@@ -5,21 +5,11 @@ const Joi = JoiBase.extend(JoiDate);
 export const createProductLogSchema = Joi.object({
   log_date: Joi.date().required(),
   team_id: Joi.number().integer().min(1).required(),
-  start_time: Joi.date().format("DD-MM-YYYY HH:mm").optional().messages({
-    "date.format": "Giờ bắt đầu phải đúng định dạng DD-MM-YYYY HH:mm",
-  }),
-  end_time: Joi.date()
-    .format("DD-MM-YYYY HH:mm")
-    .greater(Joi.ref("start_time"))
-    .optional()
-    .messages({
-      "date.format": "Giờ kết thúc phải đúng định dạng DD-MM-YYYY HH:mm",
-      "date.greater": "Giờ kết thúc phải lớn hơn giờ bắt đầu",
-    }),
 });
 
 export const updateProductLogSchema = Joi.object({
   log_start: Joi.date()
+    .format("DD-MM-YYYY HH:mm")
     .optional()
     .messages({
       "date.base": "Thời gian bắt đầu không hợp lệ",
@@ -27,7 +17,8 @@ export const updateProductLogSchema = Joi.object({
     })
     .allow(null),
   log_end: Joi.date()
-    .greater(Joi.ref("start_time"))
+    .format("DD-MM-YYYY HH:mm")
+    .greater(Joi.ref("log_start"))
     .optional()
     .messages({
       "date.base": "Thời gian kết thúc không hợp lệ",
@@ -40,7 +31,7 @@ export const updateProductLogSchema = Joi.object({
   number_of_employee: Joi.number().optional().allow(null),
   on_work: Joi.number().optional().allow(null),
   unauthorized_absence: Joi.string().optional().allow(null),
-  authorized_absence: Joi.number().optional().allow(null),
+  authorized_absence: Joi.string().optional().allow(null),
   ht_di: Joi.string().optional().allow(null),
   ht_den: Joi.string().optional().allow(null),
   forklift: Joi.string().optional().allow(null),

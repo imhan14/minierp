@@ -20,6 +20,7 @@ import { useProductionLogData } from "./customHooks/useProductionLogData";
 import { productionLogSchema } from "../../schema/productionLog.schema";
 import { useProductionLogForm } from "./customHooks/useProductionLogForm";
 import ProductionLogGeneral from "./components/ProductionLogGeneral";
+import ProductionLogDetail from "./components/ProductionLogDetail";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -150,10 +151,10 @@ const ProductionLogPage = () => {
               Products List
             </Typography>
           </Divider>
-          {/* <ProductListDetail
-            report_id={rowId}
-            onSaveSuccess={() => fetchProductionReport(selectedDate)}
-          /> */}
+          <ProductionLogDetail
+            log_id={rowId}
+            onSaveSuccess={() => fetchProductionLog(selectedDate)}
+          />
         </DynamicPopup>
       </Box>
     </Box>

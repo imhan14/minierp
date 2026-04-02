@@ -56,8 +56,13 @@ export const createProductionLogService = async (data) => {
 };
 
 export const updateProductionLogService = async (id, data) => {
+  const existingReport = await prisma.production_logs.findUnique({
+    where: { id: id },
+  });
+
+  if (!existingReport) throw new Error("Report không tồn tại");
   return await prisma.production_logs.update({
-    where: { id },
-    data: { data },
+    where: { id: id },
+    data: data,
   });
 };
