@@ -1,12 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNotify } from "../../../hooks/useNotify";
 import productionLogDetailApi from "../../../apis/productionLogDetailApi";
-import type { ProductReportDetailType } from "../../../types/ProductReportDetailType";
+import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
 
-export const useLogDetailData = (log_id: number | null) => {
+export const useLogDetailData = (
+  log_id: number | null,
+  setLogDetail: React.Dispatch<React.SetStateAction<ProductionLogDetailType[]>>,
+) => {
   const notify = useNotify();
-  const [logDetail, setLogDetail] = useState<ProductReportDetailType[]>([]);
-  const [deTailLoading, setDetailLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fetchLogDetailData = useCallback(async () => {
     if (!log_id) return;
@@ -24,7 +26,11 @@ export const useLogDetailData = (log_id: number | null) => {
     } finally {
       setDetailLoading(false);
     }
-  }, [log_id, notify]);
+  }, [log_id, notify, setLogDetail]);
 
-  return { fetchLogDetailData, logDetail, error, deTailLoading };
+  useEffect(() => {
+    fetchLogDetailData();
+  }, [log_id]);
+
+  return { fetchLogDetailData, error, detailLoading };
 };
