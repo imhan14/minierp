@@ -5,10 +5,15 @@ import {
 } from "../services/productionLogService";
 
 export const getProductionLog = async (req, res) => {
+  const { role_id, team_id: userTeamId } = req.users;
   const filters = {
     id: req.query.id ? Number(req.query.id) : undefined,
     date: req.query.date ? req.query.date : undefined,
+    team_id: undefined,
   };
+  if (role_id >= 7) filters.team_id = userTeamId;
+  else filters.team_id = req.query.req ? Number(req.query.req) : undefined;
+
   const productionLog = await getProductionLogService(filters);
   res.status(200).json(productionLog);
 };

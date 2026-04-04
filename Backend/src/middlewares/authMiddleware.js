@@ -15,6 +15,7 @@ export const authenticate = async (req, res, next) => {
         error: "Account not found!",
       });
     }
+
     req.users = {
       id: decoded.id,
       role_id: user.role_id,

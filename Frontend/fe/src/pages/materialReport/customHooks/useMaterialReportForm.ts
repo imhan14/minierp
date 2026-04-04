@@ -12,11 +12,12 @@ const useMaterialReportForm = (
   const handleAddNewReport = async () => {
     try {
       setIsSubmitting(true);
+      const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
       const dateParam = selectedDate?.isValid()
         ? selectedDate.format("YYYY-MM-DD")
         : "";
       const payload = {
-        team_id: 1,
+        team_id: currentUser?.team_id,
         report_date: dateParam,
       };
       await materialReportApi.createMaterialReport(payload);
