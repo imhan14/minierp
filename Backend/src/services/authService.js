@@ -1,14 +1,14 @@
-import { prisma } from '../../lib/prisma.ts';
+import { prisma } from "../../lib/prisma.ts";
 
 export const verifyRole = async (userData) => {
-    return await prisma.users.findUnique({
-        where: {id: userData.id},
-        select: {is_active: true, role_id: true}
-    });
+  return await prisma.users.findUnique({
+    where: { id: userData.id },
+    select: { is_active: true, role_id: true, team_id: true },
+  });
 };
 
 export const verifyUser = async (username) => {
-    return await prisma.users.findUnique({
-        where: {username}
-    });
+  return await prisma.users.findUnique({
+    where: { username },
+  });
 };

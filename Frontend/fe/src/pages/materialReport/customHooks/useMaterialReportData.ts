@@ -11,9 +11,11 @@ export const useMaterialReportData = (selectedDate?: Dayjs | null) => {
   >([]);
 
   const fetchMaterialReportData = async (date?: Dayjs | null) => {
+    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
     const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
     const response = await materialReportApi.getAllMaterialReports({
       date: dateParam,
+      team_id: currentUser?.team_id,
     });
     const formattedData: MaterialReportDisplay[] = response.data.map((item) => {
       const { teams, ...rest } = item;

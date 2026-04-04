@@ -5,6 +5,7 @@ import type {
 import instance from "./axios";
 export interface MaterialReportFilters {
   date?: string;
+  team_id?: number;
 }
 export interface MaterialReportData {
   team_id?: number;

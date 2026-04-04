@@ -17,12 +17,18 @@ export const createMaterialReport = async (req, res) => {
 };
 
 export const getMaterialReport = async (req, res) => {
+  const { role_id, team_id: userTeamId } = req.users;
+  const { id, search, date, team_id: queryTeamId } = req.query;
   const filters = {
-    id: req.query.id ? Number(req.query.id) : undefined,
-    date: req.query.date ? req.query.date : undefined,
+    id: id ? Number(id) : undefined,
+    search: search ? search : undefined,
+    date: date ? date : undefined,
+    team_id: undefined,
   };
-  const materialReports = await getMaterialReportService(filters);
+  if (role_id >= 7) filters.team_id = Number(userTeamId);
+  else filters.team_id = queryTeamId ? Number(queryTeamId) : undefined;
 
+  const materialReports = await getMaterialReportService(filters);
   res.status(200).json(materialReports);
 };
 

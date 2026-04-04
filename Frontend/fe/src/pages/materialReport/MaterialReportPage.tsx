@@ -41,8 +41,9 @@ const MaterialReportPage = () => {
   );
   const { loading, error, materialReports, getMaterialReport } =
     useMaterialReportData(selectedDate);
-  const { handleAddNewReport } = useMaterialReportForm(selectedDate, () =>
-    getMaterialReport(selectedDate),
+  const { handleAddNewReport, isSubmitting } = useMaterialReportForm(
+    selectedDate,
+    () => getMaterialReport(selectedDate),
   );
 
   const materialReportColumns = useMemo(
@@ -114,13 +115,15 @@ const MaterialReportPage = () => {
       <DrawerHeader />
       <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       <Box>
-        <Button
-          variant="contained"
-          sx={{ marginBottom: 1 }}
-          onClick={handleAddNewReport}
-        >
-          Add new Report
-        </Button>
+        {!isSubmitting && (
+          <Button
+            variant="contained"
+            sx={{ marginBottom: 1 }}
+            onClick={handleAddNewReport}
+          >
+            Add new Report
+          </Button>
+        )}
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
             <CircularProgress />

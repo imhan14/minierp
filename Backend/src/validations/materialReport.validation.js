@@ -17,7 +17,7 @@ const materialDetailSchema = Joi.object({
 
 export const createMaterialReportSchema = Joi.object({
   report_date: Joi.date().required(),
-  team_id: Joi.number().integer().min(1).required(),
+  team_id: Joi.number().integer().required(),
   shift: Joi.string().optional(),
   start_time: Joi.date().format("DD-MM-YYYY HH:mm").optional().messages({
     "date.format": "Giờ bắt đầu phải đúng định dạng DD-MM-YYYY HH:mm",
