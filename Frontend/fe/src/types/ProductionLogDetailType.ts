@@ -1,5 +1,5 @@
 export interface ProductionLogDetailType {
-  id: number;
+  id: number | string;
   production_log_id: number;
   start_time: string;
   end_time: string;
@@ -10,4 +10,5 @@ export interface ProductionLogDetailType {
   pkg_received: number;
   pkg_returned: number;
   pkg_damaged: number;
+  isNew?: boolean;
 }

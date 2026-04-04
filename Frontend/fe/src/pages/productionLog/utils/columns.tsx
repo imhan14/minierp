@@ -15,16 +15,18 @@ export const productLogDetailColumns = (
 ) => [
   {
     ...logDetailSchema.start_time,
+    gridSize: { md: 1 },
     render: (_: unknown, row: ProductionLogDetailType) => {
       const isEditing = editingId === row.id;
       return isEditing ? (
         <DateTimePicker
-          // label={row.label}
+          label={"Start Time"}
+          sx={{ width: 200 }}
           value={row.start_time ? dayjs(row.start_time) : null}
           disabled={!isEditing}
           format="DD/MM/YYYY HH:mm"
           onChange={(val) =>
-            onFieldChange(row.id, row.start_time, val ? val.toISOString() : "")
+            onFieldChange(row.id, "start_time", val ? val.toISOString() : "")
           }
           slotProps={{
             textField: {
@@ -35,7 +37,9 @@ export const productLogDetailColumns = (
           }}
         />
       ) : (
-        <span>{row.start_time}</span>
+        <span>
+          {row.start_time ? dayjs(row.start_time).format("DD/MM HH:mm") : "-"}
+        </span>
       );
     },
   },
@@ -45,12 +49,13 @@ export const productLogDetailColumns = (
       const isEditing = editingId === row.id;
       return isEditing ? (
         <DateTimePicker
-          // label={row.label}
-          value={row.start_time ? dayjs(row.end_time) : null}
+          sx={{ width: 200 }}
+          label={"End Time"}
+          value={row.end_time ? dayjs(row.end_time) : null}
           disabled={!isEditing}
           format="DD/MM/YYYY HH:mm"
           onChange={(val) =>
-            onFieldChange(row.id, row.end_time, val ? val.toISOString() : "")
+            onFieldChange(row.id, "end_time", val ? val.toISOString() : "")
           }
           slotProps={{
             textField: {
@@ -61,7 +66,9 @@ export const productLogDetailColumns = (
           }}
         />
       ) : (
-        <span>{row.end_time}</span>
+        <span>
+          {row.end_time ? dayjs(row.end_time).format("DD/MM HH:mm") : "-"}
+        </span>
       );
     },
   },
@@ -75,10 +82,12 @@ export const productLogDetailColumns = (
         { label: "Incident", value: "incident" },
         { label: "Other", value: "other" },
       ];
+
       return isEditing ? (
         <Autocomplete
+          freeSolo
           size="small"
-          sx={{ width: 300 }}
+          sx={{ width: 140 }}
           options={taskType}
           renderInput={(params) => <TextField {...params} label="Task Type" />}
           getOptionLabel={(option) =>
@@ -86,25 +95,27 @@ export const productLogDetailColumns = (
           }
           isOptionEqualToValue={(option, value) => {
             if (!value) return false;
-            return (
-              option.value === (typeof value === "string" ? value : value.value)
-            );
+            const compareValue =
+              typeof value === "string" ? value : value.value;
+            return option.value === compareValue;
           }}
           onChange={(_, newValue) => {
-            if (newValue && typeof newValue !== "string") {
-              onFieldChange(row.id, "value", newValue.value);
-              onFieldChange(row.id, "label", newValue.label);
-            } else {
-              onFieldChange(row.id, "value", null);
-              onFieldChange(row.id, "label", newValue || "");
-            }
+            const val =
+              typeof newValue === "string" ? newValue : newValue?.value || null;
+            onFieldChange(row.id, "task_type", val);
           }}
-          value={taskType.find(
-            (p) => p.value === row.task_type || row.task_type,
-          )}
+          value={
+            taskType.find((p) => p.value === row.task_type) ||
+            row.task_type ||
+            null
+          }
         />
       ) : (
-        <span>{row.task_type}</span>
+        <span>
+          {taskType.find((t) => t.value === row.task_type)?.label ||
+            row.task_type ||
+            "-"}
+        </span>
       );
     },
   },
@@ -115,10 +126,11 @@ export const productLogDetailColumns = (
       return isEditing ? (
         <TextField
           type="text"
+          sx={{ width: 200 }}
           size="small"
           fullWidth
           value={row.content || ""}
-          onChange={(e) => onFieldChange(row.id, "weight", e.target.value)}
+          onChange={(e) => onFieldChange(row.id, "content", e.target.value)}
         />
       ) : (
         <span>{row.content}</span>
@@ -131,11 +143,27 @@ export const productLogDetailColumns = (
       const isEditing = editingId === row.id;
       return isEditing ? (
         <TextField
-          type="text"
+          type="number"
+          slotProps={{
+            htmlInput: {
+              step: "any",
+              sx: {
+                "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+                  display: "none",
+                  WebkitAppearance: "none",
+                  margin: 0,
+                },
+                "&[type=number]": {
+                  MozAppearance: "textfield",
+                },
+              },
+            },
+          }}
+          sx={{ width: 80 }}
           size="small"
           fullWidth
           value={row.quantity || ""}
-          onChange={(e) => onFieldChange(row.id, "weight", e.target.value)}
+          onChange={(e) => onFieldChange(row.id, "quantity", e.target.value)}
         />
       ) : (
         <span>{row.quantity}</span>
@@ -155,8 +183,9 @@ export const productLogDetailColumns = (
       ];
       return isEditing ? (
         <Autocomplete
+          freeSolo
           size="small"
-          sx={{ width: 300 }}
+          sx={{ width: 140 }}
           options={productType}
           renderInput={(params) => (
             <TextField {...params} label="Product Type" />
@@ -166,25 +195,27 @@ export const productLogDetailColumns = (
           }
           isOptionEqualToValue={(option, value) => {
             if (!value) return false;
-            return (
-              option.value === (typeof value === "string" ? value : value.value)
-            );
+            const compareValue =
+              typeof value === "string" ? value : value.value;
+            return option.value === compareValue;
           }}
           onChange={(_, newValue) => {
-            if (newValue && typeof newValue !== "string") {
-              onFieldChange(row.id, "value", newValue.value);
-              onFieldChange(row.id, "label", newValue.label);
-            } else {
-              onFieldChange(row.id, "value", null);
-              onFieldChange(row.id, "label", newValue || "");
-            }
+            const val =
+              typeof newValue === "string" ? newValue : newValue?.value || null;
+            onFieldChange(row.id, "product_type", val);
           }}
-          value={productType.find(
-            (p) => p.value === row.product_type || row.product_type,
-          )}
+          value={
+            productType.find((p) => p.value === row.product_type) ||
+            row.product_type ||
+            null
+          }
         />
       ) : (
-        <span>{row.product_type}</span>
+        <span>
+          {productType.find((p) => p.value === row.product_type)?.label ||
+            row.product_type ||
+            "-"}
+        </span>
       );
     },
   },

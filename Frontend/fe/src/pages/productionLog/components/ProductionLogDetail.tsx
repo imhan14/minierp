@@ -10,6 +10,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
 import { useLogDetailData } from "../customHooks/useLogDetailData";
 import { productLogDetailColumns } from "../utils/columns";
+import { useLogDetailForm } from "../customHooks/useLogDetailForm";
 
 interface ProductLogDetailProps {
   log_id: number | null;
@@ -20,31 +21,23 @@ const ProductionLogDetail = ({
   log_id,
   onSaveSuccess,
 }: ProductLogDetailProps) => {
-  // const {
-  //   showConfirmDialog,
-  //   setShowConfirmDialog,
-  //   handleDiscardChanges,
-  //   handleSaveAndContinue,
-  //   guardAction,
-  //   cancelEditing,
-  //   startEditing,
-  //   error,
-  //   detailLoading,
-  //   editProducts,
-  //   setEditProducts,
-  //   editingId,
-  //   setEditingId,
-  //   productOptions,
-  //   handleDetailChange,
-  //   saveEditing,
-  //   handleDeleteRow,
-  // } = useProductDetail(log_id, onSaveSuccess);
-  const { logDetail } = useLogDetailData(log_id);
-  const columns = productLogDetailColumns(
+  const {
     editingId,
-    productOptions,
+    showConfirmDialog,
     handleDetailChange,
-  );
+    setShowConfirmDialog,
+    handleDiscardChanges,
+    handleSaveAndContinue,
+    cancelEditing,
+    deleteRowWithGuard,
+    saveEditing,
+    handleAddNewRow,
+    startEditing,
+    logDetail,
+    setLogDetail,
+  } = useLogDetailForm(log_id, onSaveSuccess);
+  const { error, detailLoading } = useLogDetailData(log_id, setLogDetail);
+  const columns = productLogDetailColumns(editingId, handleDetailChange);
 
   const getDetailActions = (
     row: ProductionLogDetailType,
@@ -76,32 +69,11 @@ const ProductionLogDetail = ({
         label: "Delete",
         icon: <DeleteOutlineIcon />,
         color: "warning",
-        onClick: (row) => handleDeleteRow(row),
+        onClick: (row) => deleteRowWithGuard(row),
       },
     ];
   };
 
-  const handleAddNewRow = () => {
-    guardAction(() => {
-      const newRow: ProductionLogDetailType = {
-        product_id: 0,
-        isNew: true,
-        id: `new-${Date.now()}`,
-        product_name: "",
-        product_reports: {} as ProductionReportType,
-        weight: 0,
-        is_finish: false,
-        type_of_specification: "",
-        start_time: "",
-        end_time: "",
-        product_line: "",
-        specification: "",
-        note: "",
-      };
-      setEditProducts((prev) => [newRow, ...prev]);
-      setEditingId(newRow.id);
-    });
-  };
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -119,7 +91,7 @@ const ProductionLogDetail = ({
           alignItems: "center",
         }}
       >
-        <Typography variant="h6">Danh sách sản phẩm</Typography>
+        <Typography variant="h6">Logs</Typography>
         <Button
           variant="contained"
           startIcon={<AddCircleOutlinedIcon />}
@@ -133,7 +105,7 @@ const ProductionLogDetail = ({
       ) : (
         <DataTable
           columns={columns}
-          data={editProducts}
+          data={logDetail}
           actions={getDetailActions}
           getRowKey={(row) => row.id!}
           renderDetail={(row) => (

@@ -101,7 +101,6 @@ const ProductionLogGeneral = ({
         forklift: data?.forklift ?? undefined,
         shift_leader: data?.shift_leader ?? undefined,
       };
-      console.log(data?.id, payload);
       await productionLogApi.updateProductionLog(editGeneral?.id, payload);
       notify("Cập nhật dữ liệu thành công!", "success");
       onSaveSuccess();
