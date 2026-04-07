@@ -2,9 +2,15 @@ import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { Navigate, Outlet } from "react-router";
+interface Props {
+  allowedRoles?: number[];
+}
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ allowedRoles }: Props) => {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userRole = user?.role;
+  // const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,6 +50,10 @@ const ProtectedRoute = () => {
 
   if (isAuth === false) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(Number(userRole))) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return <Outlet />;

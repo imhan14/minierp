@@ -2,18 +2,18 @@ import {
   FormControl,
   IconButton,
   InputAdornment,
-  MenuItem,
+  // MenuItem,
   Paper,
-  Select,
+  // Select,
   TextField,
   Typography,
-  type SelectChangeEvent,
+  // type SelectChangeEvent,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState } from "react";
+// import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { Dayjs } from "dayjs";
-import { useLocation } from "react-router";
+// import { useLocation } from "react-router";
 
 interface Filters {
   selectedDate: Dayjs | null;
@@ -21,12 +21,12 @@ interface Filters {
 }
 
 const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
-  const location = useLocation();
-  const [age, setAge] = useState("");
+  // const location = useLocation();
+  // const [age, setAge] = useState("");
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
-  };
+  // const handleChange = (event: SelectChangeEvent) => {
+  //   setAge(event.target.value);
+  // };
   return (
     <Paper
       elevation={0}
@@ -87,9 +87,9 @@ const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
           ),
         }}
       />
-      {location.pathname === "/production-log" && (
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
-          <Select
+      {/* {location.pathname === "/production-log" && ( */}
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        {/* <Select
             value={age}
             onChange={handleChange}
             displayEmpty
@@ -101,10 +101,10 @@ const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
             <MenuItem value={10}>Ten</MenuItem>
             <MenuItem value={20}>Twenty</MenuItem>
             <MenuItem value={30}>Thirty</MenuItem>
-          </Select>
-          {/* <FormHelperText>Without label</FormHelperText> */}
-        </FormControl>
-      )}
+          </Select> */}
+        {/* <FormHelperText>Without label</FormHelperText> */}
+      </FormControl>
+      {/* )} */}
     </Paper>
   );
 };

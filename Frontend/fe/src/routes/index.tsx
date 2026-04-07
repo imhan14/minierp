@@ -30,6 +30,7 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
+            // path: "/order",
             element: <Home />,
           },
           {
@@ -44,15 +45,25 @@ const router = createBrowserRouter([
             path: "/material-report",
             element: <MaterialReportPage />,
           },
+          {
+            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            children: [{ path: "/dashboard", element: <Dashboard /> }],
+          },
         ],
       },
       {
-        path: "admin",
-        element: <AdminLayout />,
+        // element: <ProtectedRoute />,
         children: [
           {
-            index: true,
-            element: <Dashboard />,
+            path: "/admin",
+            element: <AdminLayout />,
+            children: [
+              {
+                index: true,
+                // path: "/dashboard",
+                element: <Dashboard />,
+              },
+            ],
           },
         ],
       },

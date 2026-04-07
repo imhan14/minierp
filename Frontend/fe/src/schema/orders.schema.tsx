@@ -1,16 +1,8 @@
 import dayjs from "dayjs";
 import type { FieldConfig } from "../types/FieldConfig";
-import type { ProductOrderType } from "../types/ProductOrderType";
 import { Box } from "@mui/material";
+import type { OrderDisplay } from "../types/ProductOrderType";
 
-export interface OrderDisplay extends Omit<
-  ProductOrderType,
-  "teams" | "formulas"
-> {
-  formula_id: number;
-  team_name: string;
-  formula_name: string;
-}
 const STATUS_STYLES: Record<
   string,
   { bg: string; text: string; label: string }
@@ -48,6 +40,7 @@ export const orderColumns: FieldConfig<OrderDisplay>[] = [
     label: "Date",
     width: 120,
     noWrap: true,
+    isReadOnly: true,
     render: ((value: string) => {
       if (!value) return "-";
       return dayjs(value).add(24, "hour").format("DD/MM/YYYY");
@@ -64,6 +57,7 @@ export const orderColumns: FieldConfig<OrderDisplay>[] = [
     width: 120,
     align: "right",
     noWrap: true,
+    isReadOnly: true,
     render: renderStatus as FieldConfig<OrderDisplay>["render"],
   },
   { id: "input_temprature_1", label: "In °C 1", align: "right" },
