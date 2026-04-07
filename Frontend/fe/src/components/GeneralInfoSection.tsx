@@ -23,6 +23,7 @@ interface GeneralInfoSectionProps<T> {
   onGeneralChange?: (id: keyof T, value: string) => void;
   onSave: () => Promise<void> | void;
   onCancel?: () => void;
+  showEditButton?: boolean;
 }
 
 const GeneralInfoSection = <T,>({
@@ -32,6 +33,7 @@ const GeneralInfoSection = <T,>({
   onGeneralChange,
   onSave,
   onCancel,
+  showEditButton = true,
 }: GeneralInfoSectionProps<T>) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,14 +62,16 @@ const GeneralInfoSection = <T,>({
 
         <Box>
           {!isEditing ? (
-            <Button
-              startIcon={<EditIcon />}
-              variant="outlined"
-              size="small"
-              onClick={() => setIsEditing(true)}
-            >
-              Chỉnh sửa
-            </Button>
+            showEditButton && (
+              <Button
+                startIcon={<EditIcon />}
+                variant="outlined"
+                size="small"
+                onClick={() => setIsEditing(true)}
+              >
+                Chỉnh sửa
+              </Button>
+            )
           ) : (
             <Stack direction="row" spacing={1}>
               <Button
@@ -145,25 +149,52 @@ const GeneralInfoSection = <T,>({
                   </TextField>
                 )
               ) : (
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={col.label}
-                  variant="standard"
-                  disabled
-                  value={
-                    (!isEditing || col.isReadOnly) && col.render
-                      ? col.render(data[col.id as keyof T], data)
-                      : (data[col.id as keyof T] ?? "")
-                  }
+                // <TextField
+                //   fullWidth
+                //   size="small"
+                //   label={col.label}
+                //   variant="standard"
+                //   disabled
+                //   value={
+                //     (!isEditing || col.isReadOnly) && col.render
+                //       ? col.render(data[col.id as keyof T], data)
+                //       : (data[col.id as keyof T] ?? "")
+                //   }
+                //   sx={{
+                //     "& .MuiInputBase-input.Mui-disabled": {
+                //       WebkitTextFillColor: "#334155",
+                //     },
+                //     bgcolor: "#f8fafc",
+                //     ...col.sx,
+                //   }}
+                // />
+                <Box
                   sx={{
-                    "& .MuiInputBase-input.Mui-disabled": {
-                      WebkitTextFillColor: "#334155",
-                    },
-                    bgcolor: "#f8fafc",
+                    p: 0.2,
+                    // bgcolor: "#f8fafc",
+                    borderRadius: 1,
+                    border: "solid 0.5px #e2e8f0",
+                    // borderBottom: "1px solid #e2e8f0",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
                     ...col.sx,
                   }}
-                />
+                >
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    fontWeight="bold"
+                  >
+                    {col.label}
+                  </Typography>
+
+                  <Box>
+                    {col.render
+                      ? col.render(data[col.id as keyof T], data)
+                      : data[col.id as keyof T]?.toString() || "-"}
+                  </Box>
+                </Box>
               )}
             </Grid>
           );

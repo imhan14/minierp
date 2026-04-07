@@ -8,17 +8,17 @@ import {
   Typography,
 } from "@mui/material";
 import { Link } from "react-router";
-import planet_with_person from "../assets/pageNotFound/planet_with_person.png";
-import ship1 from "../assets/pageNotFound/ship1.png";
-import ship2 from "../assets/pageNotFound/ship2.png";
-import cloud1 from "../assets/pageNotFound/cloud1.png";
-import cloud2 from "../assets/pageNotFound/cloud2.png";
-import cloud3 from "../assets/pageNotFound/cloud3.png";
-import cloud4 from "../assets/pageNotFound/cloud4.png";
-import stars from "../assets/pageNotFound/stars.png";
-import line from "../assets/pageNotFound/line.png";
-import shootingStar from "../assets/pageNotFound/onStar.png";
-import moon from "../assets/pageNotFound/moon.png";
+import planet_with_person from "../assets/pageNotFound/person_with_planet.svg";
+import ship1 from "../assets/pageNotFound/ship1.svg";
+import ship2 from "../assets/pageNotFound/ship2.svg";
+import cloud1 from "../assets/pageNotFound/cloud1.svg";
+import cloud2 from "../assets/pageNotFound/cloud2.svg";
+import cloud3 from "../assets/pageNotFound/cloud3.svg";
+import cloud4 from "../assets/pageNotFound/cloud4.svg";
+import stars from "../assets/pageNotFound/stars.svg";
+import line from "../assets/pageNotFound/line.svg";
+import shootingStar from "../assets/pageNotFound/shootingStar1.svg";
+import moon from "../assets/pageNotFound/moon.svg";
 
 interface CloudProps {
   driftSpeed?: number;
@@ -26,22 +26,23 @@ interface CloudProps {
   scaleSize?: number;
 }
 
-const starMove = keyframes`
-  0% { left: 90%; top: 58%; opacity: 0; transform: scale(0.2); }
-  10% { opacity: 1; transform: scale(0.5); }
-  25% { top:42%; transform: scale(0.7); }
-  50% { left:50%; top:30%; }
-  75% { top:19% }
-  95% { opacity: 1; transform: scale(0.2);}
-  100% { left: -12%; top: 13%; opacity: 0; transform: scale(0); }
+const lineReveal = keyframes`
+0% { opacity: 0; transform: rotate(0deg); clip-path: inset(0 100% 0 0); }
+  10% { opacity: 1; }
+  80% { opacity: 1; transform: rotate(0deg); clip-path: inset(0 0 0 0); }
+  85% {opacity: 0}
+  100% {opacity: 0}
 `;
 
-const lineReveal = keyframes`
- 0% { clip-path: inset(75% 0 0 75%); opacity: 0; }
-  10% { opacity: 1; }
-  60% { clip-path:inset(40% 0 0 40%); }
-  76% { clip-path:inset(30% 0 0 30%); }
-  100% { clip-path: inset(0 0 0 0); opacity: 1; }
+const starMove = keyframes`
+  0% { left: -5%; top: 15%; opacity: 0; transform: scale(0.2); }
+  10% { opacity: 1; transform: scale(0.3); top:17%; }
+  20% { top:17.7%; transform: scale(0.5); }
+  40% { top:26.4%; }
+  50% { top:34% }
+  65% { top:45% }
+  80% { left: 93%; top: 62%; opacity: 1; transform: scale(0.3);}
+  81%,100% {opacity: 0; transform: scale(0);}
 `;
 
 const float = keyframes`
@@ -53,8 +54,6 @@ const cloudMovement = keyframes`
   0%, 100% { transform: translateX(-2%); }
   50% { transform: translateX(2%); }
 `;
-
-// --- 2. Styled Components
 
 const BackgroundContainer = styled(Box)({
   backgroundColor: "#03090a",
@@ -72,19 +71,12 @@ const BackgroundContainer = styled(Box)({
 
 const ShootingStarGroup = styled(Box)({
   position: "absolute",
-  top: "20%",
+  top: "15%",
   left: "30%",
   width: "40vw",
   aspectRatio: "1.5 / 1",
   zIndex: 10,
-});
-
-const StarImage = styled("img")({
-  position: "absolute",
-  width: "15%",
-  zIndex: 2,
-  animation: `${starMove} 4s linear infinite`,
-  transformOrigin: "center",
+  overflow: "visible",
 });
 
 const LineImage = styled("img")({
@@ -95,6 +87,13 @@ const LineImage = styled("img")({
   zIndex: 1,
   animation: `${lineReveal} 4s linear infinite`,
   pointerEvents: "none",
+});
+const StarImage = styled("img")({
+  position: "absolute",
+  width: "15%",
+  zIndex: 2,
+  animation: `${starMove} 4s linear infinite`,
+  transformOrigin: "center",
 });
 
 const Cloud = styled("img", {
@@ -138,9 +137,9 @@ const NotFound = () => {
           src={ship1}
           sx={{
             position: "absolute",
-            bottom: "20%",
-            left: "20%",
-            width: "80px",
+            bottom: { xs: "12%", md: "20%" },
+            left: { xs: "40%", md: "20%" },
+            width: { xs: "50px", md: "80px" },
             animation: `${float} 3s ease-in-out infinite`,
             zIndex: 15,
           }}
@@ -171,9 +170,8 @@ const NotFound = () => {
           >
             <Typography
               sx={{
-                marginRight: 3,
                 fontSize: { xs: "10rem", md: "15rem" },
-                fontWeight: 900,
+                fontWeight: 800,
                 color: "#1ebbb0",
                 lineHeight: 1,
               }}
@@ -186,7 +184,7 @@ const NotFound = () => {
               src={moon}
               sx={{
                 height: { xs: "8rem", md: "12rem" },
-                mx: -2,
+                mx: 2,
                 borderRadius: "50%",
                 filter: "drop-shadow(0 0 30px #1ebbb0)",
               }}
@@ -195,7 +193,7 @@ const NotFound = () => {
             <Typography
               sx={{
                 fontSize: { xs: "10rem", md: "15rem" },
-                fontWeight: 900,
+                fontWeight: 800,
                 color: "#1ebbb0",
                 lineHeight: 1,
               }}
@@ -220,8 +218,10 @@ const NotFound = () => {
               mb: 2,
             }}
           >
-            Bạn đã lạc đến rìa vũ trụ, quay về thôi!
+            Bạn không có quyền truy cập, hoặc trang không tồn tại, vui lòng quay
+            lại trang chủ
           </Typography>
+
           <Button
             variant="contained"
             component={Link}

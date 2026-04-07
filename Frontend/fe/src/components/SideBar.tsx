@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
 import { useNavigate, useLocation } from "react-router";
 import NavItem from "./NavItem";
+import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlined";
 
 const drawerWidth = 240;
 const themeColor = {
@@ -78,9 +79,15 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { full_name, role } = useSelector((state: RootState) => state.auth);
+  const { full_name, role, id } = useSelector((state: RootState) => state.auth);
 
   const menuItems = [
+    {
+      text: "Dashboard",
+      icon: <SpaceDashboardOutlinedIcon />,
+      path: "/dashboard",
+      minRole: 5,
+    },
     { text: "Order", icon: <AssignmentIcon />, path: "/" },
     {
       text: "Material Report",
@@ -94,6 +101,12 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
     },
     { text: "Production Log", icon: <GradingIcon />, path: "/production-log" },
   ];
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (item.text === "Dashboard" && Number(id) > 5) {
+      return false;
+    }
+    return true;
+  });
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -131,7 +144,7 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
         </List>
         <Divider />
         <List>
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             return (
               <NavItem
                 key={item.path}
