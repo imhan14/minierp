@@ -2,7 +2,7 @@ import BaseJoi from "joi";
 import JoiDate from "@joi/date";
 const Joi = BaseJoi.extend(JoiDate);
 
-export const orderSchema = Joi.object({
+export const orderValidateSchema = Joi.object({
   order_date: Joi.date().optional().messages({
     "date.base": "Ngày không hợp lệ",
     "any.required": "Vui lòng chọn ngày",

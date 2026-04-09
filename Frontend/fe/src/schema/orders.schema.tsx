@@ -33,9 +33,10 @@ const renderStatus = (status: string) => {
     </Box>
   );
 };
-export const orderColumns: FieldConfig<OrderDisplay>[] = [
-  { id: "id", label: "Id", width: 70 },
-  {
+
+export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
+  id: { id: "id", label: "Id" },
+  order_date: {
     id: "order_date",
     label: "Date",
     width: 120,
@@ -43,15 +44,20 @@ export const orderColumns: FieldConfig<OrderDisplay>[] = [
     isReadOnly: true,
     render: ((value: string) => {
       if (!value) return "-";
-      return dayjs(value).add(24, "hour").format("DD/MM/YYYY");
+      return dayjs(value).format("DD/MM/YYYY");
     }) as FieldConfig<OrderDisplay>["render"],
   },
-  { id: "formula_name", label: "Formular", align: "center" },
-  { id: "team_name", label: "Team Name", width: 150, align: "right" },
-  { id: "product_shift", label: "Shift", align: "right" },
-  { id: "target_quantity", label: "Quantity", align: "right" },
-  { id: "urea_rate", label: "Urea", align: "right" },
-  {
+  formula_name: { id: "formula_name", label: "Formular", align: "center" },
+  team_name: {
+    id: "team_name",
+    label: "Team Name",
+    // width: 150,
+    // align: "right",
+  },
+  product_shift: { id: "product_shift", label: "Shift", align: "right" },
+  target_quantity: { id: "target_quantity", label: "Quantity", align: "right" },
+  urea_rate: { id: "urea_rate", label: "Urea", align: "right" },
+  status: {
     id: "status",
     label: "Status",
     width: 120,
@@ -60,9 +66,24 @@ export const orderColumns: FieldConfig<OrderDisplay>[] = [
     isReadOnly: true,
     render: renderStatus as FieldConfig<OrderDisplay>["render"],
   },
-  { id: "input_temprature_1", label: "In °C 1", align: "right" },
-  { id: "output_temprature_1", label: "Out °C 1", align: "right" },
-  { id: "input_temprature_2", label: "In °C 2", align: "right" },
-  { id: "output_temprature_2", label: "Out °C 2", align: "right" },
-  { id: "actions", label: "Details", align: "center" },
-];
+  input_temprature_1: {
+    id: "input_temprature_1",
+    label: "In °C 1",
+    align: "right",
+  },
+  output_temprature_1: {
+    id: "output_temprature_1",
+    label: "Out °C 1",
+    align: "right",
+  },
+  input_temprature_2: {
+    id: "input_temprature_2",
+    label: "In °C 2",
+    align: "right",
+  },
+  output_temprature_2: {
+    id: "output_temprature_2",
+    label: "Out °C 2",
+    align: "right",
+  },
+};

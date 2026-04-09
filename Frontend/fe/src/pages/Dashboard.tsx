@@ -20,7 +20,6 @@ import type { FormulaDetailType } from "../types/FormulaDetailType";
 import DynamicPopup from "../components/DynamicPopup";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
-import { orderColumns } from "../schema/orders.schema";
 import productOrderApi from "../apis/productOrderApi";
 import formulaDetailApi from "../apis/formulaDetailApi";
 
@@ -45,105 +44,105 @@ interface FormulaDetailDisplay extends Omit<FormulaDetailType, "ingredients"> {
 }
 
 const Dashboard = () => {
-  const [orders, setOrders] = useState<OrderDisplay[]>([]);
-  const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
-  const [openDetail, setOpenDetail] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<OrderDisplay | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+  // const [orders, setOrders] = useState<OrderDisplay[]>([]);
+  // const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
+  // const [openDetail, setOpenDetail] = useState(false);
+  // const [selectedOrder, setSelectedOrder] = useState<OrderDisplay | null>(null);
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [detailLoading, setDetailLoading] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
+  // const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
 
-  const formulaColumns: FieldConfig<FormulaDetailDisplay>[] = [
-    { id: "ingredient_name", label: "Ingredient Name" },
-    { id: "unit", label: "Unit" },
-    { id: "standard_quality", label: "Quantity" },
-  ];
+  // const formulaColumns: FieldConfig<FormulaDetailDisplay>[] = [
+  //   { id: "ingredient_name", label: "Ingredient Name" },
+  //   { id: "unit", label: "Unit" },
+  //   { id: "standard_quality", label: "Quantity" },
+  // ];
 
-  const handleOpenDetail = (row: OrderDisplay) => {
-    setSelectedOrder(row);
-    fetchFormulaDetail(row.formula_id);
-    setOpenDetail(true);
-  };
-  const handleCloseDetail = () => {
-    setOpenDetail(false);
-    setTimeout(() => {
-      setSelectedOrder(null);
-      setFormula([]);
-    }, 300);
-  };
+  // const handleOpenDetail = (row: OrderDisplay) => {
+  //   setSelectedOrder(row);
+  //   fetchFormulaDetail(row.formula_id);
+  //   setOpenDetail(true);
+  // };
+  // const handleCloseDetail = () => {
+  //   setOpenDetail(false);
+  //   setTimeout(() => {
+  //     setSelectedOrder(null);
+  //     setFormula([]);
+  //   }, 300);
+  // };
 
-  const actions = (): ActionConfig<OrderDisplay>[] => {
-    return [
-      {
-        label: "Details",
-        color: "primary",
-        icon: <RemoveRedEyeOutlinedIcon />,
-        onClick: (row) => handleOpenDetail(row),
-      },
-    ];
-  };
+  // const actions = (): ActionConfig<OrderDisplay>[] => {
+  //   return [
+  //     {
+  //       label: "Details",
+  //       color: "primary",
+  //       icon: <RemoveRedEyeOutlinedIcon />,
+  //       onClick: (row) => handleOpenDetail(row),
+  //     },
+  //   ];
+  // };
 
-  const displayFields = orderColumns.filter(
-    (col) => col.id !== "id" && col.id !== "actions",
-  );
+  // const displayFields = orderColumns.filter(
+  //   (col) => col.id !== "id" && col.id !== "actions",
+  // );
 
-  const fetchOrders = async (date?: Dayjs | null) => {
-    try {
-      setLoading(true);
-      const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
-      const response = await productOrderApi.getAllOrders({ date: dateParam });
-      const formattedData: OrderDisplay[] = response.data.map((item) => {
-        const { teams, formulas, ...rest } = item;
-        return {
-          ...rest,
-          formula_id: formulas?.id,
-          team_id: teams?.id,
-          team_name: teams?.team_name || "N/A",
-          formula_name: formulas?.formula_name || "N/A",
-        };
-      });
+  // const fetchOrders = async (date?: Dayjs | null) => {
+  //   try {
+  //     setLoading(true);
+  //     const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
+  //     const response = await productOrderApi.getAllOrders({ date: dateParam });
+  //     const formattedData: OrderDisplay[] = response.data.map((item) => {
+  //       const { teams, formulas, ...rest } = item;
+  //       return {
+  //         ...rest,
+  //         formula_id: formulas?.id,
+  //         team_id: teams?.id,
+  //         team_name: teams?.team_name || "N/A",
+  //         formula_name: formulas?.formula_name || "N/A",
+  //       };
+  //     });
 
-      setOrders(formattedData);
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
-      console.error("API Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setOrders(formattedData);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
+  //     console.error("API Error:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const fetchFormulaDetail = async (formulaId: number) => {
-    try {
-      setDetailLoading(true);
-      const response = await formulaDetailApi.getAllFormulaDetails({
-        formula_id: formulaId,
-      });
-      const formattedData: FormulaDetailDisplay[] = response.data.map(
-        (item) => {
-          const { ingredients, ...rest } = item;
-          return {
-            ...rest,
-            ingredient_name: ingredients?.ingredient_name,
-            unit: ingredients?.unit,
-          };
-        },
-      );
+  // const fetchFormulaDetail = async (formulaId: number) => {
+  //   try {
+  //     setDetailLoading(true);
+  //     const response = await formulaDetailApi.getAllFormulaDetails({
+  //       formula_id: formulaId,
+  //     });
+  //     const formattedData: FormulaDetailDisplay[] = response.data.map(
+  //       (item) => {
+  //         const { ingredients, ...rest } = item;
+  //         return {
+  //           ...rest,
+  //           ingredient_name: ingredients?.ingredient_name,
+  //           unit: ingredients?.unit,
+  //         };
+  //       },
+  //     );
 
-      setFormula(formattedData);
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
-      console.error("API Error:", err);
-    } finally {
-      setDetailLoading(false);
-    }
-  };
+  //     setFormula(formattedData);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
+  //     console.error("API Error:", err);
+  //   } finally {
+  //     setDetailLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchOrders(selectedDate);
-  }, [selectedDate]);
+  // useEffect(() => {
+  //   fetchOrders(selectedDate);
+  // }, [selectedDate]);
 
   if (error) {
     return (
@@ -154,7 +153,7 @@ const Dashboard = () => {
   }
   return (
     <Box>
-      <DrawerHeader />
+      {/* <DrawerHeader />
       <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
@@ -162,7 +161,7 @@ const Dashboard = () => {
         </Box>
       ) : (
         <DataTable
-          columns={orderColumns}
+          columns={orderDetail}
           data={orders}
           actions={actions}
           getRowKey={(row) => row.id}
@@ -244,7 +243,7 @@ const Dashboard = () => {
             )}
           </Box>
         )}
-      </DynamicPopup>
+      </DynamicPopup> */}
     </Box>
   );
 };

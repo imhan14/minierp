@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Grid,
@@ -127,6 +128,41 @@ const GeneralInfoSection = <T,>({
                       },
                     }}
                   />
+                ) : col.inputType === "autocomplete" ? (
+                  <Autocomplete
+                    options={col.optionsAutoComplete || []}
+                    getOptionLabel={
+                      col.getOptionLabel ||
+                      ((option) =>
+                        typeof option === "string" ? option : option.label)
+                    }
+                    isOptionEqualToValue={(option, value) => {
+                      if (!value) return false;
+                      return (
+                        option.id ===
+                        (typeof value === "object" ? value : value.id)
+                      );
+                    }}
+                    value={
+                      col.optionsAutoComplete?.find(
+                        (opt) => String(opt.id) === String(rawValue),
+                      ) || null
+                    }
+                    onChange={(_, newValue) => {
+                      const savedValue = newValue ? String(newValue.id) : "";
+                      onGeneralChange?.(col.id as keyof T, savedValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={col.label}
+                        size="small"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ ...col.sx }}
+                      />
+                    )}
+                  />
                 ) : (
                   <TextField
                     fullWidth
@@ -149,25 +185,6 @@ const GeneralInfoSection = <T,>({
                   </TextField>
                 )
               ) : (
-                // <TextField
-                //   fullWidth
-                //   size="small"
-                //   label={col.label}
-                //   variant="standard"
-                //   disabled
-                //   value={
-                //     (!isEditing || col.isReadOnly) && col.render
-                //       ? col.render(data[col.id as keyof T], data)
-                //       : (data[col.id as keyof T] ?? "")
-                //   }
-                //   sx={{
-                //     "& .MuiInputBase-input.Mui-disabled": {
-                //       WebkitTextFillColor: "#334155",
-                //     },
-                //     bgcolor: "#f8fafc",
-                //     ...col.sx,
-                //   }}
-                // />
                 <Box
                   sx={{
                     p: 0.2,

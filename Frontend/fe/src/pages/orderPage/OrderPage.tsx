@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -18,14 +18,15 @@ import type { OrderDisplay } from "../../types/ProductOrderType";
 import type { FormulaDetailDisplay } from "../../types/FormulaDetailType";
 import type { FieldConfig } from "../../types/FieldConfig";
 import type { ActionConfig } from "../../components/DataTable";
-import { orderColumns } from "../../schema/orders.schema";
 import Filters from "../../components/Filters";
 import PermissionGate from "../../components/PermissionGate";
 import DataTable from "../../components/DataTable";
 import DynamicPopup from "../../components/DynamicPopup";
 import { useOrderData } from "./customHooks/useOrderData";
 import { useOrderForm } from "./customHooks/useOrderForm";
-import OrderGeneral from "./components/orderGeneral";
+import OrderGeneral from "./components/OrderGeneral";
+import { orderColumnSchema } from "../../schema/orders.schema";
+
 dayjs.extend(utc);
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -71,6 +72,25 @@ const OrderPage = () => {
   } = useOrderData(selectedDate);
   const { handleAddNewReport } = useOrderForm(selectedDate, () =>
     fetchOrders(selectedDate),
+  );
+  const orderColumns = useMemo(
+    () => [
+      { ...orderColumnSchema.id },
+      {
+        ...orderColumnSchema.order_date,
+        render: ((value: string) => {
+          if (!value) return "-";
+          return dayjs(value).format("DD/MM/YYYY");
+        }) as FieldConfig<OrderDisplay>["render"],
+      },
+      { ...orderColumnSchema.formula_name },
+      { ...orderColumnSchema.team_name },
+      { ...orderColumnSchema.product_shift },
+      { ...orderColumnSchema.status },
+      { ...orderColumnSchema.target_quantity },
+      { id: "actions", label: "Actions" },
+    ],
+    [],
   );
   const formulaColumns: FieldConfig<FormulaDetailDisplay>[] = [
     // { id: "id", label: "id" },
@@ -151,15 +171,6 @@ const OrderPage = () => {
         />
         {selectedOrder && (
           <Box>
-            <Typography
-              variant="subtitle1"
-              fontWeight="bold"
-              gutterBottom
-              color="primary"
-            >
-              General
-            </Typography>
-
             <Divider sx={{ my: 3 }}>
               <Typography variant="subtitle1" fontWeight="bold" color="primary">
                 Formular List (Formular)

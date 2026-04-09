@@ -1,11 +1,14 @@
 import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import { orderColumns } from "../../../schema/orders.schema";
 import { useNotify } from "../../../hooks/useNotify";
 import type { OrderDisplay } from "../../../types/ProductOrderType";
 import { validatePayload } from "../../../utils/validate";
 import dayjs from "dayjs";
-import { orderSchema } from "../../../validate/order.validate";
-import { useEffect } from "react";
+import type { FieldConfig } from "../../../types/FieldConfig";
+import { orderValidateSchema } from "../../../validate/order.validate";
+import { orderColumnSchema } from "../../../schema/orders.schema";
+import { useEffect, useState } from "react";
+import formulaApi from "../../../apis/formulaApi";
+import type { FormulaType } from "../../../types/FormulaType";
 
 interface Props {
   selectedOrder: OrderDisplay | null;
@@ -21,14 +24,58 @@ const OrderGeneral = ({
   onEditGeneral,
 }: Props) => {
   const notify = useNotify();
+  const [formula, setFormula] = useState<FormulaType[]>([]);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdminRole = [1, 2, 3, 4, 5].includes(Number(user.role));
   const isCanceled = selectedOrder?.status === "cancel";
   const canShowEdit = isAdminRole && !isCanceled;
 
-  const displayFields = orderColumns.filter(
-    (col) => col.id !== "id" && col.id !== "actions",
-  );
+  const orderDetail: FieldConfig<OrderDisplay>[] = [
+    { ...orderColumnSchema.order_date },
+    {
+      ...orderColumnSchema.formula_name,
+      inputType: "autocomplete",
+      optionsAutoComplete: formula,
+      getOptionLabel: (option: FormulaType) => option.formula_name,
+      isOptionEqualToValue: (option: FormulaType, value) => {
+        const valId = typeof value === "object" ? value.formula_id : value;
+        return String(option.formula_id) === String(valId);
+      },
+      render: (val, row) => {
+        const currentFormula = formula.find(
+          (f) => String(f.formula_id) === String(val),
+        );
+        return currentFormula
+          ? currentFormula.formula_name
+          : row.formula_name || "-";
+      },
+    },
+    { ...orderColumnSchema.team_name },
+    { ...orderColumnSchema.product_shift },
+    { ...orderColumnSchema.target_quantity },
+    { ...orderColumnSchema.urea_rate },
+    { ...orderColumnSchema.status },
+    { ...orderColumnSchema.input_temprature_1 },
+    { ...orderColumnSchema.output_temprature_1 },
+    { ...orderColumnSchema.input_temprature_2 },
+    { ...orderColumnSchema.output_temprature_2 },
+  ];
+
+  const fetchIngredientList = async () => {
+    try {
+      // setDetailLoading(true);
+      const response = await formulaApi.getAllFormula();
+
+      setFormula(response.data);
+      // setError(null);
+    } catch (err) {
+      // setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
+      console.error("API Error:", err);
+    } finally {
+      // setDetailLoading(false);
+    }
+  };
+
   const handleGeneralChange = (field: keyof OrderDisplay, value: string) => {
     if (editGeneral) {
       onEditGeneral({ ...editGeneral, [field]: value });
@@ -37,7 +84,7 @@ const OrderGeneral = ({
   const handleSave = async () => {
     if (!editGeneral) return;
     const { isValid, message, data } = validatePayload(
-      orderSchema,
+      orderValidateSchema,
       editGeneral,
     );
     if (!isValid) {
@@ -74,10 +121,14 @@ const OrderGeneral = ({
       notify("Lỗi khi nhập dữ liệu!", "error");
     }
   };
+
+  useEffect(() => {
+    fetchIngredientList();
+  }, []);
   return (
     <GeneralInfoSection
       title="General"
-      displayFields={displayFields}
+      displayFields={orderDetail}
       data={editGeneral ?? selectedOrder}
       onGeneralChange={handleGeneralChange}
       onSave={handleSave}
