@@ -6,9 +6,10 @@ import dayjs from "dayjs";
 import type { FieldConfig } from "../../../types/FieldConfig";
 import { orderValidateSchema } from "../../../validate/order.validate";
 import { orderColumnSchema } from "../../../schema/orders.schema";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import formulaApi from "../../../apis/formulaApi";
 import type { FormulaType } from "../../../types/FormulaType";
+import productOrderApi from "../../../apis/productOrderApi";
 
 interface Props {
   selectedOrder: OrderDisplay | null;
@@ -24,57 +25,63 @@ const OrderGeneral = ({
   onEditGeneral,
 }: Props) => {
   const notify = useNotify();
-  const [formula, setFormula] = useState<FormulaType[]>([]);
+  const [formula, setFormula] = useState<{ label: string; value: string }[]>(
+    [],
+  );
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdminRole = [1, 2, 3, 4, 5].includes(Number(user.role));
   const isCanceled = selectedOrder?.status === "cancel";
   const canShowEdit = isAdminRole && !isCanceled;
 
-  const orderDetail: FieldConfig<OrderDisplay>[] = [
-    { ...orderColumnSchema.order_date },
-    {
-      ...orderColumnSchema.formula_name,
-      inputType: "autocomplete",
-      optionsAutoComplete: formula,
-      getOptionLabel: (option: FormulaType) => option.formula_name,
-      isOptionEqualToValue: (option: FormulaType, value) => {
-        const valId = typeof value === "object" ? value.formula_id : value;
-        return String(option.formula_id) === String(valId);
+  const orderDetail: FieldConfig<OrderDisplay>[] = useMemo(
+    () => [
+      { ...orderColumnSchema.order_date },
+      {
+        id: "formula_id",
+        label: "Formula Name",
+        inputType: "select",
+        options: formula,
+        gridSize: { md: 6 },
+        render: (_, record) => record.formula_name || "-",
       },
-      render: (val, row) => {
-        const currentFormula = formula.find(
-          (f) => String(f.formula_id) === String(val),
-        );
-        return currentFormula
-          ? currentFormula.formula_name
-          : row.formula_name || "-";
+      { ...orderColumnSchema.team_name },
+      {
+        ...orderColumnSchema.product_shift,
+        inputType: "select",
+        options: [
+          { label: "Ca1x8", value: "C1x8" },
+          { label: "Ca1x12", value: "C1x12" },
+          { label: "Ca2x8", value: "C2x8" },
+          { label: "Ca2x12", value: "C2x12" },
+          { label: "Ca3x8", value: "C3x8" },
+        ],
       },
-    },
-    { ...orderColumnSchema.team_name },
-    { ...orderColumnSchema.product_shift },
-    { ...orderColumnSchema.target_quantity },
-    { ...orderColumnSchema.urea_rate },
-    { ...orderColumnSchema.status },
-    { ...orderColumnSchema.input_temprature_1 },
-    { ...orderColumnSchema.output_temprature_1 },
-    { ...orderColumnSchema.input_temprature_2 },
-    { ...orderColumnSchema.output_temprature_2 },
-  ];
+      { ...orderColumnSchema.target_quantity },
+      { ...orderColumnSchema.urea_rate },
+      { ...orderColumnSchema.status },
+      { ...orderColumnSchema.input_temprature_1 },
+      { ...orderColumnSchema.output_temprature_1 },
+      { ...orderColumnSchema.input_temprature_2 },
+      { ...orderColumnSchema.output_temprature_2 },
+    ],
+    [formula],
+  );
 
-  const fetchIngredientList = async () => {
-    try {
-      // setDetailLoading(true);
-      const response = await formulaApi.getAllFormula();
+  // const fetchFormulaList = useCallback(async () => {
+  //   try {
+  //     const response = await formulaApi.getAllFormula();
+  //     const formattedData = response.data.map((item: FormulaType) => ({
+  //       label: item.formula_name,
+  //       value: String(item.id),
+  //     }));
 
-      setFormula(response.data);
-      // setError(null);
-    } catch (err) {
-      // setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
-      console.error("API Error:", err);
-    } finally {
-      // setDetailLoading(false);
-    }
-  };
+  //     setFormula(formattedData);
+  //   } catch (err) {
+  //     // setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
+  //     // notify("Get Formula List failded", "error");
+  //     console.error("API Error:", err);
+  //   }
+  // }, []);
 
   const handleGeneralChange = (field: keyof OrderDisplay, value: string) => {
     if (editGeneral) {
@@ -82,6 +89,7 @@ const OrderGeneral = ({
     }
   };
   const handleSave = async () => {
+    console.log(editGeneral);
     if (!editGeneral) return;
     const { isValid, message, data } = validatePayload(
       orderValidateSchema,
@@ -99,10 +107,13 @@ const OrderGeneral = ({
       };
       const payload = {
         order_date: isValidDate(editGeneral?.order_date),
-        formula_id: data?.formula_id ?? undefined,
+        // formula_id: data?.formula_name ? Number(data?.formula_name) : undefined,
+        formula_id: data?.formula_id ? Number(data.formula_id) : undefined,
         team_id: data?.team_id ?? undefined,
         product_shift: data?.product_shift ?? undefined,
-        target_quantity: data?.target_quantity ?? undefined,
+        target_quantity: data?.target_quantity
+          ? Number(data?.target_quantity)
+          : undefined,
         status: data?.status ?? undefined,
         urea_rate: data?.urea_rate ?? undefined,
         input_temprature_1: data?.input_temprature_1 ?? undefined,
@@ -112,9 +123,20 @@ const OrderGeneral = ({
         order_note: data?.order_note ?? undefined,
         created_by: data?.created_by ?? undefined,
       };
-      //   await productionLogApi.updateProductionLog(editGeneral?.id, payload);
-      notify("Cập nhật dữ liệu thành công!", "success");
+
+      await productOrderApi.updateOrder(editGeneral?.id, payload);
+
+      const updatedLabel = formula.find(
+        (item) => String(payload.formula_id) === String(item.value),
+      )?.label;
+      onEditGeneral({
+        ...editGeneral,
+        formula_id: payload.formula_id || 0,
+        formula_name: updatedLabel || "-",
+      });
+      console.log(payload);
       onSaveSuccess();
+      notify("Cập nhật dữ liệu thành công!", "success");
     } catch (err) {
       console.error("Save error:", err);
       onEditGeneral(selectedOrder);
@@ -123,8 +145,27 @@ const OrderGeneral = ({
   };
 
   useEffect(() => {
-    fetchIngredientList();
-  }, []);
+    let isMounted = true;
+    const fetchFormulaList = async () => {
+      try {
+        const response = await formulaApi.getAllFormula();
+        if (isMounted) {
+          const formattedData = response.data.map((item: FormulaType) => ({
+            label: item.formula_name,
+            value: String(item.id),
+          }));
+          setFormula(formattedData);
+        }
+      } catch (err) {
+        notify("Get Formula List failded", "error");
+        console.error("API Error:", err);
+      }
+    };
+    fetchFormulaList();
+    return () => {
+      isMounted = false;
+    };
+  }, [notify]);
   return (
     <GeneralInfoSection
       title="General"

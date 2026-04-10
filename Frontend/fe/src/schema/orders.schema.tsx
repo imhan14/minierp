@@ -39,7 +39,7 @@ export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
   order_date: {
     id: "order_date",
     label: "Date",
-    width: 120,
+    // width: 120,
     noWrap: true,
     isReadOnly: true,
     render: ((value: string) => {
@@ -48,6 +48,7 @@ export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
     }) as FieldConfig<OrderDisplay>["render"],
   },
   formula_name: { id: "formula_name", label: "Formular", align: "center" },
+  formula_id: { id: "formula_id", label: "Formula ID" },
   team_name: {
     id: "team_name",
     label: "Team Name",
@@ -60,7 +61,7 @@ export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
   status: {
     id: "status",
     label: "Status",
-    width: 120,
+    // width: 120,
     align: "right",
     noWrap: true,
     isReadOnly: true,

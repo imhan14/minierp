@@ -165,7 +165,7 @@ const OrderPage = () => {
       >
         <OrderGeneral
           selectedOrder={selectedOrder}
-          onSaveSuccess={fetchOrders}
+          onSaveSuccess={() => fetchOrders(selectedDate)}
           editGeneral={editGeneral}
           onEditGeneral={setEditGeneral}
         />

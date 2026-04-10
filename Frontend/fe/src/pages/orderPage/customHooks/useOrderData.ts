@@ -23,8 +23,8 @@ export const useOrderData = (selectedDate: Dayjs | null) => {
           ...rest,
           formula_id: formulas?.id,
           team_id: teams?.id,
-          team_name: teams?.team_name || "N/A",
-          formula_name: formulas?.formula_name || "N/A",
+          team_name: teams?.team_name || "-",
+          formula_name: formulas?.formula_name || "-",
         };
       });
 

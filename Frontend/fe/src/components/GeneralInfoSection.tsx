@@ -105,6 +105,7 @@ const GeneralInfoSection = <T,>({
           const isFieldEditing = isEditing && !col.isReadOnly;
           const rawValue = data[col.id as keyof T] ?? "";
           const currentGridSize = col.gridSize || { xs: 12, sm: 6, md: 3 };
+
           return (
             <Grid size={currentGridSize} key={col.id.toString()}>
               {isFieldEditing ? (

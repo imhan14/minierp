@@ -20,8 +20,11 @@ export const createProductOrderSchema = Joi.object({
 
 export const updateProductOrderSchema = Joi.object({
   team_id: Joi.number().integer().min(1).optional(),
+  formula_id: Joi.number().integer().min(1).optional(),
   product_shift: Joi.string().optional(),
   status: Joi.string().optional(),
+  target_quantity: Joi.number().integer().optional(),
+  urea_rate: Joi.number().integer().optional(),
   input_temprature_1: Joi.number().integer().min(1).optional(),
   output_temprature_1: Joi.number().integer().min(1).optional(),
   input_temprature_2: Joi.number().integer().min(1).optional(),

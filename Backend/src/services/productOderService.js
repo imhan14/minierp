@@ -45,6 +45,7 @@ export const getProductOrderService = async (filters) => {
       created_at: true,
       created_by: true,
     },
+    orderBy: { id: "asc" },
   });
 };
 

@@ -25,6 +25,9 @@ const productOrderApi = {
   createOrder: (data: OrderData) => {
     return instance.post<ProductOrderType>("/product-order", data);
   },
+  updateOrder: (id: number | null, data: OrderData) => {
+    return instance.patch(`/product-order/${id}`, data);
+  },
 };
 
 export default productOrderApi;
