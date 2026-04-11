@@ -3,13 +3,14 @@ import NotFound from "../pages/NotFound";
 import UserLayout from "../layouts/UserLayout";
 import Home from "../pages/Home";
 import AdminLayout from "../layouts/AdminLayout";
-import Dashboard from "../pages/Dashboard";
+import Dashboard from "../pages/dashboard/Dashboard";
 import Login from "../pages/Login";
 import AuthLayout from "../layouts/AuthLayout";
 import ProductionReportPage from "../pages/productionReport";
 import ProductionLogPage from "../pages/productionLog";
 import MaterialReportPage from "../pages/materialReport";
 import ProtectedRoute from "../components/ProtectedRoute";
+import FormulaPage from "../pages/formula";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
           {
             element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
             children: [{ path: "/dashboard", element: <Dashboard /> }],
+          },
+          {
+            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            children: [{ path: "/formula", element: <FormulaPage /> }],
           },
         ],
       },

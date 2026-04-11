@@ -1,14 +1,5 @@
 import type { FieldConfig } from "../types/FieldConfig";
-import type { ProductReportDetailType } from "../types/ProductReportDetailType";
-
-export interface ProductionReportDetailDisplay extends Omit<
-  ProductReportDetailType,
-  "products"
-> {
-  product_name: string;
-  isNew?: boolean;
-  product_id: number;
-}
+import type { ProductionReportDetailDisplay } from "../types/ProductReportDetailType";
 
 export const productionReportDetailSchema: Record<
   string,

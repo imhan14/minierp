@@ -37,14 +37,25 @@ const OrderGeneral = ({
     () => [
       { ...orderColumnSchema.order_date },
       {
-        id: "formula_id",
+        ...orderColumnSchema.formula_id,
         label: "Formula Name",
-        inputType: "select",
-        options: formula,
+        inputType: "autocomplete",
+        optionsAutoComplete: formula,
         gridSize: { md: 6 },
         render: (_, record) => record.formula_name || "-",
+        noWrap: true,
       },
-      { ...orderColumnSchema.team_name },
+      {
+        ...orderColumnSchema.team_id,
+        label: "Team Name",
+        inputType: "select",
+        options: [
+          { label: "Team 1", value: "1" },
+          { label: "Team 2", value: "2" },
+          { label: "Team 3", value: "3" },
+        ],
+        render: (_, record) => record.team_name || "-",
+      },
       {
         ...orderColumnSchema.product_shift,
         inputType: "select",
@@ -67,29 +78,12 @@ const OrderGeneral = ({
     [formula],
   );
 
-  // const fetchFormulaList = useCallback(async () => {
-  //   try {
-  //     const response = await formulaApi.getAllFormula();
-  //     const formattedData = response.data.map((item: FormulaType) => ({
-  //       label: item.formula_name,
-  //       value: String(item.id),
-  //     }));
-
-  //     setFormula(formattedData);
-  //   } catch (err) {
-  //     // setError("Không thể tải dữ liệu đơn hàng. Vui lòng thử lại!");
-  //     // notify("Get Formula List failded", "error");
-  //     console.error("API Error:", err);
-  //   }
-  // }, []);
-
   const handleGeneralChange = (field: keyof OrderDisplay, value: string) => {
     if (editGeneral) {
       onEditGeneral({ ...editGeneral, [field]: value });
     }
   };
   const handleSave = async () => {
-    console.log(editGeneral);
     if (!editGeneral) return;
     const { isValid, message, data } = validatePayload(
       orderValidateSchema,
@@ -107,7 +101,6 @@ const OrderGeneral = ({
       };
       const payload = {
         order_date: isValidDate(editGeneral?.order_date),
-        // formula_id: data?.formula_name ? Number(data?.formula_name) : undefined,
         formula_id: data?.formula_id ? Number(data.formula_id) : undefined,
         team_id: data?.team_id ?? undefined,
         product_shift: data?.product_shift ?? undefined,
@@ -134,7 +127,6 @@ const OrderGeneral = ({
         formula_id: payload.formula_id || 0,
         formula_name: updatedLabel || "-",
       });
-      console.log(payload);
       onSaveSuccess();
       notify("Cập nhật dữ liệu thành công!", "success");
     } catch (err) {

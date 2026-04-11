@@ -6,6 +6,7 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
@@ -140,17 +141,17 @@ const GeneralInfoSection = <T,>({
                     isOptionEqualToValue={(option, value) => {
                       if (!value) return false;
                       return (
-                        option.id ===
-                        (typeof value === "object" ? value : value.id)
+                        option.value ===
+                        (typeof value === "object" ? value : value.value)
                       );
                     }}
                     value={
                       col.optionsAutoComplete?.find(
-                        (opt) => String(opt.id) === String(rawValue),
+                        (opt) => String(opt.value) === String(rawValue),
                       ) || null
                     }
                     onChange={(_, newValue) => {
-                      const savedValue = newValue ? String(newValue.id) : "";
+                      const savedValue = newValue ? String(newValue.value) : "";
                       onGeneralChange?.(col.id as keyof T, savedValue);
                     }}
                     renderInput={(params) => (
@@ -171,9 +172,14 @@ const GeneralInfoSection = <T,>({
                     label={col.label}
                     select={col.inputType === "select"}
                     value={rawValue}
-                    onChange={(e) =>
-                      onGeneralChange?.(col.id as keyof T, e.target.value)
-                    }
+                    onChange={(e) => {
+                      // console.log(
+                      //   col.options?.find(
+                      //     (opt) => String(rawValue) === String(opt.value),
+                      //   )?.label,
+                      // );
+                      onGeneralChange?.(col.id as keyof T, e.target.value);
+                    }}
                     slotProps={{ inputLabel: { shrink: true } }}
                     sx={{ ...col.sx }}
                   >
@@ -206,12 +212,45 @@ const GeneralInfoSection = <T,>({
                   >
                     {col.label}
                   </Typography>
-
-                  <Box>
-                    {col.render
-                      ? col.render(data[col.id as keyof T], data)
-                      : data[col.id as keyof T]?.toString() || "-"}
-                  </Box>
+                  <Tooltip
+                    title={(() => {
+                      if (col.inputType === "select") {
+                        return (
+                          col.options?.find(
+                            (opt) => String(opt.value) === String(rawValue),
+                          )?.label || rawValue
+                        );
+                      }
+                      if (col.inputType === "autocomplete") {
+                        return (
+                          col.optionsAutoComplete?.find(
+                            (opt) => String(opt.value) === String(rawValue),
+                          )?.label || rawValue
+                        );
+                      }
+                      return data[col.id as keyof T]?.toString() || "";
+                    })()}
+                    arrow
+                    placement="top-start"
+                    disableInteractive
+                  >
+                    <Box
+                      sx={{
+                        whiteSpace: col.noWrap ? "nowrap" : "normal",
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        cursor: "default",
+                      }}
+                    >
+                      {col.inputType === "select"
+                        ? col.options?.find((opt) => {
+                            return String(opt.value) === String(rawValue);
+                          })?.label
+                        : col.render
+                          ? col.render(data[col.id as keyof T], data)
+                          : data[col.id as keyof T]?.toString() || "-"}
+                    </Box>
+                  </Tooltip>
                 </Box>
               )}
             </Grid>

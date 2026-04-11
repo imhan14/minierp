@@ -18,7 +18,6 @@ export const useOrderForm = (
       const payload = {
         order_date: dateParam,
       };
-      console.log(payload);
       await productOrderApi.createOrder(payload);
       onSuccess();
       notify("Add successfull!", "success");

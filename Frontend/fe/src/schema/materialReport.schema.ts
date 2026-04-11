@@ -1,12 +1,5 @@
 import type { FieldConfig } from "../types/FieldConfig";
-import type { MaterialReportType } from "../types/MaterialReportType";
-
-export interface MaterialReportDisplay extends Omit<
-  MaterialReportType,
-  "teams"
-> {
-  team_name: string;
-}
+import type { MaterialReportDisplay } from "../types/MaterialReportType";
 
 export const materialReportSchema: Record<
   string,

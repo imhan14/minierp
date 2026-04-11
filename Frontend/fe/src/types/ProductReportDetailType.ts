@@ -1,6 +1,15 @@
 import type { ProductionReportType } from "./ProductionReportType";
 import type { ProductType } from "./ProductType";
 
+export interface ProductionReportDetailDisplay extends Omit<
+  ProductReportDetailType,
+  "products"
+> {
+  product_name: string;
+  isNew?: boolean;
+  product_id: number;
+}
+
 export interface ProductReportDetailType {
   id: number | string;
   products: ProductType;

@@ -1,4 +1,10 @@
 import type { TeamType } from "./TeamType";
+export interface MaterialReportDisplay extends Omit<
+  MaterialReportType,
+  "teams"
+> {
+  team_name: string;
+}
 
 export interface ExtraMaterialsJson {
   id?: number | string;

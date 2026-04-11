@@ -52,8 +52,10 @@ export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
   team_name: {
     id: "team_name",
     label: "Team Name",
-    // width: 150,
-    // align: "right",
+  },
+  team_id: {
+    id: "team_id",
+    label: "Team ID",
   },
   product_shift: { id: "product_shift", label: "Shift", align: "right" },
   target_quantity: { id: "target_quantity", label: "Quantity", align: "right" },
@@ -61,7 +63,6 @@ export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
   status: {
     id: "status",
     label: "Status",
-    // width: 120,
     align: "right",
     noWrap: true,
     isReadOnly: true,

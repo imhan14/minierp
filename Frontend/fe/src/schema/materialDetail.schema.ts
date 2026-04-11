@@ -1,11 +1,6 @@
 import type { FieldConfig } from "../types/FieldConfig";
-import type { MaterialDetailType } from "../types/MaterialDetailType";
-export interface MaterialDetailDisplay extends Omit<
-  MaterialDetailType,
-  "ingredients"
-> {
-  ingredient_name: string;
-}
+import type { MaterialDetailDisplay } from "../types/MaterialDetailType";
+
 export const materialDetailSchema: Record<
   string,
   FieldConfig<MaterialDetailDisplay>

@@ -1,12 +1,5 @@
 import type { FieldConfig } from "../types/FieldConfig";
-import type { ProductionReportType } from "../types/ProductionReportType";
-
-export interface ProductionReportDisplay extends Omit<
-  ProductionReportType,
-  "teams"
-> {
-  team_name: string;
-}
+import type { ProductionReportDisplay } from "../types/ProductionReportType";
 
 export const productionReportSchema: Record<
   string,
