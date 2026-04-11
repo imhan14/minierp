@@ -20,6 +20,7 @@ import { logout } from "../redux/slices/authSlice";
 import { useNavigate, useLocation } from "react-router";
 import NavItem from "./NavItem";
 import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlined";
+import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
 
 const drawerWidth = 240;
 const themeColor = {
@@ -100,6 +101,7 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       path: "/production-report",
     },
     { text: "Production Log", icon: <GradingIcon />, path: "/production-log" },
+    { text: "Formulas", icon: <ScienceOutlinedIcon />, path: "/formula" },
   ];
   const filteredMenuItems = menuItems.filter((item) => {
     if (item.text === "Dashboard" && Number(id) > 5) {

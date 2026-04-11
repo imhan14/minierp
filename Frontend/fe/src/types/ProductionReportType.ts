@@ -1,5 +1,12 @@
 import type { TeamType } from "./TeamType";
 
+export interface ProductionReportDisplay extends Omit<
+  ProductionReportType,
+  "teams"
+> {
+  team_name: string;
+}
+
 export interface ProductionReportType {
   id: number;
   report_date: string;

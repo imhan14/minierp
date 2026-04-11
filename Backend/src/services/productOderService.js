@@ -1,5 +1,10 @@
-import { prisma } from "../../lib/prisma.ts";
 import dayjs from "dayjs";
+import { prisma } from "../../lib/prisma.ts";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const createProductOrderService = async (data) => {
   return await prisma.product_orders.create({
@@ -11,8 +16,8 @@ export const getProductOrderService = async (filters) => {
   const { id, date, search } = filters;
   let dateFilter = {};
   if (date) {
-    const startOfDay = dayjs(date).startOf("day").toDate();
-    const endOfDay = dayjs(date).endOf("day").toDate();
+    const startOfDay = dayjs.utc(date).startOf("day").toISOString();
+    const endOfDay = dayjs.utc(date).endOf("day").toISOString();
     dateFilter = {
       gte: startOfDay,
       lte: endOfDay,
@@ -40,6 +45,7 @@ export const getProductOrderService = async (filters) => {
       created_at: true,
       created_by: true,
     },
+    orderBy: { id: "asc" },
   });
 };
 

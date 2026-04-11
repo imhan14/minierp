@@ -1,10 +1,12 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Grid,
   MenuItem,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
@@ -104,6 +106,7 @@ const GeneralInfoSection = <T,>({
           const isFieldEditing = isEditing && !col.isReadOnly;
           const rawValue = data[col.id as keyof T] ?? "";
           const currentGridSize = col.gridSize || { xs: 12, sm: 6, md: 3 };
+
           return (
             <Grid size={currentGridSize} key={col.id.toString()}>
               {isFieldEditing ? (
@@ -127,6 +130,41 @@ const GeneralInfoSection = <T,>({
                       },
                     }}
                   />
+                ) : col.inputType === "autocomplete" ? (
+                  <Autocomplete
+                    options={col.optionsAutoComplete || []}
+                    getOptionLabel={
+                      col.getOptionLabel ||
+                      ((option) =>
+                        typeof option === "string" ? option : option.label)
+                    }
+                    isOptionEqualToValue={(option, value) => {
+                      if (!value) return false;
+                      return (
+                        option.value ===
+                        (typeof value === "object" ? value : value.value)
+                      );
+                    }}
+                    value={
+                      col.optionsAutoComplete?.find(
+                        (opt) => String(opt.value) === String(rawValue),
+                      ) || null
+                    }
+                    onChange={(_, newValue) => {
+                      const savedValue = newValue ? String(newValue.value) : "";
+                      onGeneralChange?.(col.id as keyof T, savedValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={col.label}
+                        size="small"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ ...col.sx }}
+                      />
+                    )}
+                  />
                 ) : (
                   <TextField
                     fullWidth
@@ -134,9 +172,14 @@ const GeneralInfoSection = <T,>({
                     label={col.label}
                     select={col.inputType === "select"}
                     value={rawValue}
-                    onChange={(e) =>
-                      onGeneralChange?.(col.id as keyof T, e.target.value)
-                    }
+                    onChange={(e) => {
+                      // console.log(
+                      //   col.options?.find(
+                      //     (opt) => String(rawValue) === String(opt.value),
+                      //   )?.label,
+                      // );
+                      onGeneralChange?.(col.id as keyof T, e.target.value);
+                    }}
                     slotProps={{ inputLabel: { shrink: true } }}
                     sx={{ ...col.sx }}
                   >
@@ -149,25 +192,6 @@ const GeneralInfoSection = <T,>({
                   </TextField>
                 )
               ) : (
-                // <TextField
-                //   fullWidth
-                //   size="small"
-                //   label={col.label}
-                //   variant="standard"
-                //   disabled
-                //   value={
-                //     (!isEditing || col.isReadOnly) && col.render
-                //       ? col.render(data[col.id as keyof T], data)
-                //       : (data[col.id as keyof T] ?? "")
-                //   }
-                //   sx={{
-                //     "& .MuiInputBase-input.Mui-disabled": {
-                //       WebkitTextFillColor: "#334155",
-                //     },
-                //     bgcolor: "#f8fafc",
-                //     ...col.sx,
-                //   }}
-                // />
                 <Box
                   sx={{
                     p: 0.2,
@@ -188,12 +212,45 @@ const GeneralInfoSection = <T,>({
                   >
                     {col.label}
                   </Typography>
-
-                  <Box>
-                    {col.render
-                      ? col.render(data[col.id as keyof T], data)
-                      : data[col.id as keyof T]?.toString() || "-"}
-                  </Box>
+                  <Tooltip
+                    title={(() => {
+                      if (col.inputType === "select") {
+                        return (
+                          col.options?.find(
+                            (opt) => String(opt.value) === String(rawValue),
+                          )?.label || rawValue
+                        );
+                      }
+                      if (col.inputType === "autocomplete") {
+                        return (
+                          col.optionsAutoComplete?.find(
+                            (opt) => String(opt.value) === String(rawValue),
+                          )?.label || rawValue
+                        );
+                      }
+                      return data[col.id as keyof T]?.toString() || "";
+                    })()}
+                    arrow
+                    placement="top-start"
+                    disableInteractive
+                  >
+                    <Box
+                      sx={{
+                        whiteSpace: col.noWrap ? "nowrap" : "normal",
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        cursor: "default",
+                      }}
+                    >
+                      {col.inputType === "select"
+                        ? col.options?.find((opt) => {
+                            return String(opt.value) === String(rawValue);
+                          })?.label
+                        : col.render
+                          ? col.render(data[col.id as keyof T], data)
+                          : data[col.id as keyof T]?.toString() || "-"}
+                    </Box>
+                  </Tooltip>
                 </Box>
               )}
             </Grid>

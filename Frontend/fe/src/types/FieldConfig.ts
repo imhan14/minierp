@@ -12,7 +12,17 @@ export interface FieldConfig<T> {
   inGeneral?: boolean;
   isReadOnly?: boolean;
   isCellEditable?: boolean;
-  inputType?: "text" | "number" | "date" | "time" | "select" | "datetime-local";
+  optionsAutoComplete?: any[];
+  getOptionLabel?: (option: any) => string;
+  isOptionEqualToValue?: (option: any, value: any) => boolean;
+  inputType?:
+    | "text"
+    | "number"
+    | "date"
+    | "time"
+    | "select"
+    | "datetime-local"
+    | "autocomplete";
   options?: { label: string; value: string }[];
   gridSize?: { xs?: number; sm?: number; md?: number; lg?: number };
   sx?: SxProps<Theme>;

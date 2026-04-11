@@ -11,6 +11,7 @@ export const useOrderData = (selectedDate: Dayjs | null) => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
   const [error, setError] = useState<string | null>(null);
+
   const fetchOrders = async (date?: Dayjs | null) => {
     try {
       setLoading(true);
@@ -22,8 +23,8 @@ export const useOrderData = (selectedDate: Dayjs | null) => {
           ...rest,
           formula_id: formulas?.id,
           team_id: teams?.id,
-          team_name: teams?.team_name || "N/A",
-          formula_name: formulas?.formula_name || "N/A",
+          team_name: teams?.team_name || "-",
+          formula_name: formulas?.formula_name || "-",
         };
       });
 
@@ -38,6 +39,7 @@ export const useOrderData = (selectedDate: Dayjs | null) => {
   };
 
   const fetchFormulaDetail = async (formulaId: number) => {
+    if (!formulaId) return;
     try {
       setDetailLoading(true);
       const response = await formulaDetailApi.getAllFormulaDetails({
@@ -63,6 +65,7 @@ export const useOrderData = (selectedDate: Dayjs | null) => {
       setDetailLoading(false);
     }
   };
+
   useEffect(() => {
     fetchOrders(selectedDate);
   }, [selectedDate]);

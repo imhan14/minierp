@@ -13,6 +13,7 @@ import materialReportRouter from "./materialReportRoutes.js";
 import materialDetailRouter from "./materialDetailRoutes.js";
 import productReportDetailRouter from "./productReportDetailRoutes.js";
 import productionLogDetailRouter from "./productionLogDetailRoutes.js";
+import formulaRouter from "./formulaRoutes.js";
 
 const router = express.Router();
 
@@ -30,5 +31,6 @@ router.use("/material-report", materialReportRouter);
 router.use("/material-detail", materialDetailRouter);
 router.use("/product-report-detail", productReportDetailRouter);
 router.use("/production-log-detail", productionLogDetailRouter);
+router.use("/formula", formulaRouter);
 
 export default router;
