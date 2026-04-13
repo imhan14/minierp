@@ -1,22 +1,34 @@
 import { useEffect, useState } from "react";
 import type { Dayjs } from "dayjs";
-import productOrderApi from "../../../apis/productOrderApi";
+import productOrderApi, {
+  type OrderFilters,
+} from "../../../apis/productOrderApi";
 import formulaDetailApi from "../../../apis/formulaDetailApi";
 import type { OrderDisplay } from "../../../types/ProductOrderType";
 import type { FormulaDetailDisplay } from "../../../types/FormulaDetailType";
 
-export const useOrderData = (selectedDate: Dayjs | null) => {
+export const useOrderData = (
+  selectedDate: Dayjs | null,
+  endDate: Dayjs | null = null,
+) => {
   const [orders, setOrders] = useState<OrderDisplay[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOrders = async (date?: Dayjs | null) => {
+  const fetchOrders = async (start?: Dayjs | null, endDate?: Dayjs | null) => {
     try {
       setLoading(true);
-      const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
-      const response = await productOrderApi.getAllOrders({ date: dateParam });
+      const params: OrderFilters = {};
+      if (endDate && start) {
+        params.startDate = start.format("YYYY-MM-DD");
+        params.endDate = endDate.format("YYYY-MM-DD");
+      } else if (start) {
+        params.date = start.format("YYYY-MM-DD");
+      }
+
+      const response = await productOrderApi.getAllOrders(params);
       const formattedData: OrderDisplay[] = response.data.map((item) => {
         const { teams, formulas, ...rest } = item;
         return {
@@ -67,8 +79,8 @@ export const useOrderData = (selectedDate: Dayjs | null) => {
   };
 
   useEffect(() => {
-    fetchOrders(selectedDate);
-  }, [selectedDate]);
+    fetchOrders(selectedDate, endDate);
+  }, [selectedDate, endDate]);
   return {
     orders,
     detailLoading,

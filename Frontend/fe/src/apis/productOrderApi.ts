@@ -1,5 +1,11 @@
 import type { ProductOrderType } from "../types/ProductOrderType";
 import instance from "./axios";
+
+export interface OrderFilters {
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+}
 export interface OrderData {
   formula_id?: number;
   team_id?: number;
@@ -17,9 +23,9 @@ export interface OrderData {
 }
 
 const productOrderApi = {
-  getAllOrders: (params?: unknown) => {
+  getAllOrders: (params?: OrderFilters) => {
     return instance.get<ProductOrderType[]>("/product-order", {
-      params: params,
+      params,
     });
   },
   createOrder: (data: OrderData) => {
