@@ -15,12 +15,12 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import DynamicPopup from "../../components/DynamicPopup";
 import type { FieldConfig } from "../../types/FieldConfig";
 import { materialReportSchema } from "../../schema/materialReport.schema";
-import type { MaterialReportDisplay } from "../../schema/materialReport.schema";
 import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
 import MaterialDetailList from "./components/MaterialDetailList";
 import OtherIngredient from "./components/OtherIngredient";
 import { useMaterialReportData } from "./customHooks/useMaterialReportData";
 import useMaterialReportForm from "./customHooks/useMaterialReportForm";
+import type { MaterialReportDisplay } from "../../types/MaterialReportType";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -39,8 +39,10 @@ const MaterialReportPage = () => {
   const [editGeneral, setEditGeneral] = useState<MaterialReportDisplay | null>(
     null,
   );
+  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   const { loading, error, materialReports, getMaterialReport } =
-    useMaterialReportData(selectedDate);
+    useMaterialReportData(selectedDate, endDate);
   const { handleAddNewReport, isSubmitting } = useMaterialReportForm(
     selectedDate,
     () => getMaterialReport(selectedDate),
@@ -113,16 +115,31 @@ const MaterialReportPage = () => {
   return (
     <Box>
       <DrawerHeader />
-      <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <Filters
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        mode={filterMode}
+        setMode={setFilterMode}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
       <Box>
         {!isSubmitting && (
-          <Button
-            variant="contained"
-            sx={{ marginBottom: 1 }}
-            onClick={handleAddNewReport}
-          >
-            Add new Report
-          </Button>
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Button
+              disabled={filterMode === "range"}
+              variant="contained"
+              sx={{ marginBottom: 1 }}
+              onClick={handleAddNewReport}
+            >
+              Add new Order
+            </Button>
+            {filterMode === "range" && (
+              <Typography sx={{ color: "red" }} variant="subtitle2">
+                *Add button only available on Single Mode
+              </Typography>
+            )}
+          </Box>
         )}
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>

@@ -1,12 +1,10 @@
 import type { FieldConfig } from "../../../types/FieldConfig";
-import {
-  materialReportSchema,
-  type MaterialReportDisplay,
-} from "../../../schema/materialReport.schema";
+import { materialReportSchema } from "../../../schema/materialReport.schema";
 import dayjs from "dayjs";
 import GeneralInfoSection from "../../../components/GeneralInfoSection";
 import { useNotify } from "../../../hooks/useNotify";
 import materialReportApi from "../../../apis/materialReportApi";
+import type { MaterialReportDisplay } from "../../../types/MaterialReportType";
 
 interface Props {
   selectedMaterial: MaterialReportDisplay | null;

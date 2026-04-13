@@ -6,6 +6,8 @@ import instance from "./axios";
 export interface MaterialReportFilters {
   date?: string;
   team_id?: number;
+  startDate?: string;
+  endDate?: string;
 }
 export interface MaterialReportData {
   team_id?: number;
@@ -18,9 +20,9 @@ export interface MaterialReportData {
 }
 
 const materialReportApi = {
-  getAllMaterialReports: (filters: MaterialReportFilters) => {
+  getAllMaterialReports: (params: MaterialReportFilters) => {
     return instance.get<MaterialReportType[]>("/material-report", {
-      params: filters,
+      params,
     });
   },
   createMaterialReport: (data: MaterialReportData) => {

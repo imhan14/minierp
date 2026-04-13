@@ -36,29 +36,14 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
 }));
-// export interface OrderDisplay extends Omit<
-//   ProductOrderType,
-//   "teams" | "formulas"
-// > {
-//   formula_id: number;
-//   team_name: string;
-//   formula_name: string;
-// }
-// interface FormulaDetailDisplay extends Omit<FormulaDetailType, "ingredients"> {
-//   ingredient_name: string;
-//   unit: string;
-// }
 
 const OrderPage = () => {
-  // const [orders, setOrders] = useState<OrderDisplay[]>([]);
-  // const [formula, setFormula] = useState<FormulaDetailDisplay[]>([]);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderDisplay | null>(null);
-  // const [loading, setLoading] = useState<boolean>(true);
-  // const [detailLoading, setDetailLoading] = useState(false);
-  // const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [editGeneral, setEditGeneral] = useState<OrderDisplay | null>(null);
+  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
 
   const {
     detailLoading,
@@ -69,7 +54,7 @@ const OrderPage = () => {
     orders,
     setFormula,
     fetchOrders,
-  } = useOrderData(selectedDate);
+  } = useOrderData(selectedDate, endDate);
   const { handleAddNewReport } = useOrderForm(selectedDate, () =>
     fetchOrders(selectedDate),
   );
@@ -135,16 +120,31 @@ const OrderPage = () => {
   return (
     <Box>
       <DrawerHeader />
-      <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-      <PermissionGate allowedRoles={[1, 2, 3, 4, 5]}>
-        <Button
-          variant="contained"
-          sx={{ marginBottom: 1 }}
-          onClick={handleAddNewReport}
-        >
-          Add new Order
-        </Button>
-      </PermissionGate>
+      <Filters
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        mode={filterMode}
+        setMode={setFilterMode}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <PermissionGate allowedRoles={[1, 2, 3, 4, 5]}>
+          <Button
+            disabled={filterMode === "range"}
+            variant="contained"
+            sx={{ marginBottom: 1 }}
+            onClick={handleAddNewReport}
+          >
+            Add new Order
+          </Button>
+          {filterMode === "range" && (
+            <Typography sx={{ color: "red" }} variant="subtitle2">
+              *Add button only available on Single Mode
+            </Typography>
+          )}
+        </PermissionGate>
+      </Box>
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
           <CircularProgress />
@@ -157,7 +157,6 @@ const OrderPage = () => {
           getRowKey={(row) => row.id}
         />
       )}
-
       <DynamicPopup
         open={openDetail}
         onClose={handleCloseDetail}

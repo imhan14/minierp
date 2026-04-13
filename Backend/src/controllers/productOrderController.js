@@ -40,6 +40,8 @@ export const getProductOrder = async (req, res) => {
   const filters = {
     id: req.query.id ? Number(req.query.id) : undefined,
     date: req.query.date ? req.query.date : undefined,
+    startDate: req.query.startDate ? req.query.startDate : undefined,
+    endDate: req.query.endDate ? req.query.endDate : undefined,
   };
 
   const productOrders = await getProductOrderService(filters);

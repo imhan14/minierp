@@ -13,21 +13,23 @@ export const createProductOrderService = async (data) => {
 };
 
 export const getProductOrderService = async (filters) => {
-  const { id, date, search } = filters;
-  let dateFilter = {};
-  if (date) {
-    const startOfDay = dayjs.utc(date).startOf("day").toISOString();
-    const endOfDay = dayjs.utc(date).endOf("day").toISOString();
-    dateFilter = {
-      gte: startOfDay,
-      lte: endOfDay,
+  const { id, date, search, startDate, endDate } = filters;
+  const where = {};
+
+  if (id) where.id = id;
+  if (startDate && endDate)
+    where.order_date = {
+      gte: dayjs.utc(startDate).startOf("day").toISOString(),
+      lte: dayjs.utc(endDate).endOf("day").toISOString(),
     };
-  }
+  else if (date)
+    where.order_date = {
+      gte: dayjs.utc(date).startOf("day").toISOString(),
+      lte: dayjs.utc(date).endOf("day").toISOString(),
+    };
+
   return await prisma.product_orders.findMany({
-    where: {
-      ...(id && { id: id }),
-      ...(date && { order_date: dateFilter }),
-    },
+    where,
     select: {
       id: true,
       order_date: true,

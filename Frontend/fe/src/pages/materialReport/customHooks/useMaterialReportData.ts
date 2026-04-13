@@ -1,22 +1,36 @@
 import type { Dayjs } from "dayjs";
-import type { MaterialReportDisplay } from "../../../schema/materialReport.schema";
-import { useCallback, useEffect, useState } from "react";
-import materialReportApi from "../../../apis/materialReportApi";
 
-export const useMaterialReportData = (selectedDate?: Dayjs | null) => {
+import { useCallback, useEffect, useState } from "react";
+import materialReportApi, {
+  type MaterialReportFilters,
+} from "../../../apis/materialReportApi";
+import type { MaterialReportDisplay } from "../../../types/MaterialReportType";
+
+export const useMaterialReportData = (
+  selectedDate?: Dayjs | null,
+  endDate?: Dayjs | null,
+) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [materialReports, setMaterialReports] = useState<
     MaterialReportDisplay[]
   >([]);
 
-  const fetchMaterialReportData = async (date?: Dayjs | null) => {
+  const fetchMaterialReportData = async (
+    start?: Dayjs | null,
+    endDate?: Dayjs | null,
+  ) => {
     const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-    const dateParam = date?.isValid() ? date.format("YYYY-MM-DD") : "";
-    const response = await materialReportApi.getAllMaterialReports({
-      date: dateParam,
-      team_id: currentUser?.team_id,
-    });
+    const params: MaterialReportFilters = {};
+    if (endDate && start) {
+      params.startDate = start.format("YYYY-MM-DD");
+      params.endDate = endDate.format("YYYY-MM-DD");
+    } else if (start) {
+      params.date = start.format("YYYY-MM-DD");
+    }
+    if (currentUser?.team_id) params.team_id = currentUser?.team_id;
+    // const dateParam = date?.isValid() ? start.format("YYYY-MM-DD") : "";
+    const response = await materialReportApi.getAllMaterialReports(params);
     const formattedData: MaterialReportDisplay[] = response.data.map((item) => {
       const { teams, ...rest } = item;
       return {
@@ -28,21 +42,24 @@ export const useMaterialReportData = (selectedDate?: Dayjs | null) => {
     return formattedData;
   };
 
-  const getMaterialReport = useCallback(async (date?: Dayjs | null) => {
-    try {
-      setLoading(true);
-      setMaterialReports(await fetchMaterialReportData(date));
-      setError(null);
-    } catch (err) {
-      setError("Không thể tải dữ liệu.");
-      console.error("API Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getMaterialReport = useCallback(
+    async (date?: Dayjs | null, endDate?: Dayjs | null) => {
+      try {
+        setLoading(true);
+        setMaterialReports(await fetchMaterialReportData(date, endDate));
+        setError(null);
+      } catch (err) {
+        setError("Không thể tải dữ liệu.");
+        console.error("API Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    getMaterialReport(selectedDate);
-  }, [getMaterialReport, selectedDate]);
+    getMaterialReport(selectedDate, endDate);
+  }, [getMaterialReport, selectedDate, endDate]);
   return { loading, error, materialReports, getMaterialReport };
 };

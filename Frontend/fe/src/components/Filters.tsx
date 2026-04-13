@@ -1,16 +1,14 @@
 import {
+  Box,
   FormControl,
   IconButton,
   InputAdornment,
-  // MenuItem,
   Paper,
-  // Select,
   TextField,
-  Typography,
-  // type SelectChangeEvent,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-// import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { Dayjs } from "dayjs";
 // import { useLocation } from "react-router";
@@ -18,9 +16,22 @@ import { Dayjs } from "dayjs";
 interface Filters {
   selectedDate: Dayjs | null;
   setSelectedDate: (value: Dayjs | null) => void;
+  mode: "single" | "range";
+  setMode: (mode: "single" | "range") => void;
+  children?: React.ReactNode;
+  endDate?: Dayjs | null;
+  setEndDate?: (value: Dayjs | null) => void;
 }
 
-const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
+const Filters = ({
+  selectedDate,
+  setSelectedDate,
+  mode,
+  setMode,
+  children,
+  endDate,
+  setEndDate,
+}: Filters) => {
   // const location = useLocation();
   // const [age, setAge] = useState("");
 
@@ -43,29 +54,64 @@ const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
         flexWrap: "wrap",
       }}
     >
-      <Typography sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}>
-        Filters:
-      </Typography>
+      <ToggleButtonGroup
+        value={mode}
+        exclusive
+        onChange={(_, nextMode) => {
+          if (nextMode) {
+            setMode(nextMode);
+
+            if (nextMode === "single") {
+              setEndDate?.(null);
+            } else if (nextMode === "range") {
+              setEndDate?.(selectedDate);
+            }
+          }
+        }}
+        size="small"
+        sx={{ mr: 2 }}
+      >
+        <ToggleButton value="single">Một ngày</ToggleButton>
+        <ToggleButton value="range">Bộ lọc</ToggleButton>
+      </ToggleButtonGroup>
+
       <DatePicker
-        label="Pick date"
+        label={mode === "single" ? "Chọn ngày" : "Từ ngày"}
         value={selectedDate}
         onChange={(newValue) => setSelectedDate(newValue)}
         format="DD/MM/YYYY"
         slotProps={{
           textField: {
-            sx: { maxWidth: "200px" },
+            sx: { maxWidth: "150px" },
             size: "small",
             fullWidth: true,
           },
         }}
       />
+      {mode === "range" && (
+        <DatePicker
+          label="Đến ngày"
+          value={endDate || null}
+          onChange={(newValue) => {
+            if (setEndDate) setEndDate(newValue);
+          }}
+          format="DD/MM/YYYY"
+          slotProps={{
+            textField: {
+              sx: { maxWidth: "150px" },
+              size: "small",
+              fullWidth: true,
+            },
+          }}
+        />
+      )}
       <TextField
         variant="outlined"
         placeholder="Search..."
         size="small"
         fullWidth
         sx={{
-          maxWidth: "400px",
+          maxWidth: "250px",
           borderRadius: 1.5,
           "& .MuiOutlinedInput-root": {
             color: "black",
@@ -87,6 +133,7 @@ const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
           ),
         }}
       />
+
       {/* {location.pathname === "/production-log" && ( */}
       <FormControl sx={{ m: 1, minWidth: 120 }}>
         {/* <Select
@@ -105,6 +152,8 @@ const Filters = ({ selectedDate, setSelectedDate }: Filters) => {
         {/* <FormHelperText>Without label</FormHelperText> */}
       </FormControl>
       {/* )} */}
+      <Box sx={{ flexGrow: 1 }} />
+      {children}
     </Paper>
   );
 };
