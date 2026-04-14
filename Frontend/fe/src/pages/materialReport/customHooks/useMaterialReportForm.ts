@@ -1,7 +1,7 @@
 import type { Dayjs } from "dayjs";
-import materialReportApi from "../../../apis/materialReportApi";
+import materialReportApi from "@/apis/materialReportApi";
 import { useState } from "react";
-import { useNotify } from "../../../hooks/useNotify";
+import { useNotify } from "@/hooks/useNotify";
 
 const useMaterialReportForm = (
   selectedDate: Dayjs | null,

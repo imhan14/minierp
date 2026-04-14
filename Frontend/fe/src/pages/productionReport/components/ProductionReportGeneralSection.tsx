@@ -1,14 +1,12 @@
-import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import {
-  productionReportSchema,
-  type ProductionReportDisplay,
-} from "../../../schema/productionReport.schema";
-import type { FieldConfig } from "../../../types/FieldConfig";
+import GeneralInfoSection from "@components/GeneralInfoSection";
+import { productionReportSchema } from "@/schema/productionReport.schema";
+import type { FieldConfig } from "@/types/FieldConfig";
 import dayjs from "dayjs";
-import { useNotify } from "../../../hooks/useNotify";
-import productionReportApi from "../../../apis/productionReportApi";
-import { updateGeneralSchema } from "../../../validate/productionReport.validate";
-import { validatePayload } from "../../../utils/validate";
+import { useNotify } from "@/hooks/useNotify";
+import productionReportApi from "@/apis/productionReportApi";
+import { updateGeneralSchema } from "@/validate/productionReport.validate";
+import { validatePayload } from "@/utils/validate";
+import type { ProductionReportDisplay } from "@/types/ProductionReportType";
 
 interface Props {
   selectedMaterial: ProductionReportDisplay | null;

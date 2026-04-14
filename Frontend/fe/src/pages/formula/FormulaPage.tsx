@@ -13,10 +13,19 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 const FormulaPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   return (
     <>
       <DrawerHeader />
-      <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <Filters
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        mode={filterMode}
+        setMode={setFilterMode}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
     </>
   );
 };

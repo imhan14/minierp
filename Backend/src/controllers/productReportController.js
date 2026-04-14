@@ -30,6 +30,8 @@ export const getProductReport = async (req, res) => {
     search: search ? search : undefined,
     date: date ? date : undefined,
     team_id: undefined,
+    startDate: req.query.startDate ? req.query.startDate : undefined,
+    endDate: req.query.endDate ? req.query.endDate : undefined,
   };
   if (role >= 7) filters.team_id = Number(userTeamId);
   else filters.team_id = queryTeamId ? Number(queryTeamId) : undefined;

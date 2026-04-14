@@ -1,13 +1,13 @@
-import { ConfirmDiscardDialog } from "../../../components/ConfirmDiscardDialog";
+import { ConfirmDiscardDialog } from "@components/ConfirmDiscardDialog";
 import LogExtraInfor from "./LogExtraInfor";
-import DataTable, { type ActionConfig } from "../../../components/DataTable";
+import DataTable, { type ActionConfig } from "@components/DataTable";
 import { Box, Button, Skeleton, Typography } from "@mui/material";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
+import type { ProductionLogDetailType } from "@/types/ProductionLogDetailType";
 import { useLogDetailData } from "../customHooks/useLogDetailData";
 import { productLogDetailColumns } from "../utils/columns";
 import { useLogDetailForm } from "../customHooks/useLogDetailForm";

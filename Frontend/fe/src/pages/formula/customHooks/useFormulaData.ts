@@ -1,39 +1,35 @@
-import { useCallback, useEffect, useState } from "react";
+import formulaApi, { type FormulaFilters } from "@/apis/formulaApi";
+import type { FormulaDisplay } from "@/types/FormulaType";
 import type { Dayjs } from "dayjs";
-import productionLogApi, {
-  type ProductionLogFilters,
-} from "@/apis/productionLogApi";
-import type { ProductionLogDisplay } from "@/types/ProductionLogType";
+import { useCallback, useEffect, useState } from "react";
 
-export const useProductionLogData = (
+export const useFormulaData = (
   selectedDate: Dayjs | null,
   endDate: Dayjs | null = null,
 ) => {
-  const [productionLog, setProductionLog] = useState<ProductionLogDisplay[]>(
-    [],
-  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formula, setFormula] = useState<FormulaDisplay[]>([]);
 
-  const formatProductionLog = async (
+  const formatFormula = async (
     start?: Dayjs | null,
     endDate?: Dayjs | null,
   ) => {
-    const params: ProductionLogFilters = {};
+    const params: FormulaFilters = {};
     if (endDate && start) {
       params.startDate = start.format("YYYY-MM-DD");
       params.endDate = endDate.format("YYYY-MM-DD");
     } else if (start) {
       params.date = start.format("YYYY-MM-DD");
     }
-    const response = await productionLogApi.getAllProductionLog(params);
+    const response = await formulaApi.getAllFormula(params);
 
-    const formattedData: ProductionLogDisplay[] = response.data.map((item) => {
-      const { teams, ...rest } = item;
+    const formattedData: FormulaDisplay[] = response.data.map((item) => {
+      const { products, ...rest } = item;
       return {
         ...rest,
-        team_id: teams?.id,
-        team_name: teams?.team_name || "N/A",
+        product_id: products?.id,
+        product_name_name: products?.team_name || "N/A",
       };
     });
     return formattedData;
@@ -42,7 +38,7 @@ export const useProductionLogData = (
     async (date?: Dayjs | null, endDate?: Dayjs | null) => {
       try {
         setLoading(true);
-        setProductionLog(await formatProductionLog(date, endDate));
+        setFormula(await formatFormula(date, endDate));
         setError(null);
       } catch (err) {
         setError("Không thể tải dữ liệu.");
@@ -56,5 +52,6 @@ export const useProductionLogData = (
   useEffect(() => {
     fetchProductionLog(selectedDate, endDate);
   }, [selectedDate, endDate, fetchProductionLog]);
-  return { productionLog, loading, error, fetchProductionLog };
+
+  return { loading, error, formula };
 };

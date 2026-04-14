@@ -1,12 +1,16 @@
+import type { FormulaType } from "@/types/FormulaType";
 import instance from "./axios";
 
-export interface FiltersProps {
+export interface FormulaFilters {
   id?: number;
+  startDate?: string;
+  endDate?: string;
+  date?: string;
 }
 
 const formulaApi = {
-  getAllFormula: (filters?: FiltersProps) => {
-    return instance.get("/formula", { params: filters });
+  getAllFormula: (params?: FormulaFilters) => {
+    return instance.get<FormulaType[]>("/formula", { params });
   },
 };
 

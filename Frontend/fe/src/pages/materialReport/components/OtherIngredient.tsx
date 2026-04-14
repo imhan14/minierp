@@ -1,14 +1,16 @@
 import { Box, Button, Skeleton, TextField, Typography } from "@mui/material";
 import { useEffect } from "react";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import DataTable, { type ActionConfig } from "../../../components/DataTable";
+import DataTable, { type ActionConfig } from "@components/DataTable";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import type { MaterialReportDisplay } from "../../../schema/materialReport.schema";
-import type { ExtraMaterialsJson } from "../../../types/MaterialReportType";
-import { ExtraMaterialsJsonSchema } from "../../../schema/extralMaterial.schema";
+import type {
+  ExtraMaterialsJson,
+  MaterialReportDisplay,
+} from "@/types/MaterialReportType";
+import { ExtraMaterialsJsonSchema } from "@/schema/extralMaterial.schema";
 import useOtherIngredientForm from "../customHooks/useOtherIngredientForm";
 import useOtherIngredientData from "../customHooks/useOtherIngredientData";
 

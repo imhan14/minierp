@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { useNotify } from "../../../hooks/useNotify";
-import type { ExtraMaterialsJson } from "../../../types/MaterialReportType";
-import materialReportApi from "../../../apis/materialReportApi";
+import { useNotify } from "@/hooks/useNotify";
+import type { ExtraMaterialsJson } from "@/types/MaterialReportType";
+import materialReportApi from "@/apis/materialReportApi";
 
 const useOtherIngredientForm = (
   material_id: number | undefined,

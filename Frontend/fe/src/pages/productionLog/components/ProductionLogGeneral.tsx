@@ -1,12 +1,12 @@
-import type { ProductionLogDisplay } from "../../../types/ProductionLogType";
-import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import { productionLogSchema } from "../../../schema/productionLog.schema";
-import type { FieldConfig } from "../../../types/FieldConfig";
-import { useNotify } from "../../../hooks/useNotify";
+import type { ProductionLogDisplay } from "@/types/ProductionLogType";
+import GeneralInfoSection from "@components/GeneralInfoSection";
+import { productionLogSchema } from "@/schema/productionLog.schema";
+import type { FieldConfig } from "@/types/FieldConfig";
+import { useNotify } from "@/hooks/useNotify";
 import dayjs from "dayjs";
-import { validatePayload } from "../../../utils/validate";
-import { updateProductLogGeneralSchema } from "../../../validate/productionLog.validate";
-import productionLogApi from "../../../apis/productionLogApi";
+import { validatePayload } from "@/utils/validate";
+import { updateProductLogGeneralSchema } from "@/validate/productionLog.validate";
+import productionLogApi from "@/apis/productionLogApi";
 
 interface Props {
   selectedLog: ProductionLogDisplay | null;

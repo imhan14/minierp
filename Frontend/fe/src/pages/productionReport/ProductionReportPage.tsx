@@ -9,19 +9,17 @@ import { useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import Filters from "../../components/Filters";
-import DataTable, { type ActionConfig } from "../../components/DataTable";
+import Filters from "@components/Filters";
+import DataTable, { type ActionConfig } from "@components/DataTable";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import {
-  productionReportSchema,
-  type ProductionReportDisplay,
-} from "../../schema/productionReport.schema";
-import type { FieldConfig } from "../../types/FieldConfig";
-import DynamicPopup from "../../components/DynamicPopup";
+import { productionReportSchema } from "@/schema/productionReport.schema";
+import type { FieldConfig } from "@/types/FieldConfig";
+import DynamicPopup from "@components/DynamicPopup";
 import ProductionReportGeneralSection from "./components/ProductionReportGeneralSection";
 import ProductListDetail from "./components/ProductListDetail";
 import { useProductionReportData } from "./customHooks/useProductionReportData";
 import { useProductionReportForm } from "./customHooks/useProductionReportForm";
+import type { ProductionReportDisplay } from "@/types/ProductionReportType";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -33,13 +31,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const ProductionReportPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const { productionReports, error, loading, fetchProductionReport } =
-    useProductionReportData(selectedDate);
-  const { isSubmitting, handleAddNewReport } = useProductionReportForm(
-    selectedDate,
-    () => fetchProductionReport(selectedDate),
-  );
-
   const [rowId, setRowId] = useState<number | null>(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectedProduct, setSelectedProduct] =
@@ -47,7 +38,15 @@ const ProductionReportPage = () => {
   const [editGeneral, setEditGeneral] =
     useState<ProductionReportDisplay | null>(null);
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
 
+  const { productionReports, error, loading, fetchProductionReport } =
+    useProductionReportData(selectedDate, endDate);
+  const { isSubmitting, handleAddNewReport } = useProductionReportForm(
+    selectedDate,
+    () => fetchProductionReport(selectedDate, endDate),
+  );
   const productionReportColumns = useMemo(
     () => [
       { ...productionReportSchema.id },
@@ -111,7 +110,14 @@ const ProductionReportPage = () => {
   return (
     <Box>
       <DrawerHeader />
-      <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <Filters
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        mode={filterMode}
+        setMode={setFilterMode}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
       <Box sx={{}}>
         {currentUser.role < 8 && (
           <Button
@@ -141,7 +147,7 @@ const ProductionReportPage = () => {
         >
           <ProductionReportGeneralSection
             selectedMaterial={selectedProduct}
-            onSaveSuccess={() => fetchProductionReport(selectedDate)}
+            onSaveSuccess={() => fetchProductionReport(selectedDate, endDate)}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
@@ -152,7 +158,7 @@ const ProductionReportPage = () => {
           </Divider>
           <ProductListDetail
             report_id={rowId}
-            onSaveSuccess={() => fetchProductionReport(selectedDate)}
+            onSaveSuccess={() => fetchProductionReport(selectedDate, endDate)}
           />
         </DynamicPopup>
       </Box>

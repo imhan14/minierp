@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import type { ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
 import dayjs from "dayjs";
-import { useNotify } from "../../../hooks/useNotify";
-import productionReportDetailApi from "../../../apis/productionReportDetailApi";
-import productionApi from "../../../apis/productionApi";
-import type { ProductType } from "../../../types/ProductType";
+import { useNotify } from "@/hooks/useNotify";
+import productionReportDetailApi from "@/apis/productionReportDetailApi";
+import productionApi from "@/apis/productionApi";
+import type { ProductType } from "@/types/ProductType";
+import type { ProductionReportDetailDisplay } from "@/types/ProductReportDetailType";
 
 export const useProductDetail = (
   report_id: number | null,

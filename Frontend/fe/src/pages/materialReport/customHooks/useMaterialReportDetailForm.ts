@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import mateiralDetailApi from "../../../apis/materialDetailApi";
-import type { MaterialDetailDisplay } from "../../../schema/materialDetail.schema";
-import { useNotify } from "../../../hooks/useNotify";
+import mateiralDetailApi from "@/apis/materialDetailApi";
+import { useNotify } from "@/hooks/useNotify";
+import type { MaterialDetailDisplay } from "@/types/MaterialDetailType";
 
 const useMaterialReportDetailForm = (
   setEditIngredients: React.Dispatch<

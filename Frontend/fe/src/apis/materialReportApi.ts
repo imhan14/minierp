@@ -20,7 +20,7 @@ export interface MaterialReportData {
 }
 
 const materialReportApi = {
-  getAllMaterialReports: (params: MaterialReportFilters) => {
+  getAllMaterialReports: (params?: MaterialReportFilters) => {
     return instance.get<MaterialReportType[]>("/material-report", {
       params,
     });

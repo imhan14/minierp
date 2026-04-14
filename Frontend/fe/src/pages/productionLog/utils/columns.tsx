@@ -1,7 +1,6 @@
 import { Autocomplete, TextField } from "@mui/material";
-
-import { logDetailSchema } from "../../../schema/productionLogDetail.schema";
-import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
+import { logDetailSchema } from "@/schema/productionLogDetail.schema";
+import type { ProductionLogDetailType } from "@/types/ProductionLogDetailType";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 

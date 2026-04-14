@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNotify } from "../../../hooks/useNotify";
+import { useNotify } from "@/hooks/useNotify";
 import dayjs from "dayjs";
-import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
-import productionLogDetailApi from "../../../apis/productionLogDetailApi";
+import type { ProductionLogDetailType } from "@/types/ProductionLogDetailType";
+import productionLogDetailApi from "@/apis/productionLogDetailApi";
 
 export const useLogDetailForm = (
   log_id: number | null,

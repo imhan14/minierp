@@ -7,11 +7,16 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const getProductionLogService = async (filters) => {
-  const { id, date, team_id } = filters;
+  const { id, date, team_id, startDate, endDate } = filters;
   const where = {};
 
   if (id) where.id = id;
-  if (date)
+  if (startDate && endDate)
+    where.log_date = {
+      gte: dayjs.utc(startDate).startOf("day").toISOString(),
+      lte: dayjs.utc(endDate).endOf("day").toISOString(),
+    };
+  else if (date)
     where.log_date = {
       gte: dayjs.utc(date).startOf("day").toISOString(),
       lte: dayjs.utc(date).endOf("day").toISOString(),

@@ -1,5 +1,5 @@
 import { Box, Grid, TextField, Typography } from "@mui/material";
-import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
+import type { ProductionLogDetailType } from "@/types/ProductionLogDetailType";
 
 interface LogExtraInfoProps {
   row: ProductionLogDetailType;

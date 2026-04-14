@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
-import mateiralDetailApi from "../../../apis/materialDetailApi";
-import type { MaterialDetailDisplay } from "../../../schema/materialDetail.schema";
+import mateiralDetailApi from "@/apis/materialDetailApi";
+import type { MaterialDetailDisplay } from "@/types/MaterialDetailType";
 
 const useMaterialReportDetailData = () => {
   const [error, setError] = useState<string | null>(null);

@@ -1,9 +1,7 @@
 import { Autocomplete, MenuItem, TextField } from "@mui/material";
-import {
-  productionReportDetailSchema,
-  type ProductionReportDetailDisplay,
-} from "../../../schema/productReportDetail.schema";
-import type { ProductType } from "../../../types/ProductType";
+import { productionReportDetailSchema } from "@/schema/productReportDetail.schema";
+import type { ProductType } from "@/types/ProductType";
+import type { ProductionReportDetailDisplay } from "@/types/ProductReportDetailType";
 
 export const productDetailColumns = (
   editingId: number | null | string | undefined,

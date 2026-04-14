@@ -1,14 +1,13 @@
 import type { Dayjs } from "dayjs";
-
 import { useCallback, useEffect, useState } from "react";
 import materialReportApi, {
   type MaterialReportFilters,
-} from "../../../apis/materialReportApi";
-import type { MaterialReportDisplay } from "../../../types/MaterialReportType";
+} from "@/apis/materialReportApi";
+import type { MaterialReportDisplay } from "@/types/MaterialReportType";
 
 export const useMaterialReportData = (
   selectedDate?: Dayjs | null,
-  endDate?: Dayjs | null,
+  endDate: Dayjs | null = null,
 ) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

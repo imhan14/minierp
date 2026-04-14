@@ -4,6 +4,8 @@ import instance from "./axios";
 export interface ProductionReportFilter {
   date?: string;
   team_id?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface CreateReportPayload {
@@ -20,7 +22,7 @@ export interface UpdateReportData {
 const productionReportApi = {
   getAllProductionReports: (params?: ProductionReportFilter) => {
     return instance.get<ProductionReportType[]>("/product-report", {
-      params: params,
+      params,
     });
   },
   addProductionReport: (data: CreateReportPayload) => {
