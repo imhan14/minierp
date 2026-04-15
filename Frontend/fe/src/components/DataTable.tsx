@@ -99,6 +99,7 @@ const CollapsibleRow = <T,>({
               sx={{
                 whiteSpace: column.noWrap ? "nowrap" : "normal",
                 maxWidth: column.width,
+                color: column.id.toString() === "id" ? "gray" : "",
               }}
             >
               {column.render ? column.render(value, row) : String(value ?? "")}

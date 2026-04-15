@@ -173,11 +173,6 @@ const GeneralInfoSection = <T,>({
                     select={col.inputType === "select"}
                     value={rawValue}
                     onChange={(e) => {
-                      // console.log(
-                      //   col.options?.find(
-                      //     (opt) => String(rawValue) === String(opt.value),
-                      //   )?.label,
-                      // );
                       onGeneralChange?.(col.id as keyof T, e.target.value);
                     }}
                     slotProps={{ inputLabel: { shrink: true } }}

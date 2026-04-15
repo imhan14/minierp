@@ -3,7 +3,7 @@ import JoiDate from "@joi/date";
 const Joi = BaseJoi.extend(JoiDate);
 
 export const formulaValidateSchema = Joi.object({
-  formula_code: Joi.string().optional(),
+  formula_code: Joi.number().optional(),
   formula_name: Joi.string().optional().allow(null),
   product_id: Joi.number()
     .optional()
@@ -13,5 +13,5 @@ export const formulaValidateSchema = Joi.object({
   specification: Joi.string().optional().allow(null),
   color: Joi.string().optional().allow(null),
   type_of_specification: Joi.string().optional().allow(null),
-  created_by: Joi.number().optional().allow(null),
+  // created_by: Joi.number().optional().allow(null),
 });
