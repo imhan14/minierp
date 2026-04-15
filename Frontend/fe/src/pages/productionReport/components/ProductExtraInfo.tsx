@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Grid, TextField, Typography } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
-import type { ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
+import type { ProductionReportDetailDisplay } from "@/types/ProductReportDetailType";
 
 interface ProductExtraInfoProps {
   row: ProductionReportDetailDisplay;

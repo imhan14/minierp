@@ -1,7 +1,7 @@
 import type { Dayjs } from "dayjs";
-import { useNotify } from "../../../hooks/useNotify";
+import { useNotify } from "@/hooks/useNotify";
 import { useState } from "react";
-import productOrderApi from "../../../apis/productOrderApi";
+import productOrderApi from "@/apis/productOrderApi";
 
 export const useOrderForm = (
   selectedDate: Dayjs | null,

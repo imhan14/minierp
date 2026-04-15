@@ -10,6 +10,8 @@ export const getProductionLog = async (req, res) => {
     id: req.query.id ? Number(req.query.id) : undefined,
     date: req.query.date ? req.query.date : undefined,
     team_id: undefined,
+    startDate: req.query.startDate ? req.query.startDate : undefined,
+    endDate: req.query.endDate ? req.query.endDate : undefined,
   };
   if (role_id >= 7) filters.team_id = userTeamId;
   else filters.team_id = req.query.req ? Number(req.query.req) : undefined;

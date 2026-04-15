@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-// import mateiralDetailApi from "../../../apis/materialDetailApi";
-// import type { MaterialDetailDisplay } from "../../../schema/materialDetail.schema";
-import type { MaterialReportDisplay } from "../../../schema/materialReport.schema";
-import type { ExtraMaterialsJson } from "../../../types/MaterialReportType";
+import type {
+  ExtraMaterialsJson,
+  MaterialReportDisplay,
+} from "@/types/MaterialReportType";
 
 const useOtherIngredientData = (
   extral_material: MaterialReportDisplay | null,

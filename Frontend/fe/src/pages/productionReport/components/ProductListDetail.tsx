@@ -1,16 +1,16 @@
 import { Box, Button, Skeleton, Typography } from "@mui/material";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import DataTable, { type ActionConfig } from "../../../components/DataTable";
+import DataTable, { type ActionConfig } from "@components/DataTable";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { type ProductionReportDetailDisplay } from "../../../schema/productReportDetail.schema";
-import type { ProductionReportType } from "../../../types/ProductionReportType";
+import type { ProductionReportType } from "@/types/ProductionReportType";
 import { useProductDetail } from "../customHooks/useProductDetail";
 import { productDetailColumns } from "../utils/columns";
 import { ProductExtraInfo } from "./ProductExtraInfo";
-import { ConfirmDiscardDialog } from "../../../components/ConfirmDiscardDialog";
+import { ConfirmDiscardDialog } from "@components/ConfirmDiscardDialog";
+import type { ProductionReportDetailDisplay } from "@/types/ProductReportDetailType";
 
 interface ProductListDetailProps {
   report_id: number | null;

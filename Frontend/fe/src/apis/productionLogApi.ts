@@ -3,6 +3,8 @@ import instance from "./axios";
 
 export interface ProductionLogFilters {
   date?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ProductionLogData {
@@ -23,9 +25,9 @@ export interface ProductionLogData {
 }
 
 const productionLogApi = {
-  getAllProductionLog: (filters?: ProductionLogFilters) => {
+  getAllProductionLog: (params?: ProductionLogFilters) => {
     return instance.get<ProductionLogType[]>("/production-log", {
-      params: filters,
+      params,
     });
   },
   createProductionLog: (data: ProductionLogData) => {

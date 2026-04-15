@@ -1,15 +1,15 @@
-import GeneralInfoSection from "../../../components/GeneralInfoSection";
-import { useNotify } from "../../../hooks/useNotify";
-import type { OrderDisplay } from "../../../types/ProductOrderType";
-import { validatePayload } from "../../../utils/validate";
+import GeneralInfoSection from "@components/GeneralInfoSection";
+import { useNotify } from "@/hooks/useNotify";
+import type { OrderDisplay } from "@/types/ProductOrderType";
+import { validatePayload } from "@/utils/validate";
 import dayjs from "dayjs";
-import type { FieldConfig } from "../../../types/FieldConfig";
-import { orderValidateSchema } from "../../../validate/order.validate";
-import { orderColumnSchema } from "../../../schema/orders.schema";
+import type { FieldConfig } from "@/types/FieldConfig";
+import { orderValidateSchema } from "@/validate/order.validate";
+import { orderColumnSchema } from "@/schema/orders.schema";
 import { useEffect, useMemo, useState } from "react";
-import formulaApi from "../../../apis/formulaApi";
-import type { FormulaType } from "../../../types/FormulaType";
-import productOrderApi from "../../../apis/productOrderApi";
+import formulaApi from "@/apis/formulaApi";
+import type { FormulaType } from "@/types/FormulaType";
+import productOrderApi from "@/apis/productOrderApi";
 
 interface Props {
   selectedOrder: OrderDisplay | null;

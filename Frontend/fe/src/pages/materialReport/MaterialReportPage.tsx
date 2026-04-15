@@ -7,20 +7,20 @@ import {
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
-import Filters from "../../components/Filters";
+import Filters from "@components/Filters";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import DataTable, { type ActionConfig } from "../../components/DataTable";
+import DataTable, { type ActionConfig } from "@components/DataTable";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import DynamicPopup from "../../components/DynamicPopup";
-import type { FieldConfig } from "../../types/FieldConfig";
-import { materialReportSchema } from "../../schema/materialReport.schema";
+import DynamicPopup from "@components/DynamicPopup";
+import type { FieldConfig } from "@/types/FieldConfig";
+import { materialReportSchema } from "@/schema/materialReport.schema";
 import MaterialReportGeneralSection from "./components/MaterialReportGeneralSection";
 import MaterialDetailList from "./components/MaterialDetailList";
 import OtherIngredient from "./components/OtherIngredient";
 import { useMaterialReportData } from "./customHooks/useMaterialReportData";
 import useMaterialReportForm from "./customHooks/useMaterialReportForm";
-import type { MaterialReportDisplay } from "../../types/MaterialReportType";
+import type { MaterialReportDisplay } from "@/types/MaterialReportType";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -40,12 +40,12 @@ const MaterialReportPage = () => {
     null,
   );
   const [filterMode, setFilterMode] = useState<"single" | "range">("single");
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const { loading, error, materialReports, getMaterialReport } =
     useMaterialReportData(selectedDate, endDate);
   const { handleAddNewReport, isSubmitting } = useMaterialReportForm(
     selectedDate,
-    () => getMaterialReport(selectedDate),
+    () => getMaterialReport(selectedDate, endDate),
   );
 
   const materialReportColumns = useMemo(
@@ -161,7 +161,7 @@ const MaterialReportPage = () => {
         >
           <MaterialReportGeneralSection
             selectedMaterial={selectedMaterial}
-            onSaveSuccess={() => getMaterialReport(selectedDate)}
+            onSaveSuccess={() => getMaterialReport(selectedDate, endDate)}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
@@ -179,7 +179,7 @@ const MaterialReportPage = () => {
           <OtherIngredient
             material_id={selectedMaterial?.id}
             extral_material={selectedMaterial}
-            onSaveSuccess={() => getMaterialReport(selectedDate)}
+            onSaveSuccess={() => getMaterialReport(selectedDate, endDate)}
           />
         </DynamicPopup>
       </Box>

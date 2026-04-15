@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNotify } from "../../../hooks/useNotify";
-import productionLogDetailApi from "../../../apis/productionLogDetailApi";
-import type { ProductionLogDetailType } from "../../../types/ProductionLogDetailType";
-
+import { useNotify } from "@/hooks/useNotify";
+import productionLogDetailApi from "@/apis/productionLogDetailApi";
+import type { ProductionLogDetailType } from "@/types/ProductionLogDetailType";
 export const useLogDetailData = (
   log_id: number | null,
   setLogDetail: React.Dispatch<React.SetStateAction<ProductionLogDetailType[]>>,

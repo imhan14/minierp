@@ -1,6 +1,6 @@
 import type { Dayjs } from "dayjs";
-import productionLogApi from "../../../apis/productionLogApi";
-import { useNotify } from "../../../hooks/useNotify";
+import productionLogApi from "@/apis/productionLogApi";
+import { useNotify } from "@/hooks/useNotify";
 import { useState } from "react";
 
 export const useProductionLogForm = (

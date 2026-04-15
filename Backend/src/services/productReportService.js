@@ -13,7 +13,7 @@ export const createProductReportService = async (data) => {
 };
 
 export const getProductReportService = async (filters) => {
-  const { id, date, team_id } = filters;
+  const { id, date, team_id, startDate, endDate } = filters;
   const where = {};
   if (id) {
     where.id = id;
@@ -21,12 +21,16 @@ export const getProductReportService = async (filters) => {
   if (team_id) {
     where.team_id = team_id;
   }
-  if (date) {
+  if (startDate && endDate)
+    where.report_date = {
+      gte: dayjs.utc(startDate).startOf("day").toISOString(),
+      lte: dayjs.utc(endDate).endOf("day").toISOString(),
+    };
+  else if (date)
     where.report_date = {
       gte: dayjs.utc(date).startOf("day").toISOString(),
       lte: dayjs.utc(date).endOf("day").toISOString(),
     };
-  }
 
   return await prisma.product_reports.findMany({
     where,

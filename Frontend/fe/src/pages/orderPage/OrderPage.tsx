@@ -14,18 +14,18 @@ import dayjs, { Dayjs } from "dayjs";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 
 import utc from "dayjs/plugin/utc";
-import type { OrderDisplay } from "../../types/ProductOrderType";
-import type { FormulaDetailDisplay } from "../../types/FormulaDetailType";
-import type { FieldConfig } from "../../types/FieldConfig";
-import type { ActionConfig } from "../../components/DataTable";
-import Filters from "../../components/Filters";
-import PermissionGate from "../../components/PermissionGate";
-import DataTable from "../../components/DataTable";
-import DynamicPopup from "../../components/DynamicPopup";
+import type { OrderDisplay } from "@/types/ProductOrderType";
+import type { FormulaDetailDisplay } from "@/types/FormulaDetailType";
+import type { FieldConfig } from "@/types/FieldConfig";
+import type { ActionConfig } from "@components/DataTable";
+import Filters from "@components/Filters";
+import PermissionGate from "@components/PermissionGate";
+import DataTable from "@components/DataTable";
+import DynamicPopup from "@components/DynamicPopup";
 import { useOrderData } from "./customHooks/useOrderData";
 import { useOrderForm } from "./customHooks/useOrderForm";
 import OrderGeneral from "./components/OrderGeneral";
-import { orderColumnSchema } from "../../schema/orders.schema";
+import { orderColumnSchema } from "@/schema/orders.schema";
 
 dayjs.extend(utc);
 
@@ -56,7 +56,7 @@ const OrderPage = () => {
     fetchOrders,
   } = useOrderData(selectedDate, endDate);
   const { handleAddNewReport } = useOrderForm(selectedDate, () =>
-    fetchOrders(selectedDate),
+    fetchOrders(selectedDate, endDate),
   );
   const orderColumns = useMemo(
     () => [
@@ -164,7 +164,7 @@ const OrderPage = () => {
       >
         <OrderGeneral
           selectedOrder={selectedOrder}
-          onSaveSuccess={() => fetchOrders(selectedDate)}
+          onSaveSuccess={() => fetchOrders(selectedDate, endDate)}
           editGeneral={editGeneral}
           onEditGeneral={setEditGeneral}
         />

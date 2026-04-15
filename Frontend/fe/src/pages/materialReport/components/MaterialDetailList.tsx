@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useMemo } from "react";
-import DataTable, { type ActionConfig } from "../../../components/DataTable";
-import {
-  materialDetailSchema,
-  type MaterialDetailDisplay,
-} from "../../../schema/materialDetail.schema";
+import DataTable, { type ActionConfig } from "@components/DataTable";
+import { materialDetailSchema } from "@/schema/materialDetail.schema";
 import { Skeleton, TextField, Typography } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import useMaterialReportDetailData from "../customHooks/useMaterialReportDetailData";
 import useMaterialReportDetailForm from "../customHooks/useMaterialReportDetailForm";
+import type { MaterialDetailDisplay } from "@/types/MaterialDetailType";
 
 interface MaterialDetailListProps {
   material_id: number | null;

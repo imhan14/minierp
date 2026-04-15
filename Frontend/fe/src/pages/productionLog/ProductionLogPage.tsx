@@ -5,19 +5,18 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { styled } from "@mui/material/styles";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import Filters from "../../components/Filters";
-import DataTable, { type ActionConfig } from "../../components/DataTable";
+import Filters from "@/components/Filters";
+import DataTable, { type ActionConfig } from "@components/DataTable";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import type { FieldConfig } from "../../types/FieldConfig";
-
+import type { FieldConfig } from "@/types/FieldConfig";
 import DynamicPopup from "../../components/DynamicPopup";
-import type { ProductionLogDisplay } from "../../types/ProductionLogType";
+import type { ProductionLogDisplay } from "@/types/ProductionLogType";
 import { useProductionLogData } from "./customHooks/useProductionLogData";
-import { productionLogSchema } from "../../schema/productionLog.schema";
+import { productionLogSchema } from "@/schema/productionLog.schema";
 import { useProductionLogForm } from "./customHooks/useProductionLogForm";
 import ProductionLogGeneral from "./components/ProductionLogGeneral";
 import ProductionLogDetail from "./components/ProductionLogDetail";
@@ -39,10 +38,13 @@ const ProductionLogPage = () => {
   const [editGeneral, setEditGeneral] = useState<ProductionLogDisplay | null>(
     null,
   );
+  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+
   const { error, loading, productionLog, fetchProductionLog } =
-    useProductionLogData();
+    useProductionLogData(selectedDate, endDate);
   const { handleAddNewReport } = useProductionLogForm(selectedDate, () =>
-    fetchProductionLog(selectedDate),
+    fetchProductionLog(selectedDate, endDate),
   );
 
   const productionLogColumns = useMemo(
@@ -100,9 +102,6 @@ const ProductionLogPage = () => {
     ];
   };
 
-  useEffect(() => {
-    fetchProductionLog(selectedDate);
-  }, [selectedDate, fetchProductionLog]);
   if (error) {
     return (
       <Typography color="error" textAlign="center">
@@ -113,7 +112,14 @@ const ProductionLogPage = () => {
   return (
     <Box>
       <DrawerHeader />
-      <Filters selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <Filters
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        mode={filterMode}
+        setMode={setFilterMode}
+        endDate={endDate}
+        setEndDate={setEndDate}
+      />
       <Box sx={{}}>
         <Button
           variant="contained"
@@ -141,7 +147,7 @@ const ProductionLogPage = () => {
         >
           <ProductionLogGeneral
             selectedLog={selectedProduct}
-            onSaveSuccess={() => fetchProductionLog(selectedDate)}
+            onSaveSuccess={() => fetchProductionLog(selectedDate, endDate)}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
@@ -153,7 +159,7 @@ const ProductionLogPage = () => {
           </Divider>
           <ProductionLogDetail
             log_id={rowId}
-            onSaveSuccess={() => fetchProductionLog(selectedDate)}
+            onSaveSuccess={() => fetchProductionLog(selectedDate, endDate)}
           />
         </DynamicPopup>
       </Box>
