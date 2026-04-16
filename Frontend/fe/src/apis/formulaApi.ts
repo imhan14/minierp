@@ -27,7 +27,7 @@ const formulaApi = {
     return instance.get<FormulaType[]>("/formula", { params });
   },
   createFormula: (data?: FormulaData) => {
-    return instance.post("/formula", data);
+    return instance.post<FormulaType>("/formula", data);
   },
   updateFormula: (id: number, data?: FormulaData) => {
     return instance.patch(`/formula/${id}`, data);

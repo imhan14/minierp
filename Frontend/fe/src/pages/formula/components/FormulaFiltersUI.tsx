@@ -3,7 +3,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useState } from "react";
 import type { FormulaFilters } from "@/apis/formulaApi";
 
-const FormulaFilters = ({
+const FormulaFiltersUI = ({
   onFilterChange,
 }: {
   onFilterChange?: (filters: FormulaFilters) => void;
@@ -60,7 +60,7 @@ const FormulaFilters = ({
       id: "orderBy",
       label: "Order By",
       options: [
-        { label: "ID: A - Z", value: "id:asc" },
+        { label: "ID: A-Z", value: "id:asc" },
         { label: "Name: A-Z", value: "formula_name:asc" },
         { label: "Name: Z-A", value: "formula_name:desc" },
       ],
@@ -85,7 +85,7 @@ const FormulaFilters = ({
         mb: 3,
         boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
         position: "sticky",
-        top: 80,
+        top: 60,
         zIndex: 10,
         flexWrap: "wrap",
       }}
@@ -108,31 +108,44 @@ const FormulaFilters = ({
           ),
         }}
       />
-      {filterOptions.map((item) => (
-        <TextField
-          size="small"
-          label={item.label}
-          select
-          value={filters[item.id as keyof typeof filters]}
-          defaultValue="True"
-          onChange={(e) => {
-            handleChange(item.id, e.target.value);
-          }}
-          slotProps={{ inputLabel: { shrink: true } }}
-          sx={{ width: 120 }}
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          {item.options.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.label}
+      {filterOptions.map((item) => {
+        const isDefaultValue = filters[item.id as keyof typeof filters] === "";
+        return (
+          <TextField
+            size="small"
+            label={item.label}
+            select
+            value={filters[item.id as keyof typeof filters]}
+            onChange={(e) => {
+              handleChange(item.id, e.target.value);
+            }}
+            SelectProps={{
+              displayEmpty: true,
+            }}
+            slotProps={{ inputLabel: { shrink: true } }}
+            sx={{
+              width: 120,
+              "& .MuiSelect-select": {
+                color: isDefaultValue ? "text.secondary" : "inherit",
+                fontStyle: isDefaultValue ? "italic" : "normal",
+                opacity: isDefaultValue ? 0.8 : 1,
+              },
+            }}
+          >
+            <MenuItem value="">
+              {item.id === "orderBy" ? "ID: Z-A" : <em>All</em>}
             </MenuItem>
-          ))}
-        </TextField>
-      ))}
+
+            {item.options.map((opt) => (
+              <MenuItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        );
+      })}
     </Paper>
   );
 };
 
-export default FormulaFilters;
+export default FormulaFiltersUI;

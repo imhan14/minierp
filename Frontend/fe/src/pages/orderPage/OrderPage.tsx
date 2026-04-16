@@ -43,7 +43,7 @@ const OrderPage = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [editGeneral, setEditGeneral] = useState<OrderDisplay | null>(null);
   const [filterMode, setFilterMode] = useState<"single" | "range">("single");
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   const {
     detailLoading,

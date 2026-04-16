@@ -3,12 +3,12 @@ import type { FieldConfig } from "@/types/FieldConfig";
 import { useNotify } from "@/hooks/useNotify";
 import { validatePayload } from "@/utils/validate";
 import type { FormulaDisplay } from "@/types/FormulaType";
-import { formulaSchema } from "@/schema/formula.schema";
 import { formulaValidateSchema } from "@/validate/formula.validate";
 import formulaApi from "@/apis/formulaApi";
 import { useEffect, useState } from "react";
 import type { ProductType } from "@/types/ProductType";
 import productionApi from "@/apis/productionApi";
+import { formulaSchema } from "@/schema/formula.schema";
 
 interface Props {
   selectedFormula: FormulaDisplay | null;
@@ -39,45 +39,11 @@ const FormulaGeneral = ({
       render: (_, record) => record.product_name || "-",
       noWrap: true,
     },
-    {
-      ...formulaSchema.is_active,
-      inputType: "select",
-      options: [
-        { label: "True", value: "true" },
-        { label: "False", value: "false" },
-      ],
-      sx: { color: "red" },
-    },
-    {
-      ...formulaSchema.product_line,
-      inputType: "select",
-      options: [
-        { label: "Trộn", value: "tron" },
-        { label: "Sang Bao", value: "sangbao" },
-        { label: "1 hạt", value: "mothat" },
-      ],
-    },
-    {
-      ...formulaSchema.specification,
-      inputType: "select",
-      options: [{ label: "Bao thành phẩm", value: "btp" }],
-    },
-    {
-      ...formulaSchema.color,
-      inputType: "select",
-      options: [
-        { label: "3 màu", value: "bamau" },
-        { label: "Xám", value: "xam" },
-      ],
-    },
-    {
-      ...formulaSchema.type_of_specification,
-      inputType: "select",
-      options: [
-        { label: "25 Kg", value: "25Kg" },
-        { label: "50 Kg", value: "50Kg" },
-      ],
-    },
+    { ...formulaSchema.is_active, inputType: "select" },
+    { ...formulaSchema.product_line, inputType: "select" },
+    { ...formulaSchema.specification, inputType: "select" },
+    { ...formulaSchema.color, inputType: "select" },
+    { ...formulaSchema.type_of_specification, inputType: "select" },
   ];
 
   const handleGeneralChange = (field: keyof FormulaDisplay, value: string) => {

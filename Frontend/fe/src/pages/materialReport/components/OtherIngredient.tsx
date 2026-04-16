@@ -210,6 +210,7 @@ const OtherIngredient = ({
           data={editIngredients}
           actions={getDetailActions}
           getRowKey={(row) => row.id!}
+          hideEmptyRows={true}
         />
       )}
     </>

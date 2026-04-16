@@ -1,4 +1,8 @@
-import { getAllFormlasService } from "../services/formulaService";
+import {
+  createFormulaService,
+  getAllFormlasService,
+  updateFormulaService,
+} from "../services/formulaService";
 
 export const getAllFomulas = async (req, res) => {
   const filters = {
@@ -23,4 +27,26 @@ export const getAllFomulas = async (req, res) => {
 export const createFormula = async (req, res) => {
   const newFormula = await createFormulaService();
   res.status(201).json(newFormula);
+};
+
+export const updateFormula = async (req, res) => {
+  const id = Number(req.params.id);
+  const fields = [
+    "formula_code",
+    "formula_name",
+    "product_id",
+    "is_active",
+    "product_line",
+    "specification",
+    "color",
+    "type_of_specification",
+  ];
+  let updateData = {};
+  fields.forEach((field) => {
+    if (req.body[field] !== undefined) {
+      updateData[field] = req.body[field];
+    }
+  });
+  const formula = await updateFormulaService(id, updateData);
+  res.status(200).json(formula);
 };

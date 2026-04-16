@@ -60,9 +60,23 @@ export const getAllFormlasService = async (filters) => {
 };
 
 export const createFormulaService = async () => {
-  return await prisma.formulas.create({
+  const newFormula = await prisma.formulas.create({
     data: {
       is_active: true,
     },
+  });
+  const updatedFormula = await prisma.formulas.update({
+    where: { id: newFormula.id },
+    data: {
+      formula_code: newFormula.id,
+    },
+  });
+  return updatedFormula;
+};
+
+export const updateFormulaService = async (id, data) => {
+  return await prisma.formulas.update({
+    where: { id: id },
+    data: data,
   });
 };

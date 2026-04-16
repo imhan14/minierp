@@ -1,12 +1,10 @@
-import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
 import { useMemo, useState } from "react";
-import Filters from "../../components/Filters";
 import {
   Box,
   Button,
-  CircularProgress,
   Divider,
+  Skeleton,
+  Stack,
   styled,
   Typography,
 } from "@mui/material";
@@ -16,10 +14,12 @@ import DynamicPopup from "@/components/DynamicPopup";
 import { useFormulaData } from "./customHooks/useFormulaData";
 import FormulaGeneral from "./components/FormulaGeneral";
 import { formulaSchema } from "@/schema/formula.schema";
-import type { FieldConfig } from "@/types/FieldConfig";
+// import type { FieldConfig } from "@/types/FieldConfig";
 import type { FormulaDisplay } from "@/types/FormulaType";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import FormulaFilters from "./components/FormulaFilters";
+import FormulaFiltersUI from "./components/FormulaFiltersUI";
+import type { FieldConfig } from "@/types/FieldConfig";
+import type { FormulaDetailDisplay } from "@/types/FormulaDetailType";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -29,21 +29,25 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 const FormulaPage = () => {
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
-  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs());
   const [openDetail, setOpenDetail] = useState(false);
-  const [selectedMaterial, setSelectedMaterial] =
-    useState<FormulaDisplay | null>(null);
+  const [selectedFormula, setSelectedFormula] = useState<FormulaDisplay | null>(
+    null,
+  );
   const [rowId, setRowId] = useState<number | null>(null);
   const [editGeneral, setEditGeneral] = useState<FormulaDisplay | null>(null);
 
   const { fetchFormula, formula } = useFormulaData();
-  const onCreateSuccess = (newFormula: FormulaDisplay) => {
-    fetchFormula(); // Load lại danh sách table
-    handleOpenDetail(newFormula); // Tự động mở popup để người dùng nhập tiếp
+  const handleOpenDetail = (row: FormulaDisplay) => {
+    setSelectedFormula(row);
+    setEditGeneral(row);
+    setOpenDetail(true);
+    setRowId(row.id);
   };
-  const { isSubmitting, handleAddNewReport } = useFormulaForm(fetchFormula);
+  const onCreateSuccess = (newFormula: FormulaDisplay) => {
+    fetchFormula();
+    handleOpenDetail(newFormula);
+  };
+  const { isSubmitting, handleAddNewReport } = useFormulaForm(onCreateSuccess);
 
   const formulaColumns = useMemo(
     () => [
@@ -51,29 +55,28 @@ const FormulaPage = () => {
         ...formulaSchema.id,
         width: 20,
       },
-      { ...formulaSchema.formula_code, width: 70 },
+      { ...formulaSchema.formula_code, width: 70, align: "center" as const },
       { ...formulaSchema.formula_name },
-      { ...formulaSchema.is_active, align: "center" as const, width: 70 },
+      { ...formulaSchema.is_active, align: "center" as const, width: 90 },
       { ...formulaSchema.product_line, align: "center" as const },
       { ...formulaSchema.specification, align: "center" as const },
-      { ...formulaSchema.color, align: "center" as const, width: 70 },
+      { ...formulaSchema.color, align: "center" as const, width: 80 },
       { ...formulaSchema.type_of_specification, align: "center" as const },
       { id: "actions", label: "Actions" },
     ],
     [],
   );
-
-  const handleOpenDetail = (row: FormulaDisplay) => {
-    setSelectedMaterial(row);
-    setEditGeneral(row);
-    setOpenDetail(true);
-    setRowId(row.id);
-  };
+  const formulaDetailColumns: FieldConfig<FormulaDetailDisplay>[] = [
+    // { id: "id", label: "id" },
+    { id: "ingredient_name", label: "Ingredient Name" },
+    { id: "unit", label: "Unit" },
+    { id: "standard_quality", label: "Quantity" },
+  ];
 
   const handleCloseDetail = () => {
     setOpenDetail(false);
     setTimeout(() => {
-      setSelectedMaterial(null);
+      setSelectedFormula(null);
     }, 300);
   };
 
@@ -91,7 +94,7 @@ const FormulaPage = () => {
   return (
     <>
       <DrawerHeader />
-      <FormulaFilters
+      <FormulaFiltersUI
         onFilterChange={(newFilters) => fetchFormula(newFilters)}
       />
       <Box>
@@ -115,20 +118,38 @@ const FormulaPage = () => {
         <DynamicPopup
           open={openDetail}
           onClose={handleCloseDetail}
-          title={`Formula Code: #${selectedMaterial?.formula_code}`}
+          title={`Formula Code: #${selectedFormula?.formula_code}`}
           // enableSend={true}
         >
           <FormulaGeneral
-            selectedFormula={selectedMaterial}
+            selectedFormula={selectedFormula}
             onSaveSuccess={() => fetchFormula()}
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="subtitle1" fontWeight="bold" color="primary">
-              Ingredient List (Editable)
-            </Typography>
-          </Divider>
+          {selectedFormula && (
+            <Box>
+              <Divider sx={{ my: 3 }}>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  color="primary"
+                >
+                  Formular List (Formular)
+                </Typography>
+              </Divider>
+
+              <Stack spacing={1}>
+                <Skeleton variant="rounded" height={600} />
+              </Stack>
+
+              <DataTable
+                columns={formulaDetailColumns}
+                data={formula}
+                getRowKey={(row) => row.id}
+              />
+            </Box>
+          )}
           {/* <MaterialDetailList material_id={rowId} /> */}
         </DynamicPopup>
       </Box>

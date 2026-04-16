@@ -20,7 +20,6 @@ export const useFormulaData = () => {
         product_name: products?.product_name || "N/A",
       };
     });
-    console.log(response.data);
     return formattedData;
   };
   const fetchFormula = useCallback(async (newFilters?: FormulaFilters) => {
