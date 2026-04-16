@@ -136,6 +136,7 @@ const ProductListDetail = ({
           data={editProducts}
           actions={getDetailActions}
           getRowKey={(row) => row.id!}
+          hideEmptyRows={true}
           renderDetail={(row) => (
             <ProductExtraInfo
               row={row}

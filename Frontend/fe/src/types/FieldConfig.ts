@@ -23,7 +23,8 @@ export interface FieldConfig<T> {
     | "select"
     | "datetime-local"
     | "autocomplete";
-  options?: { label: string; value: string }[];
+  options?: { label: string; value: string; text?: string; bg?: string }[];
   gridSize?: { xs?: number; sm?: number; md?: number; lg?: number };
   sx?: SxProps<Theme>;
+  hideEmptyRows?: boolean;
 }

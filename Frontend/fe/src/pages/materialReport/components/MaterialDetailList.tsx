@@ -141,6 +141,7 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
         data={editIngredients}
         actions={getDetailActions}
         getRowKey={(row) => row.id}
+        hideEmptyRows={true}
       />
     </>
   );

@@ -13,6 +13,7 @@ import {
   Tooltip,
   Collapse,
   Box,
+  Pagination,
 } from "@mui/material";
 import React, { useState } from "react";
 import type { FieldConfig } from "../types/FieldConfig";
@@ -32,6 +33,7 @@ interface DynamicTableProps<T> {
   actions?: (row: T) => ActionConfig<T>[];
   getRowKey: (row: T) => string | number;
   renderDetail?: (row: T) => React.ReactNode;
+  hideEmptyRows?: boolean;
 }
 const CollapsibleRow = <T,>({
   row,
@@ -97,8 +99,16 @@ const CollapsibleRow = <T,>({
               key={column.id.toString()}
               align={column.align || "left"}
               sx={{
+                width: column.width,
                 whiteSpace: column.noWrap ? "nowrap" : "normal",
-                maxWidth: column.width,
+                color: column.id.toString() === "id" ? "gray" : "",
+                ...(column.id === "actions" && {
+                  position: "sticky",
+                  right: 0,
+                  zIndex: 10,
+                  backgroundColor: "#f1f5f9",
+                  boxShadow: "-2px 0 5px rgba(0,0,0,0.05)",
+                }),
               }}
             >
               {column.render ? column.render(value, row) : String(value ?? "")}
@@ -131,53 +141,97 @@ const DataTable = <T,>({
   actions,
   getRowKey,
   renderDetail,
+  hideEmptyRows = false,
 }: DynamicTableProps<T>) => {
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10; //số dòng
+
+  //tổng số trang
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  //Cắt dữ liệu để hiển thị (Logic: (page - 1) * 10)
+  const visibleRows = React.useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return data.slice(startIndex, startIndex + rowsPerPage);
+  }, [data, page]);
+  const emptyRows = rowsPerPage - visibleRows.length;
   return (
-    <TableContainer component={Paper} sx={{ borderRadius: 1.5, boxShadow: 3 }}>
-      <Table>
-        <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-          <TableRow>
-            {renderDetail && <TableCell sx={{ width: 50 }} />}
-            {columns.map((col) => (
-              <TableCell
-                key={col.id.toString()}
-                align={col.align || "left"}
-                style={{ maxWidth: col.width }}
-                sx={{
-                  fontWeight: "bold",
-                  backgroundColor: "#f1f5f9",
-                  width: col.width,
-                }}
-              >
-                {col.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.length > 0 ? (
-            data.map((row) => (
-              <CollapsibleRow
-                key={getRowKey(row)}
-                row={row}
-                columns={columns}
-                actions={actions}
-                getRowKey={getRowKey}
-                renderDetail={renderDetail}
-              />
-            ))
-          ) : (
+    <Paper sx={{ borderRadius: 1.5, boxShadow: 3, overflow: "hidden" }}>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 1.5, boxShadow: 0 }}
+      >
+        <Table size="small">
+          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell colSpan={columns.length} align="center">
-                <Typography variant="body2" sx={{ py: 2 }}>
-                  Không có dữ liệu
-                </Typography>
-              </TableCell>
+              {renderDetail && <TableCell sx={{ width: 50 }} />}
+              {columns.map((col) => (
+                <TableCell
+                  key={col.id.toString()}
+                  align={col.align || "left"}
+                  style={{ maxWidth: col.width }}
+                  sx={{
+                    fontWeight: "bold",
+                    backgroundColor: "#f1f5f9",
+                    width: col.width,
+                  }}
+                >
+                  {col.label}
+                </TableCell>
+              ))}
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {visibleRows.length > 0 ? (
+              visibleRows.map((row) => (
+                <CollapsibleRow
+                  key={getRowKey(row)}
+                  row={row}
+                  columns={columns}
+                  actions={actions}
+                  getRowKey={getRowKey}
+                  renderDetail={renderDetail}
+                />
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} align="center">
+                  <Typography variant="body2" sx={{ py: 1 }}>
+                    Không có dữ liệu
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+            {!hideEmptyRows &&
+              emptyRows > 0 &&
+              Array.from({ length: emptyRows }).map((_, index) => (
+                <TableRow key={`empty-${index}`} style={{ height: 47 }}>
+                  {" "}
+                  <TableCell
+                    colSpan={columns.length + (renderDetail ? 1 : 0)}
+                  />
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={handleChangePage}
+            color="primary"
+            // shape="rounded"
+            showFirstButton
+            showLastButton
+          />
+        </Box>
+      )}
+    </Paper>
   );
 };
 

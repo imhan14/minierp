@@ -101,10 +101,18 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       path: "/production-report",
     },
     { text: "Production Log", icon: <GradingIcon />, path: "/production-log" },
-    { text: "Formulas", icon: <ScienceOutlinedIcon />, path: "/formula" },
+    {
+      text: "Formulas",
+      icon: <ScienceOutlinedIcon />,
+      path: "/formula",
+      minRole: 5,
+    },
   ];
   const filteredMenuItems = menuItems.filter((item) => {
-    if (item.text === "Dashboard" && Number(id) > 5) {
+    if (
+      (item.text === "Dashboard" || item.text === "Formulas") &&
+      Number(id) > 5
+    ) {
       return false;
     }
     return true;

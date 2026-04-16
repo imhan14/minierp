@@ -1,12 +1,14 @@
 import GeneralInfoSection from "@components/GeneralInfoSection";
 import type { FieldConfig } from "@/types/FieldConfig";
 import { useNotify } from "@/hooks/useNotify";
-import dayjs from "dayjs";
 import { validatePayload } from "@/utils/validate";
-import productionLogApi from "@/apis/productionLogApi";
 import type { FormulaDisplay } from "@/types/FormulaType";
-import { formulaSchema } from "@/schema/formula.schema";
 import { formulaValidateSchema } from "@/validate/formula.validate";
+import formulaApi from "@/apis/formulaApi";
+import { useEffect, useState } from "react";
+import type { ProductType } from "@/types/ProductType";
+import productionApi from "@/apis/productionApi";
+import { formulaSchema } from "@/schema/formula.schema";
 
 interface Props {
   selectedFormula: FormulaDisplay | null;
@@ -22,45 +24,26 @@ const FormulaGeneral = ({
   onEditGeneral,
 }: Props) => {
   const notify = useNotify();
+  const [product, setProduct] = useState<{ label: string; value: string }[]>(
+    [],
+  );
 
   const fieldsDetail: FieldConfig<FormulaDisplay>[] = [
-    { ...formulaSchema.team_name, gridSize: { md: 3 } },
+    { ...formulaSchema.formula_name, sx: { height: 50 }, gridSize: { md: 6 } },
     {
-      ...formulaSchema.log_date,
-      gridSize: { md: 3 },
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).format("DD/MM/YYYY");
-      }) as FieldConfig<FormulaDisplay>["render"],
-    },
-    { ...formulaSchema.electric_production, gridSize: { md: 3 } },
-    { ...formulaSchema.electric_mix, gridSize: { md: 3 } },
-    {
-      ...formulaSchema.log_start,
-      inputType: "datetime-local",
+      ...formulaSchema.product_id,
+      label: "Product Name",
+      inputType: "autocomplete",
+      optionsAutoComplete: product,
       gridSize: { md: 6 },
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).format("DD/MM/YYYY HH:mm");
-      }) as FieldConfig<FormulaDisplay>["render"],
+      render: (_, record) => record.product_name || "-",
+      noWrap: true,
     },
-    {
-      ...formulaSchema.log_end,
-      inputType: "datetime-local",
-      gridSize: { md: 6 },
-      render: ((value: string) => {
-        if (!value) return "-";
-        return dayjs(value).format("DD/MM/YYYY HH:mm");
-      }) as FieldConfig<FormulaDisplay>["render"],
-    },
-    { ...formulaSchema.number_of_employee, gridSize: { md: 3 } },
-    { ...formulaSchema.on_work, gridSize: { md: 3 } },
-    { ...formulaSchema.unauthorized_absence, gridSize: { md: 3 } },
-    { ...formulaSchema.authorized_absence, gridSize: { md: 3 } },
-    { ...formulaSchema.ht_di, gridSize: { md: 3 } },
-    { ...formulaSchema.ht_den, gridSize: { md: 3 } },
-    { ...formulaSchema.forklift, gridSize: { md: 3 } },
-    { ...formulaSchema.shift_leader, gridSize: { md: 3 } },
+    { ...formulaSchema.is_active, inputType: "select" },
+    { ...formulaSchema.product_line, inputType: "select" },
+    { ...formulaSchema.specification, inputType: "select" },
+    { ...formulaSchema.color, inputType: "select" },
+    { ...formulaSchema.type_of_specification, inputType: "select" },
   ];
 
   const handleGeneralChange = (field: keyof FormulaDisplay, value: string) => {
@@ -89,7 +72,7 @@ const FormulaGeneral = ({
         color: data?.color ?? undefined,
         type_of_specification: data?.type_of_specification ?? undefined,
       };
-      //   await productionLogApi.updateProductionLog(editGeneral?.id, payload);
+      await formulaApi.updateFormula(editGeneral?.id, payload);
       notify("Cập nhật dữ liệu thành công!", "success");
       onSaveSuccess();
     } catch (err) {
@@ -98,6 +81,29 @@ const FormulaGeneral = ({
       notify("Lỗi khi nhập dữ liệu!", "error");
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchFormulaList = async () => {
+      try {
+        const response = await productionApi.getAllProducts();
+        if (isMounted) {
+          const formattedData = response.data.map((item: ProductType) => ({
+            label: item.product_name,
+            value: String(item.id),
+          }));
+          setProduct(formattedData);
+        }
+      } catch (err) {
+        notify("Get Product List failded", "error");
+        console.error("API Error:", err);
+      }
+    };
+    fetchFormulaList();
+    return () => {
+      isMounted = false;
+    };
+  }, [notify]);
 
   return (
     <GeneralInfoSection

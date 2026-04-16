@@ -49,7 +49,7 @@ const Filters = ({
         mb: 3,
         boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
         position: "sticky",
-        top: 80,
+        top: 60,
         zIndex: 10,
         flexWrap: "wrap",
       }}
