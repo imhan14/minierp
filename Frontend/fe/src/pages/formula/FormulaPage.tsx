@@ -1,13 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  Box,
-  Button,
-  Divider,
-  Skeleton,
-  Stack,
-  styled,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Divider, styled, Typography } from "@mui/material";
 import { useFormulaForm } from "./customHooks/useFormulaForm";
 import DataTable, { type ActionConfig } from "@/components/DataTable";
 import DynamicPopup from "@/components/DynamicPopup";
@@ -18,8 +10,7 @@ import { formulaSchema } from "@/schema/formula.schema";
 import type { FormulaDisplay } from "@/types/FormulaType";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import FormulaFiltersUI from "./components/FormulaFiltersUI";
-import type { FieldConfig } from "@/types/FieldConfig";
-import type { FormulaDetailDisplay } from "@/types/FormulaDetailType";
+import FormulaDetailList from "./components/FormulaDetailList";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -51,10 +42,7 @@ const FormulaPage = () => {
 
   const formulaColumns = useMemo(
     () => [
-      {
-        ...formulaSchema.id,
-        width: 20,
-      },
+      { ...formulaSchema.id, width: 20 },
       { ...formulaSchema.formula_code, width: 70, align: "center" as const },
       { ...formulaSchema.formula_name },
       { ...formulaSchema.is_active, align: "center" as const, width: 90 },
@@ -66,12 +54,6 @@ const FormulaPage = () => {
     ],
     [],
   );
-  const formulaDetailColumns: FieldConfig<FormulaDetailDisplay>[] = [
-    // { id: "id", label: "id" },
-    { id: "ingredient_name", label: "Ingredient Name" },
-    { id: "unit", label: "Unit" },
-    { id: "standard_quality", label: "Quantity" },
-  ];
 
   const handleCloseDetail = () => {
     setOpenDetail(false);
@@ -127,30 +109,18 @@ const FormulaPage = () => {
             editGeneral={editGeneral}
             onEditGeneral={setEditGeneral}
           />
-          {selectedFormula && (
-            <Box>
-              <Divider sx={{ my: 3 }}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                  color="primary"
-                >
-                  Formular List (Formular)
-                </Typography>
-              </Divider>
+          <Box>
+            <Divider sx={{ my: 3 }}>
+              <Typography variant="subtitle1" fontWeight="bold" color="primary">
+                Formular List (Formular)
+              </Typography>
+            </Divider>
 
-              <Stack spacing={1}>
+            {/* <Stack spacing={1}>
                 <Skeleton variant="rounded" height={600} />
-              </Stack>
-
-              <DataTable
-                columns={formulaDetailColumns}
-                data={formula}
-                getRowKey={(row) => row.id}
-              />
-            </Box>
-          )}
-          {/* <MaterialDetailList material_id={rowId} /> */}
+              </Stack> */}
+            {selectedFormula && <FormulaDetailList formula_id={rowId} />}
+          </Box>
         </DynamicPopup>
       </Box>
     </>
