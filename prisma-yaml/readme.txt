@@ -1,0 +1,1 @@
+đây là file khởi động docker cho dự án chính minierp_db (postgres)
