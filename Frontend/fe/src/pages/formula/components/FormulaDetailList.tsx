@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DataTable, { type ActionConfig } from "@components/DataTable";
 import { Autocomplete, Box, Button, TextField } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -11,6 +11,7 @@ import { formulaDetailSchema } from "@/schema/formulaDetail.schema";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import type { IngredientType } from "@/types/IngredientType";
 import ingredientApi from "@/apis/ingredientApi";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 interface FormulaDetailListProps {
   formula_id: number | null;
@@ -21,6 +22,7 @@ const FormulaDetailList = ({
   formula_id,
   onSaveSuccess,
 }: FormulaDetailListProps) => {
+  const [ingredients, setIngredients] = useState<IngredientType[]>([]);
   const { formulaDetail, setFormulaDetail, fetchFormulaDetail } =
     useFormulaDetailData(formula_id);
   const {
@@ -40,7 +42,7 @@ const FormulaDetailList = ({
   } = useFormulaDetailForm(
     formula_id,
     () => fetchFormulaDetail(formula_id),
-    formulaDetail, // ✅ truyền state dùng chung
+    formulaDetail,
     setFormulaDetail,
   );
 
@@ -65,9 +67,9 @@ const FormulaDetailList = ({
             <Autocomplete
               size="small"
               sx={{ width: 300 }}
-              options={[]}
+              options={ingredients}
               renderInput={(params) => (
-                <TextField {...params} label="Product" />
+                <TextField {...params} label="Ingredient" />
               )}
               getOptionLabel={(option) =>
                 typeof option === "string" ? option : option.ingredient_name
@@ -80,19 +82,25 @@ const FormulaDetailList = ({
               }}
               onChange={(_, newValue) => {
                 if (newValue && typeof newValue !== "string") {
-                  handleDetailChange(row.id, "product_id", String(newValue.id));
                   handleDetailChange(
                     row.id,
-                    "product_name",
+                    "ingredient_id",
+                    String(newValue.id),
+                  );
+                  handleDetailChange(
+                    row.id,
+                    "ingredient_name",
                     newValue.ingredient_name,
                   );
+                  handleDetailChange(row.id, "unit", newValue.unit);
                 } else {
-                  handleDetailChange(row.id, "product_id", null);
-                  handleDetailChange(row.id, "product_name", newValue || "");
+                  handleDetailChange(row.id, "ingredient_id", null);
+                  handleDetailChange(row.id, "ingredient_name", newValue || "");
+                  handleDetailChange(row.id, "unit", "");
                 }
               }}
               value={
-                ([].find(
+                (ingredients.find(
                   (p) => p.id === row.ingredient_id,
                 ) as IngredientType) || row.ingredient_name
               }
@@ -121,13 +129,14 @@ const FormulaDetailList = ({
         label: "Actions",
       },
     ],
-    [editingId, handleIngredientChange, handleDetailChange],
+    [editingId, handleIngredientChange, handleDetailChange, ingredients],
   );
 
   const getDetailActions = (
     row: FormulaDetailDisplay,
   ): ActionConfig<FormulaDetailDisplay>[] => {
     if (editingId === row.id) {
+      console.log(row.id);
       return [
         {
           label: "Save",
@@ -150,16 +159,20 @@ const FormulaDetailList = ({
         color: "primary",
         onClick: (row) => startEditing(row),
       },
-      // {
-      //   label: "Delete",
-      //   icon: <DeleteOutlineIcon />,
-      //   color: "warning",
-      //   onClick: (row) => deleteRowWithGuard(row),
-      // },
+      {
+        label: "Delete",
+        icon: <DeleteOutlineIcon />,
+        color: "warning",
+        onClick: (row) => deleteRowWithGuard(row),
+      },
     ];
   };
   useEffect(() => {
-    const ingredientOptions = ingredientApi.getAllIngredients();
+    const fetchIngredient = async () => {
+      const ingredientOptions = await ingredientApi.getAllIngredients();
+      setIngredients(ingredientOptions.data);
+    };
+    fetchIngredient();
   }, []);
 
   return (

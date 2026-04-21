@@ -1,6 +1,8 @@
+import { FormulaFilters, UpdateFormulaData } from "@/types/formula.type";
 import { prisma } from "../../lib/prisma";
+import { Prisma } from "../../generated/prisma/client";
 
-export const getAllFormlasService = async (filters) => {
+export const getAllFormlasService = async (filters: FormulaFilters) => {
   const {
     id,
     search,
@@ -12,7 +14,7 @@ export const getAllFormlasService = async (filters) => {
     orderBy,
   } = filters;
 
-  const andConditions = [];
+  const andConditions: Prisma.formulasWhereInput[] = [];
 
   if (id) andConditions.push({ id });
   if (active !== undefined) andConditions.push({ is_active: active });
@@ -26,7 +28,7 @@ export const getAllFormlasService = async (filters) => {
     const searchTrim = search.trim();
     const searchAsNumber = parseInt(searchTrim);
 
-    const orConditions = [
+    const orConditions: Prisma.formulasWhereInput[] = [
       { formula_name: { contains: searchTrim, mode: "insensitive" } },
     ];
     if (!isNaN(searchAsNumber)) {
@@ -36,11 +38,11 @@ export const getAllFormlasService = async (filters) => {
     andConditions.push({ OR: orConditions });
   }
   let sortField = "id";
-  let sortDirection = "desc";
+  let sortDirection: Prisma.SortOrder = "desc";
   if (orderBy && orderBy.includes(":")) {
     const parts = orderBy.split(":");
     sortField = parts[0];
-    sortDirection = parts[1];
+    sortDirection = parts[1] as Prisma.SortOrder;
   }
   return await prisma.formulas.findMany({
     where: andConditions.length > 0 ? { AND: andConditions } : {},
@@ -55,7 +57,7 @@ export const getAllFormlasService = async (filters) => {
       color: true,
       type_of_specification: true,
     },
-    orderBy: { [sortField]: sortDirection },
+    orderBy: { [sortField]: sortDirection } as Record<string, Prisma.SortOrder>,
   });
 };
 
@@ -74,7 +76,10 @@ export const createFormulaService = async () => {
   return updatedFormula;
 };
 
-export const updateFormulaService = async (id, data) => {
+export const updateFormulaService = async (
+  id: number,
+  data: UpdateFormulaData,
+) => {
   return await prisma.formulas.update({
     where: { id: id },
     data: data,
