@@ -33,8 +33,8 @@ declare global {
     interface Request {
       users?: {
         id: number;
-        role_id: number | null;
-        team_id: number | null;
+        role_id: number;
+        team_id: number;
       };
     }
   }
