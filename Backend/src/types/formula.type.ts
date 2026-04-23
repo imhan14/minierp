@@ -1,14 +1,12 @@
-import { StringRegexOptions } from "joi";
-
 export interface FormulaFilters {
   id?: number;
   search?: string;
-  active: boolean;
-  line: string;
-  specification: string;
-  color: string;
-  typeOfSpecification: string;
-  orderBy: string;
+  active?: boolean;
+  line?: string;
+  specification?: string;
+  color?: string;
+  typeOfSpecification?: string;
+  orderBy?: string;
 }
 
 export interface CreateFormulaData {}

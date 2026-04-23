@@ -2,19 +2,25 @@ import dayjs from "dayjs";
 import { prisma } from "../../lib/prisma.ts";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import {
+  CreateOrderData,
+  OrderFilters,
+  UpdateOrderData,
+} from "@/types/order.type.ts";
+import { Prisma } from "../../generated/prisma/client.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export const createProductOrderService = async (data) => {
+export const createProductOrderService = async (data: CreateOrderData) => {
   return await prisma.product_orders.create({
     data: data,
   });
 };
 
-export const getProductOrderService = async (filters) => {
+export const getProductOrderService = async (filters: OrderFilters) => {
   const { id, date, search, startDate, endDate } = filters;
-  const where = {};
+  const where: Prisma.product_ordersWhereInput = {};
 
   if (id) where.id = id;
   if (startDate && endDate)
@@ -51,23 +57,26 @@ export const getProductOrderService = async (filters) => {
   });
 };
 
-export const updateProductOrderService = async (id, data) => {
+export const updateProductOrderService = async (
+  id: number,
+  data: UpdateOrderData,
+) => {
   const currentOrder = await prisma.product_orders.findUnique({
     where: { id },
   });
-  if (currentOrder.status !== "pending")
+  if (currentOrder?.status !== "pending")
     throw new Error("The current state does not allow data editing!");
   return await prisma.product_orders.update({
     where: { id: id },
-    data: data,
+    data: data as Prisma.product_ordersUncheckedUpdateInput,
   });
 };
 
-export const confirmProductOrderService = async (id) => {
+export const confirmProductOrderService = async (id: number) => {
   const currentOrder = await prisma.product_orders.findUnique({
     where: { id },
   });
-  if (currentOrder.status !== "pending")
+  if (currentOrder?.status !== "pending")
     throw new Error("The current state does not allow data editing!");
   return await prisma.product_orders.update({
     where: { id },
@@ -75,11 +84,11 @@ export const confirmProductOrderService = async (id) => {
   });
 };
 
-export const cancelProductOrderService = async (id) => {
+export const cancelProductOrderService = async (id: number) => {
   const currentOrder = await prisma.product_orders.findUnique({
     where: { id },
   });
-  if (currentOrder.status !== "pending")
+  if (currentOrder?.status !== "pending")
     throw new Error("The current state does not allow data editing!");
   return await prisma.product_orders.update({
     where: { id },
@@ -87,7 +96,7 @@ export const cancelProductOrderService = async (id) => {
   });
 };
 
-export const deleteProductOrderService = async (id) => {
+export const deleteProductOrderService = async (id: number) => {
   return await prisma.product_orders.delete({
     where: { id: id },
   });

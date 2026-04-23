@@ -1,20 +1,32 @@
+import {
+  CreateMaterialDetailData,
+  MaterialDetailFilters,
+  UpdateMaterialDetailData,
+} from "@/types/materialDetail.type.ts";
 import { prisma } from "../../lib/prisma.ts";
 
-export const createMaterialDetailsService = async (data) => {
+export const createMaterialDetailsService = async (
+  data: CreateMaterialDetailData,
+) => {
   return await prisma.material_details.createMany({
     data: data,
     skipDuplicates: true,
   });
 };
 
-export const updateMaterialDetailService = async (id, data) => {
+export const updateMaterialDetailService = async (
+  id: number,
+  data: UpdateMaterialDetailData,
+) => {
   return await prisma.material_details.update({
     where: { id: id },
     data: data,
   });
 };
 
-export const getMaterialDetailService = async (filters) => {
+export const getMaterialDetailService = async (
+  filters: MaterialDetailFilters,
+) => {
   const { material_id } = filters;
   return await prisma.material_details.findMany({
     where: {
