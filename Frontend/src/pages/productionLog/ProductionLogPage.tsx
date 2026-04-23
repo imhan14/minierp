@@ -46,6 +46,7 @@ const ProductionLogPage = () => {
   const { handleAddNewReport } = useProductionLogForm(selectedDate, () =>
     fetchProductionLog(selectedDate, endDate),
   );
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   const productionLogColumns = useMemo(
     () => [
@@ -121,13 +122,23 @@ const ProductionLogPage = () => {
         setEndDate={setEndDate}
       />
       <Box sx={{}}>
-        <Button
-          variant="contained"
-          sx={{ marginBottom: 1 }}
-          onClick={handleAddNewReport}
-        >
-          Add new Report
-        </Button>
+        {currentUser.role < 8 && (
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Button
+              variant="contained"
+              disabled={filterMode === "range"}
+              sx={{ marginBottom: 1 }}
+              onClick={handleAddNewReport}
+            >
+              Add new Report
+            </Button>
+            {filterMode === "range" && (
+              <Typography sx={{ color: "red" }} variant="subtitle2">
+                *Add button only available on Single Mode
+              </Typography>
+            )}
+          </Box>
+        )}
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
             <CircularProgress />

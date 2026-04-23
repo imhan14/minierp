@@ -104,14 +104,17 @@ export const useFormulaDetailForm = (
   };
   const saveEditing = async (row: FormulaDetailDisplay) => {
     try {
+      if (row.isNew && !row.ingredient_id) {
+        notify("Vui lòng chọn ingredient!", "warning");
+        return;
+      }
       const payload = {
         ingredient_id: row.ingredient_id || undefined,
         standard_quality: row.standard_quality || undefined,
         formula_id: formula_id || undefined,
       };
       if (row.isNew) await formulaDetailApi.createFormulaDetail(payload);
-      else
-        await formulaDetailApi.updateFormulaDetail(Number(formula_id), payload);
+      else await formulaDetailApi.updateFormulaDetail(Number(row.id), payload);
       setEditingId(null);
       notify("Cập nhật thành công!", "success");
       onSaveSuccess();

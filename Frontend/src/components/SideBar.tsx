@@ -21,6 +21,7 @@ import { useNavigate, useLocation } from "react-router";
 import NavItem from "./NavItem";
 import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlined";
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
+import Co2OutlinedIcon from "@mui/icons-material/Co2Outlined";
 
 const drawerWidth = 240;
 const themeColor = {
@@ -105,6 +106,12 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       text: "Formulas",
       icon: <ScienceOutlinedIcon />,
       path: "/formula",
+      minRole: 5,
+    },
+    {
+      text: "Ingredient",
+      icon: <Co2OutlinedIcon />,
+      path: "/ingredient",
       minRole: 5,
     },
   ];

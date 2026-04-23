@@ -7,26 +7,21 @@ export const useFormulaData = () => {
   const [error, setError] = useState<string | null>(null);
   const [formula, setFormula] = useState<FormulaDisplay[]>([]);
 
-  const formatFormula = async (newFilters?: FormulaFilters) => {
-    const params: FormulaFilters = { ...newFilters };
-
-    const response = await formulaApi.getAllFormula(params);
-
-    const formattedData: FormulaDisplay[] = response.data.map((item) => {
-      const { products, ...rest } = item;
-      return {
-        ...rest,
-        product_id: products?.id,
-        product_name: products?.product_name || "N/A",
-      };
-    });
-    return formattedData;
-  };
   const fetchFormula = useCallback(async (newFilters?: FormulaFilters) => {
     try {
       setLoading(true);
-      setFormula(await formatFormula(newFilters));
       setError(null);
+      const response = await formulaApi.getAllFormula(newFilters || {});
+      const formattedData: FormulaDisplay[] = response.data.map((item) => {
+        const { products, ...rest } = item;
+        return {
+          ...rest,
+          product_id: products?.id,
+          product_name: products?.product_name || "N/A",
+        };
+      });
+
+      setFormula(formattedData);
     } catch (err) {
       setError("Không thể tải dữ liệu.");
       console.error("API Error:", err);

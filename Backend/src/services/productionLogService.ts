@@ -2,13 +2,21 @@ import dayjs from "dayjs";
 import { prisma } from "../../lib/prisma.ts";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import {
+  CreateProductLogData,
+  ProductionLogFilters,
+  UpdateProductLogData,
+} from "@/types/productionLog.type.ts";
+import { Prisma } from "../../generated/prisma/client.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export const getProductionLogService = async (filters) => {
+export const getProductionLogService = async (
+  filters: ProductionLogFilters,
+) => {
   const { id, date, team_id, startDate, endDate } = filters;
-  const where = {};
+  const where: Prisma.production_logsWhereInput = {};
 
   if (id) where.id = id;
   if (startDate && endDate)
@@ -52,13 +60,18 @@ export const getProductionLogService = async (filters) => {
   });
 };
 
-export const createProductionLogService = async (data) => {
+export const createProductionLogService = async (
+  data: CreateProductLogData,
+) => {
   return await prisma.production_logs.create({
     data: data,
   });
 };
 
-export const updateProductionLogService = async (id, data) => {
+export const updateProductionLogService = async (
+  id: number,
+  data: UpdateProductLogData,
+) => {
   const existingReport = await prisma.production_logs.findUnique({
     where: { id: id },
   });

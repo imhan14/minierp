@@ -3,11 +3,11 @@ import {
   createFormulaService,
   getAllFormlasService,
   updateFormulaService,
-} from "../services/formulaService";
+} from "../services/formulaService.js";
 import { FormulaFilters } from "@/types/formula.type";
 import catchAsync from "@/utils/catchAsync";
 
-export const getAllFomulas = catchAsync(async (req: Request, res: Response) => {
+export const getAllFomulas = async (req: Request, res: Response) => {
   const filters: FormulaFilters = {
     id: req.query.id ? Number(req.query.id) : undefined,
     search: req.query.search ? String(req.query.search) : undefined,
@@ -17,15 +17,19 @@ export const getAllFomulas = catchAsync(async (req: Request, res: Response) => {
         : req.query.active === "false"
           ? false
           : undefined,
-    line: String(req.query.line) ?? undefined,
-    specification: String(req.query.specification) ?? undefined,
-    color: String(req.query.color) ?? undefined,
-    typeOfSpecification: String(req.query.typeOfSpecification) ?? undefined,
-    orderBy: String(req.query.orderBy) || undefined,
+    line: req.query.line ? String(req.query.line) : undefined,
+    specification: req.query.specification
+      ? String(req.query.specification)
+      : undefined,
+    color: req.query.color ? String(req.query.color) : undefined,
+    typeOfSpecification: req.query.typeOfSpecification
+      ? String(req.query.typeOfSpecification)
+      : undefined,
+    orderBy: req.query.orderBy ? String(req.query.orderBy) : undefined,
   };
   const formulas = await getAllFormlasService(filters);
   res.status(200).json(formulas);
-});
+};
 
 export const createFormula = catchAsync(async (req: Request, res: Response) => {
   const newFormula = await createFormulaService();

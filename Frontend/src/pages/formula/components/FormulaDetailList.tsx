@@ -136,7 +136,6 @@ const FormulaDetailList = ({
     row: FormulaDetailDisplay,
   ): ActionConfig<FormulaDetailDisplay>[] => {
     if (editingId === row.id) {
-      console.log(row.id);
       return [
         {
           label: "Save",
