@@ -120,13 +120,21 @@ const ProductionReportPage = () => {
       />
       <Box sx={{}}>
         {currentUser.role < 8 && (
-          <Button
-            variant="contained"
-            sx={{ marginBottom: 1 }}
-            onClick={handleAddNewReport}
-          >
-            Add new Report
-          </Button>
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Button
+              disabled={filterMode === "range"}
+              variant="contained"
+              sx={{ marginBottom: 1 }}
+              onClick={handleAddNewReport}
+            >
+              Add new Report
+            </Button>
+            {filterMode === "range" && (
+              <Typography sx={{ color: "red" }} variant="subtitle2">
+                *Add button only available on Single Mode
+              </Typography>
+            )}
+          </Box>
         )}
         {loading || isSubmitting ? (
           <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>

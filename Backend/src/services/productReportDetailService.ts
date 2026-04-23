@@ -1,6 +1,13 @@
+import {
+  CreateProductReportDetailData,
+  ProductReportDetailFilters,
+  UpdateProductReportDetailData,
+} from "@/types/productReportDetail.type.ts";
 import { prisma } from "../../lib/prisma.ts";
 
-export const getProductReportDetailSercive = async (filters) => {
+export const getProductReportDetailSercive = async (
+  filters: ProductReportDetailFilters,
+) => {
   const { id, report_id } = filters;
   return await prisma.reports_products.findMany({
     where: {
@@ -29,19 +36,24 @@ export const getProductReportDetailSercive = async (filters) => {
   });
 };
 
-export const createProductReportDetailService = async (data) => {
+export const createProductReportDetailService = async (
+  data: CreateProductReportDetailData,
+) => {
   return await prisma.reports_products.create({
     data: data,
   });
 };
 
-export const updateProductReportDetailService = async (id, data) => {
+export const updateProductReportDetailService = async (
+  id: number,
+  data: UpdateProductReportDetailData,
+) => {
   return await prisma.reports_products.update({
     where: { id: id },
     data: data,
   });
 };
-export const deleteProductReportDetailService = async (id) => {
+export const deleteProductReportDetailService = async (id: number) => {
   return await prisma.reports_products.delete({
     where: { id: id },
   });

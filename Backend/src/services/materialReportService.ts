@@ -2,13 +2,21 @@ import dayjs from "dayjs";
 import { prisma } from "../../lib/prisma.ts";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import {
+  CreateMaterialReportData,
+  MaterialReportFilters,
+  UpdateMaterialReportData,
+} from "@/types/materialReport.type.ts";
+import { Prisma } from "../../generated/prisma/client.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export const getMaterialReportService = async (filters) => {
+export const getMaterialReportService = async (
+  filters: MaterialReportFilters,
+) => {
   const { id, date, team_id, startDate, endDate } = filters;
-  const where = {};
+  const where: Prisma.material_reportsWhereInput = {};
   if (id) where.id = id;
   if (startDate && endDate)
     where.report_date = {
@@ -42,13 +50,18 @@ export const getMaterialReportService = async (filters) => {
   });
 };
 
-export const createMaterialReportService = async (data) => {
+export const createMaterialReportService = async (
+  data: CreateMaterialReportData,
+) => {
   return await prisma.material_reports.create({
     data: data,
   });
 };
 
-export const updateMaterialReportService = async (id, data) => {
+export const updateMaterialReportService = async (
+  id: number,
+  data: UpdateMaterialReportData,
+) => {
   const existingReport = await prisma.material_reports.findUnique({
     where: { id: id },
   });
@@ -56,8 +69,8 @@ export const updateMaterialReportService = async (id, data) => {
   if (!existingReport) throw new Error("Report không tồn tại");
   return await prisma.material_reports.update({
     where: { id: id },
-    data: data,
+    data: data as Prisma.material_reportsUncheckedUpdateInput,
   });
 };
 
-export const deleteMaterialReportService = async (id) => {};
+export const deleteMaterialReportService = async (id: number) => {};

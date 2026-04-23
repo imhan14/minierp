@@ -1,8 +1,9 @@
+import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtHeader, JwtPayload } from "jsonwebtoken";
 import { verifyUser } from "../services/authService.js";
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   const user = await verifyUser(username);
   if (!user) return res.status(401).json({ error: "Sai tên đăng nhập" });
@@ -11,7 +12,7 @@ export const login = async (req, res) => {
   if (!isMatch) return res.status(401).json({ error: "Sai mật khẩu" });
   const token = jwt.sign(
     { id: user.id, role_id: user.role_id },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET!,
     { expiresIn: "1d" },
   );
   res.json({

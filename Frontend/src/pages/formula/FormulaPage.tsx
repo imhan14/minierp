@@ -119,7 +119,12 @@ const FormulaPage = () => {
             {/* <Stack spacing={1}>
                 <Skeleton variant="rounded" height={600} />
               </Stack> */}
-            {selectedFormula && <FormulaDetailList formula_id={rowId} />}
+            {selectedFormula && (
+              <FormulaDetailList
+                formula_id={rowId}
+                onSaveSuccess={fetchFormula}
+              />
+            )}
           </Box>
         </DynamicPopup>
       </Box>

@@ -27,6 +27,15 @@ export interface JwtPayload {
   id: number;
 }
 
+export interface UserPayload {
+  id: number;
+  username: string;
+  full_name: string;
+  role_id: number;
+  is_active: boolean;
+  team_id: number | null;
+}
+
 // Extend Express Request
 declare global {
   namespace Express {

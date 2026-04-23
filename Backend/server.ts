@@ -1,8 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import rootRouter from "./src/routes/index.js";
-import { globalErrorHandler } from "./src/middlewares/errorMiddleware.js";
+import rootRouter from "./src/routes/index";
+import { globalErrorHandler } from "./src/middlewares/errorMiddleware";
 const app = express();
 
 app.use(

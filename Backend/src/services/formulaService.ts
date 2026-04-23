@@ -1,5 +1,5 @@
 import { FormulaFilters, UpdateFormulaData } from "@/types/formula.type";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.ts";
 import { Prisma } from "../../generated/prisma/client";
 
 export const getAllFormlasService = async (filters: FormulaFilters) => {
@@ -13,16 +13,13 @@ export const getAllFormlasService = async (filters: FormulaFilters) => {
     typeOfSpecification,
     orderBy,
   } = filters;
-
-  const andConditions: Prisma.formulasWhereInput[] = [];
-
-  if (id) andConditions.push({ id });
-  if (active !== undefined) andConditions.push({ is_active: active });
-  if (line) andConditions.push({ product_line: line });
-  if (specification) andConditions.push({ specification });
-  if (color) andConditions.push({ color });
-  if (typeOfSpecification)
-    andConditions.push({ type_of_specification: typeOfSpecification });
+  const where: Prisma.formulasWhereInput = {};
+  if (id) where.id = id;
+  if (active !== undefined) where.is_active = active;
+  if (line) where.product_line = line;
+  if (specification) where.specification = specification;
+  if (color) where.color = color;
+  if (typeOfSpecification) where.type_of_specification = typeOfSpecification;
 
   if (search && search.trim() !== "") {
     const searchTrim = search.trim();
@@ -35,8 +32,9 @@ export const getAllFormlasService = async (filters: FormulaFilters) => {
       orConditions.push({ formula_code: searchAsNumber });
     }
 
-    andConditions.push({ OR: orConditions });
+    where.OR = orConditions;
   }
+
   let sortField = "id";
   let sortDirection: Prisma.SortOrder = "desc";
   if (orderBy && orderBy.includes(":")) {
@@ -45,7 +43,7 @@ export const getAllFormlasService = async (filters: FormulaFilters) => {
     sortDirection = parts[1] as Prisma.SortOrder;
   }
   return await prisma.formulas.findMany({
-    where: andConditions.length > 0 ? { AND: andConditions } : {},
+    where,
     select: {
       id: true,
       formula_code: true,
