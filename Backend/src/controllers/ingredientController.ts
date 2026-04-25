@@ -15,10 +15,12 @@ export const createIngredient = async (req: Request, res: Response) => {
 };
 
 export const getIngredients = async (req: Request, res: Response) => {
-  const { id, search } = req.query;
+  const { id, search, unit, orderBy } = req.query;
   const filters: Record<string, unknown> = {
     id: id && !isNaN(Number(id)) ? Number(id) : undefined,
-    search: search,
+    search: search ? String(search) : undefined,
+    unit: unit ? String(unit) : undefined,
+    orderBy: orderBy ? String(orderBy) : undefined,
   };
   const ingredients = await getIngredientsService(filters);
   res.status(200).json(ingredients);

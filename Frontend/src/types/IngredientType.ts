@@ -4,5 +4,5 @@ export interface IngredientType {
   ingredient_name: string;
   unit: string;
   description: string;
-  created_at: string;
+  // created_at: string;
 }
