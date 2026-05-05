@@ -84,7 +84,7 @@ const FormulaPage = () => {
           <Button
             variant="contained"
             sx={{ marginBottom: 1 }}
-            onClick={handleAddNewReport}
+            onClick={() => setOpenDetail(true)}
           >
             Add new Formula
           </Button>
@@ -100,7 +100,11 @@ const FormulaPage = () => {
         <DynamicPopup
           open={openDetail}
           onClose={handleCloseDetail}
-          title={`Formula Code: #${selectedFormula?.formula_code}`}
+          title={
+            selectedFormula?.formula_code
+              ? `Formula Code: #${selectedFormula?.formula_code}`
+              : "New Formula"
+          }
           // enableSend={true}
         >
           <FormulaGeneral

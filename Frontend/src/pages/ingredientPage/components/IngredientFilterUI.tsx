@@ -19,7 +19,7 @@ const IngredientFilterUI = ({
       label: "Unit",
       options: [
         { label: "Kg", value: "Kg" },
-        { label: "Lit", value: "lit" },
+        { label: "Lit", value: "Lit" },
       ],
     },
     {
@@ -50,7 +50,7 @@ const IngredientFilterUI = ({
         p: 2,
         mb: 3,
         boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
-        position: "sticky",
+        // position: "sticky",
         top: 60,
         zIndex: 10,
         flexWrap: "wrap",

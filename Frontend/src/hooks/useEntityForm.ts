@@ -214,7 +214,7 @@ export function useEntityForm<
           notify(result.message ?? "Dữ liệu không hợp lệ", "error");
           return;
         }
-        await service.create(result.data);
+        await service.create(result.data as CreatePayload);
         notify(messages.createSuccess ?? "Thêm mới thành công!", "success");
         close();
         onSuccess();
@@ -239,7 +239,7 @@ export function useEntityForm<
           return;
         }
 
-        await service.update(editingId, result.data);
+        await service.update(Number(editingId), result.data as UpdatePayload);
         notify(messages.updateSuccess ?? "Cập nhật thành công!", "success");
         close();
         onSuccess();
@@ -286,7 +286,7 @@ export function useEntityForm<
 
       setIsDeleting(true);
       try {
-        await service.delete(id);
+        await service.delete(Number(id));
         notify(messages.deleteSuccess ?? "Xóa thành công!", "success");
         onSuccess();
       } catch (err) {

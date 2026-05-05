@@ -5,10 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
-  MenuItem,
   styled,
-  TextField,
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import IngredientFilterUI from "./components/IngredientFilterUI";
@@ -25,12 +22,13 @@ import type {
 import { getFieldConfigs } from "@/utils/schema-parser";
 import type { IngredientType } from "@/types/IngredientType";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import ingredientApi, { type IngredientFilters } from "@/apis/ingredientApi";
 import { useEntity } from "@/hooks/useEntity";
 import { useEntityForm } from "@/hooks/useEntityForm";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { ConfirmDiscardDialog } from "@/components/ConfirmDiscardDialog";
+import type { FieldConfig } from "@/types/FieldConfig";
+import GeneralInfoSection from "@/components/GeneralInfoSection";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -39,14 +37,16 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
 }));
+const FIELD_WIDTHS: Partial<Record<string, number>> = {
+  ingredient_code: 130,
+  ingredient_name: 200,
+  unit: 100,
+};
+
 type UnitType = "Kg" | "Met" | "Cai" | "Lit";
 const IngredientPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [openDetail, setOpenDetail] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] =
-    useState<IngredientType | null>(null);
-  const [editGeneral, setEditGeneral] = useState<IngredientType | null>(null);
   const { data: ingredients, reload } = useEntity<
     IngredientType,
     IngredientType,
@@ -106,13 +106,27 @@ const IngredientPage = () => {
     () => getFieldConfigs(IngredientSchema),
     [],
   );
+  const dialogFields = useMemo((): FieldConfig<IngredientType>[] => {
+    return ingredientConfigs
+      .filter((f) => f.formOrder !== false && f.name !== "id")
+      .map((f) => ({
+        id: f.name as keyof IngredientType,
+        label: f.label,
+        inputType: f.type ?? "text",
+        options: f.options,
+        gridSize: f.name === "description" ? { xs: 12 } : { xs: 12, sm: 6 },
+        isReadOnly: false,
+        required: f.isRequired,
+      }));
+  }, [ingredientConfigs]);
+  // ── Columns cho DataTable ──────────────────────────────────────────────────
   const columns = useMemo(() => {
     const dynamicColumns = ingredientConfigs
       .filter((f) => f.tableVisible)
       .map((f) => ({
         id: f.name as keyof IngredientType | "actions",
         label: f.label,
-        width: f.name === "ingredient_name" ? 250 : 150,
+        width: FIELD_WIDTHS[f.name],
         align: (f.type === "number" ? "right" : "left") as "right" | "left",
         render: (value: unknown) => {
           if (f.type === "number") return value?.toLocaleString() || "0";
@@ -125,8 +139,6 @@ const IngredientPage = () => {
       {
         id: "actions",
         label: "Thao tác",
-        // width: 120,
-        // align: "right" as const,
       },
     ];
   }, [ingredientConfigs]);
@@ -134,15 +146,6 @@ const IngredientPage = () => {
   //____actions_______________________________________________________
   const actions = (): ActionConfig<IngredientType>[] => {
     return [
-      {
-        label: "Details",
-        color: "primary",
-        icon: <RemoveRedEyeOutlinedIcon />,
-        onClick: (row) => {
-          setSelectedIngredient(row);
-          setOpenDetail(true);
-        },
-      },
       {
         label: "Sửa",
         color: "primary",
@@ -160,13 +163,11 @@ const IngredientPage = () => {
       },
     ];
   };
-  const unitField = ingredientConfigs.find((f) => f.name === "unit");
   return (
     <>
       <DrawerHeader />
       <IngredientFilterUI onFilterChange={(newFilters) => reload(newFilters)} />
       <Box>
-        {/* {!isSubmitting && ( */}
         <Button
           variant="contained"
           sx={{ marginBottom: 1 }}
@@ -174,7 +175,6 @@ const IngredientPage = () => {
         >
           Add new Ingredient
         </Button>
-        {/* )} */}
         <DataTable
           columns={columns}
           data={ingredients}
@@ -194,73 +194,21 @@ const IngredientPage = () => {
               : "Chỉnh sửa nguyên liệu"}
           </DialogTitle>
 
-          <DialogContent dividers>
-            <Grid container spacing={2} sx={{ pt: 1 }}>
-              {/* Mã nguyên liệu */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label="Mã nguyên liệu *"
-                  value={form.formData.ingredient_code ?? ""}
-                  onChange={(e) =>
-                    form.setField("ingredient_code", e.target.value)
-                  }
-                  error={!!form.fieldErrors.ingredient_code}
-                  helperText={form.fieldErrors.ingredient_code}
-                  // Không cho sửa mã khi edit (business rule)
-                  disabled={form.mode === "edit"}
-                />
-              </Grid>
-
-              {/* Tên nguyên liệu */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label="Tên nguyên liệu *"
-                  value={form.formData.ingredient_name ?? ""}
-                  onChange={(e) =>
-                    form.setField("ingredient_name", e.target.value)
-                  }
-                  error={!!form.fieldErrors.ingredient_name}
-                  helperText={form.fieldErrors.ingredient_name}
-                />
-              </Grid>
-
-              {/* Đơn vị */}
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField
-                  select
-                  fullWidth
-                  size="small"
-                  label="Đơn vị *"
-                  value={form.formData.unit ?? ""}
-                  onChange={(e) => form.setField("unit", e.target.value)}
-                  error={!!form.fieldErrors.unit}
-                  helperText={form.fieldErrors.unit}
+          <DialogContent dividers sx={{ pt: 2 }}>
+            <GeneralInfoSection<IngredientType>
+              mode="form"
+              displayFields={dialogFields}
+              data={form.formData as IngredientType}
+              onGeneralChange={(id, value) => form.setField(id, value)}
+              errors={
+                form.fieldErrors as Partial<
+                  Record<keyof IngredientType, string>
                 >
-                  {unitField?.options.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-
-              {/* Mô tả */}
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label="Mô tả"
-                  multiline
-                  rows={2}
-                  value={form.formData.description ?? ""}
-                  onChange={(e) => form.setField("description", e.target.value)}
-                />
-              </Grid>
-            </Grid>
+              }
+              disabledFields={{
+                ingredient_code: form.mode === "edit",
+              }}
+            />
           </DialogContent>
 
           <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
@@ -287,9 +235,12 @@ const IngredientPage = () => {
         </Dialog>
         <ConfirmDiscardDialog
           open={confirmOpen}
-          onContinueEditing={handleContinueEditing}
           onDiscard={handleDiscard}
           onClose={handleContinueEditing}
+          onSave={async () => {
+            await form.submit();
+            setConfirmOpen(false);
+          }}
         />
       </Box>
     </>

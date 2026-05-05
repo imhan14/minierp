@@ -28,20 +28,22 @@ export const IngredientSchema = z.object({
       }),
     ),
 
-  unit: z.enum(["Kg", "Met", "Cai", "Lit"]).describe(
-    JSON.stringify({
-      label: "Đơn vị tính",
-      type: "select",
-      options: [
-        { label: "Kg", value: "Kg" },
-        { label: "Met", value: "Met" },
-        { label: "Cái", value: "Cai" },
-        { label: "Lít", value: "Lit" },
-      ],
-      tableVisible: true,
-      formOrder: 3,
-    }),
-  ),
+  unit: z
+    .enum(["Kg", "Met", "Cai", "Lit"], "Đơn vị tính không hợp lệ")
+    .describe(
+      JSON.stringify({
+        label: "Đơn vị tính",
+        type: "select",
+        options: [
+          { label: "Kg", value: "Kg" },
+          { label: "Met", value: "Met" },
+          { label: "Cái", value: "Cai" },
+          { label: "Lít", value: "Lit" },
+        ],
+        tableVisible: true,
+        formOrder: 3,
+      }),
+    ),
 
   description: z
     .string()
@@ -49,8 +51,8 @@ export const IngredientSchema = z.object({
     .describe(
       JSON.stringify({
         label: "Ghi chú",
-        type: "textarea",
-        tableVisible: false,
+        type: "text",
+        tableVisible: true,
         formOrder: 6,
       }),
     ),

@@ -17,6 +17,7 @@ export function getFieldConfigs<T extends z.ZodRawShape>(
       options: meta.options || [],
       placeholder: meta.placeholder || "",
       zodField: field,
+      isRequired: !field.isOptional(),
     };
   });
 }
