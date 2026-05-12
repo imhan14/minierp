@@ -16,28 +16,14 @@ export interface UseEntityFormConfig<T, CreatePayload, UpdatePayload> {
   createSchema: ZodSchema<CreatePayload>;
   updateSchema: ZodSchema<UpdatePayload>;
 
-  /**
-   * Transform formData → payload trước khi gọi API create.
-   * Dùng để format date, coerce type, loại bỏ field thừa, v.v.
-   */
   toCreatePayload: (formData: Partial<T>) => CreatePayload;
 
-  /**
-   * Transform formData → payload trước khi gọi API update.
-   * Nếu không truyền, mặc định dùng toCreatePayload.
-   */
   toUpdatePayload?: (formData: Partial<T>) => UpdatePayload;
 
-  /**
-   * Giá trị mặc định khi mở form Add New.
-   * Có thể là object rỗng hoặc preset một số field.
-   */
   defaultValues: Partial<T>;
 
-  /** Callback gọi sau mỗi thao tác thành công (refresh data) */
   onSuccess: () => void;
 
-  /** Thông báo tuỳ chỉnh. Mặc định dùng message chung. */
   messages?: {
     createSuccess?: string;
     updateSuccess?: string;
@@ -51,52 +37,38 @@ export interface UseEntityFormConfig<T, CreatePayload, UpdatePayload> {
 /** State trả về từ hook */
 export interface UseEntityFormReturn<T> {
   // ─── Form state ────────────────────────────────────────────────────────────
-  /** Dữ liệu đang được chỉnh sửa trong form */
   formData: Partial<T>;
 
-  /** Lỗi validation theo từng field key */
   fieldErrors: Record<string, string>;
 
-  /** Mode hiện tại của form */
   mode: "idle" | "add" | "edit";
 
-  /** Form đang ở trạng thái submit */
   isSubmitting: boolean;
 
-  /** Form đang ở trạng thái delete */
   isDeleting: boolean;
 
   // ─── Derived state ─────────────────────────────────────────────────────────
-  /** true nếu form đang mở (mode !== 'idle') */
   isOpen: boolean;
 
-  /** true nếu form có thay đổi chưa lưu (dirty check) */
   isDirty: boolean;
 
-  /** ID của record đang edit (null nếu là add new) */
   editingId: number | string | null;
 
   // ─── Actions ───────────────────────────────────────────────────────────────
-  /** Mở form Add New với defaultValues */
   openAdd: () => void;
 
-  /** Mở form Edit với data của record */
   openEdit: (record: T) => void;
 
-  /** Đóng form, reset state */
   close: () => void;
 
-  /** Cập nhật 1 field trong formData */
   setField: (key: keyof T, value: unknown) => void;
 
-  /** Cập nhật nhiều field cùng lúc */
   setFields: (fields: Partial<T>) => void;
 
-  /** Submit form (validate → create hoặc update tuỳ mode) */
   submit: () => Promise<void>;
 
-  /** Xóa record (có confirm) */
   deleteRecord: (record: T, confirmMessage?: string) => Promise<void>;
+  setFieldErrors: (errors: Record<string, string>) => void;
 }
 
 // ─── ID resolution ────────────────────────────────────────────────────────────
@@ -193,7 +165,9 @@ export function useEntityForm<
   const setFields = useCallback((fields: Partial<T>) => {
     setFormData((prev) => ({ ...prev, ...fields }));
   }, []);
-
+  const exposeSetFieldErrors = useCallback((errors: Record<string, string>) => {
+    setFieldErrors(errors);
+  }, []);
   // ─── Submit ──────────────────────────────────────────────────────────────────
 
   const submit = useCallback(async () => {
@@ -311,6 +285,7 @@ export function useEntityForm<
     isOpen,
     isDirty,
     editingId,
+    setFieldErrors: exposeSetFieldErrors,
     // actions
     openAdd,
     openEdit,

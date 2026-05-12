@@ -33,7 +33,7 @@ interface DynamicTableProps<T> {
   columns: FieldConfig<T>[];
   data: T[];
   actions?: (row: T) => ActionConfig<T>[];
-  getRowKey: (row: T) => string | number;
+  getRowKey: (row: T) => undefined | number;
   renderDetail?: (row: T) => React.ReactNode;
   hideEmptyRows?: boolean;
 }
@@ -52,7 +52,7 @@ const CollapsibleRow = <T,>({
   row: T;
   columns: FieldConfig<T>[];
   actions?: (row: T) => ActionConfig<T>[];
-  getRowKey: (row: T) => string | number;
+  getRowKey: (row: T) => undefined | number;
   renderDetail?: (row: T) => React.ReactNode;
   stickyActionsSx: object;
   idSx: object;

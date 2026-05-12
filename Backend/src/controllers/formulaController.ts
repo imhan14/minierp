@@ -32,7 +32,8 @@ export const getAllFomulas = async (req: Request, res: Response) => {
 };
 
 export const createFormula = catchAsync(async (req: Request, res: Response) => {
-  const newFormula = await createFormulaService();
+  const data = req.body;
+  const newFormula = await createFormulaService(data);
   res.status(201).json(newFormula);
 });
 

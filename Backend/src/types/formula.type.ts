@@ -9,7 +9,15 @@ export interface FormulaFilters {
   orderBy?: string;
 }
 
-export interface CreateFormulaData {}
+export interface CreateFormulaData {
+  formula_name: string;
+  product_id: number;
+  is_active?: boolean;
+  product_line: string;
+  specification: string;
+  color: string;
+  type_of_specification: string;
+}
 
 export interface UpdateFormulaData {
   formula_name?: string;

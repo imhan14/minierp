@@ -7,31 +7,68 @@ import {
   Button,
   IconButton,
   Box,
-  //   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface DynamicPopupProps {
   open: boolean;
   onClose: () => void;
-  onSubmit?: () => void;
   title: string;
   children: React.ReactNode;
-  footer?: React.ReactNode;
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
-  enableSend?: boolean;
+  mode?: "view" | "add" | "edit";
+  onSubmit?: () => void;
+  isSubmitting?: boolean;
+  footer?: React.ReactNode;
 }
-
+const SUBMIT_CONFIG = {
+  add: {
+    label: "Thêm mới",
+    loadingLabel: "Đang thêm...",
+    color: "primary" as const,
+  },
+  edit: {
+    label: "Lưu thay đổi",
+    loadingLabel: "Đang lưu...",
+    color: "success" as const,
+  },
+};
 const DynamicPopup = ({
   open,
   onClose,
-  onSubmit,
   title,
   children,
-  footer,
   maxWidth = "md",
-  enableSend = false,
+  mode,
+  onSubmit,
+  isSubmitting = false,
+  footer,
 }: DynamicPopupProps) => {
+  const submitCfg = mode && mode !== "view" ? SUBMIT_CONFIG[mode] : null;
+  const defaultFooter = (
+    <Box sx={{ display: "flex", gap: 1 }}>
+      {submitCfg && (
+        <Button
+          onClick={onSubmit}
+          variant="contained"
+          color={submitCfg.color}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? submitCfg.loadingLabel : submitCfg.label}
+        </Button>
+      )}
+
+      <Button
+        onClick={onClose}
+        color="inherit"
+        variant="outlined"
+        disabled={isSubmitting}
+      >
+        {mode === "view" ? "Đóng" : "Hủy"}
+      </Button>
+    </Box>
+  );
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth>
       <DialogTitle
@@ -56,20 +93,7 @@ const DynamicPopup = ({
       </DialogContent>
 
       <DialogActions sx={{ p: 2, bgcolor: "#f8fafc" }}>
-        {footer || (
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              onClick={onSubmit}
-              variant="contained"
-              sx={{ display: enableSend ? "block" : "none" }}
-            >
-              Gửi
-            </Button>
-            <Button onClick={onClose} color="inherit" variant="outlined">
-              Đóng
-            </Button>
-          </Box>
-        )}
+        {footer ?? defaultFooter}
       </DialogActions>
     </Dialog>
   );

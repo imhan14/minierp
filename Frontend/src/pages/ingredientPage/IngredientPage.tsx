@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  styled,
-} from "@mui/material";
+import { Box, Button, styled } from "@mui/material";
 import { useMemo, useState } from "react";
 import IngredientFilterUI from "./components/IngredientFilterUI";
 import DataTable, { type ActionConfig } from "@/components/DataTable";
@@ -17,10 +9,11 @@ import {
 } from "@/schema/ingredient.schema";
 import type {
   IngredientCreatePayload,
+  IngredientType,
   IngredientUpdatePayload,
 } from "@/schema/ingredient.schema";
 import { getFieldConfigs } from "@/utils/schema-parser";
-import type { IngredientType } from "@/types/IngredientType";
+// import type { IngredientType } from "@/types/IngredientType";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ingredientApi, { type IngredientFilters } from "@/apis/ingredientApi";
 import { useEntity } from "@/hooks/useEntity";
@@ -29,6 +22,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { ConfirmDiscardDialog } from "@/components/ConfirmDiscardDialog";
 import type { FieldConfig } from "@/types/FieldConfig";
 import GeneralInfoSection from "@/components/GeneralInfoSection";
+import DynamicPopup from "@/components/DynamicPopup";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -43,7 +37,6 @@ const FIELD_WIDTHS: Partial<Record<string, number>> = {
   unit: 100,
 };
 
-type UnitType = "Kg" | "Met" | "Cai" | "Lit";
 const IngredientPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -86,19 +79,13 @@ const IngredientPage = () => {
     },
     createSchema: CreateIngredientSchema,
     updateSchema: UpdateIngredientSchema,
-    toCreatePayload: (d) => ({
-      ingredient_code: d.ingredient_code ?? "",
-      ingredient_name: d.ingredient_name ?? "",
-      unit: (d.unit ?? "Kg") as UnitType,
-      description: d.description ?? "",
-    }),
-    toUpdatePayload: (d) => ({
-      ingredient_code: d.ingredient_code || undefined,
-      ingredient_name: d.ingredient_name || undefined,
-      unit: d.unit as UnitType | undefined,
-      description: d.description || undefined,
-    }),
-    defaultValues: { ingredient_code: "", ingredient_name: "", unit: "" },
+    toCreatePayload: (d) => d as IngredientCreatePayload,
+    toUpdatePayload: (d) => d as IngredientUpdatePayload,
+    defaultValues: {
+      ingredient_code: "",
+      ingredient_name: "",
+      unit: undefined,
+    },
     onSuccess: reload,
   });
 
@@ -182,57 +169,33 @@ const IngredientPage = () => {
           getRowKey={(row) => row.id}
         />
 
-        <Dialog
+        <DynamicPopup
           open={form.isOpen}
           onClose={() => guardAction(form.close)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle>
-            {form.mode === "add"
+          title={
+            form.mode === "add"
               ? "Thêm nguyên liệu mới"
-              : "Chỉnh sửa nguyên liệu"}
-          </DialogTitle>
+              : "Chỉnh sửa nguyên liệu"
+          }
+          mode={form.mode === "idle" ? undefined : form.mode}
+          onSubmit={form.submit}
+          isSubmitting={form.isSubmitting}
+          maxWidth="sm"
+        >
+          <GeneralInfoSection<IngredientType>
+            mode="form"
+            displayFields={dialogFields}
+            data={form.formData as IngredientType}
+            onGeneralChange={(id, value) => form.setField(id, value)}
+            errors={
+              form.fieldErrors as Partial<Record<keyof IngredientType, string>>
+            }
+            disabledFields={{
+              ingredient_code: form.mode === "edit",
+            }}
+          />
+        </DynamicPopup>
 
-          <DialogContent dividers sx={{ pt: 2 }}>
-            <GeneralInfoSection<IngredientType>
-              mode="form"
-              displayFields={dialogFields}
-              data={form.formData as IngredientType}
-              onGeneralChange={(id, value) => form.setField(id, value)}
-              errors={
-                form.fieldErrors as Partial<
-                  Record<keyof IngredientType, string>
-                >
-              }
-              disabledFields={{
-                ingredient_code: form.mode === "edit",
-              }}
-            />
-          </DialogContent>
-
-          <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-            <Button
-              variant="outlined"
-              onClick={() => guardAction(form.close)}
-              disabled={form.isSubmitting}
-            >
-              Hủy
-            </Button>
-            <Button
-              variant="contained"
-              color={form.mode === "add" ? "primary" : "success"}
-              onClick={form.submit}
-              disabled={form.isSubmitting}
-            >
-              {form.isSubmitting
-                ? "Đang lưu..."
-                : form.mode === "add"
-                  ? "Thêm mới"
-                  : "Lưu thay đổi"}
-            </Button>
-          </DialogActions>
-        </Dialog>
         <ConfirmDiscardDialog
           open={confirmOpen}
           onDiscard={handleDiscard}

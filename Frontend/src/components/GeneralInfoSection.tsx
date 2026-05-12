@@ -24,7 +24,7 @@ interface GeneralInfoSectionProps<T> {
   title?: string;
   displayFields: FieldConfig<T>[];
   data: T | null;
-  onSave?: () => Promise<void> | void;
+  onSave?: () => Promise<boolean | void> | boolean | void;
   onCancel?: () => void;
   onGeneralChange?: (id: keyof T, value: string) => void;
   mode?: SectionMode;
@@ -56,9 +56,9 @@ const GeneralInfoSection = <T,>({
 
   const handleSaveClick = async () => {
     setLoading(true);
-    await onSave?.();
+    const result = await onSave?.();
     setLoading(false);
-    setIsEditing(false);
+    if (result === true) setIsEditing(false);
   };
   const handleCancelClick = () => {
     if (onCancel) onCancel();

@@ -1,4 +1,5 @@
-import type { FormulaType } from "@/types/FormulaType";
+// import type { FormulaType } from "@/types/FormulaType";
+import type { FormulaType } from "@/schema/formula.schema";
 import instance from "./axios";
 
 export interface FormulaFilters {
@@ -23,14 +24,26 @@ export interface FormulaData {
 }
 
 const formulaApi = {
-  getAllFormula: (params?: FormulaFilters) => {
-    return instance.get<FormulaType[]>("/formula", { params });
+  getAllFormula: async (params?: FormulaFilters) => {
+    const res = await instance.get<FormulaType[]>("/formula", { params });
+    return {
+      ...res,
+      data: res.data.map((item: FormulaType) => ({
+        ...item,
+        product_id: item.products?.id,
+        product_name: item.products?.product_name,
+      })),
+    };
   },
   createFormula: (data?: FormulaData) => {
+    console.log(data);
     return instance.post<FormulaType>("/formula", data);
   },
   updateFormula: (id: number, data?: FormulaData) => {
     return instance.patch(`/formula/${id}`, data);
+  },
+  deleteFormula: (id: number) => {
+    return instance.delete(`/formula/${id}`);
   },
 };
 

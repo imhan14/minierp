@@ -1,4 +1,8 @@
-import { FormulaFilters, UpdateFormulaData } from "@/types/formula.type";
+import {
+  CreateFormulaData,
+  FormulaFilters,
+  UpdateFormulaData,
+} from "@/types/formula.type";
 import { prisma } from "../../lib/prisma.ts";
 import { Prisma } from "../../generated/prisma/client";
 
@@ -59,9 +63,10 @@ export const getAllFormlasService = async (filters: FormulaFilters) => {
   });
 };
 
-export const createFormulaService = async () => {
+export const createFormulaService = async (formulaData: CreateFormulaData) => {
   const newFormula = await prisma.formulas.create({
     data: {
+      ...formulaData,
       is_active: true,
     },
   });
