@@ -4,13 +4,36 @@ import {
   UpdateIngredientData,
 } from "@/types/ingredient.type.ts";
 import { prisma } from "../../lib/prisma.ts";
+import { Prisma } from "../../generated/prisma/client.ts";
 
 export const getIngredientsService = async (filters: IngredientFilters) => {
-  const { id } = filters;
+  const { id, unit, search, orderBy } = filters;
+
+  const where: Prisma.ingredientsWhereInput = {};
+  if (id) where.id = id;
+  if (unit) where.unit = unit;
+  if (search && search.trim() !== "") {
+    const searchTrim = search.trim();
+    const searchCode = searchTrim;
+    const orConditions: Prisma.ingredientsWhereInput[] = [
+      { ingredient_name: { contains: searchTrim, mode: "insensitive" } },
+    ];
+    if (!searchCode) {
+      orConditions.push({ ingredient_code: searchCode });
+    }
+    where.OR = orConditions;
+  }
+  let sortField = "id";
+  let sortDirection: Prisma.SortOrder = "asc";
+  if (orderBy && orderBy.includes(":")) {
+    const parts = orderBy.split(":");
+    sortField = parts[0];
+    sortDirection = parts[1] as Prisma.SortOrder;
+  }
+
   return await prisma.ingredients.findMany({
-    where: {
-      id: id ? Number(id) : undefined,
-    },
+    where,
+    orderBy: { [sortField]: sortDirection } as Record<string, Prisma.SortOrder>,
   });
 };
 

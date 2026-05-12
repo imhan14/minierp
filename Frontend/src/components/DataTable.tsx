@@ -19,6 +19,8 @@ import React, { useState } from "react";
 import type { FieldConfig } from "../types/FieldConfig";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import { useTheme, useMediaQuery } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material";
 
 export interface ActionConfig<T> {
   label: string;
@@ -31,22 +33,29 @@ interface DynamicTableProps<T> {
   columns: FieldConfig<T>[];
   data: T[];
   actions?: (row: T) => ActionConfig<T>[];
-  getRowKey: (row: T) => string | number;
+  getRowKey: (row: T) => undefined | number;
   renderDetail?: (row: T) => React.ReactNode;
   hideEmptyRows?: boolean;
 }
+
+const ID_WIDTH = 70;
+
 const CollapsibleRow = <T,>({
   row,
   columns,
   actions,
   getRowKey,
   renderDetail,
+  stickyActionsSx,
+  idSx,
 }: {
   row: T;
   columns: FieldConfig<T>[];
   actions?: (row: T) => ActionConfig<T>[];
-  getRowKey: (row: T) => string | number;
+  getRowKey: (row: T) => undefined | number;
   renderDetail?: (row: T) => React.ReactNode;
+  stickyActionsSx: object;
+  idSx: object;
 }) => {
   const [open, setOpen] = useState(false);
   return (
@@ -60,11 +69,16 @@ const CollapsibleRow = <T,>({
           </TableCell>
         )}
         {columns.map((column) => {
+          // ___actions_______________________________________________________
           if (column.id === "actions") {
             const rowActions = actions ? actions(row) : [];
             return (
-              <TableCell key="actions" align={column.align || "left"}>
-                <Stack direction="row" spacing={1}>
+              <TableCell
+                key="actions"
+                align={column.align || "left"}
+                sx={stickyActionsSx}
+              >
+                <Stack direction="row" spacing={0.5}>
                   {rowActions.map((action, index) => (
                     <Tooltip key={index} title={action.label}>
                       <span>
@@ -93,25 +107,45 @@ const CollapsibleRow = <T,>({
               </TableCell>
             );
           }
+          //___data_________________________________________________________
           const value = row[column.id as keyof T];
+          const rendered = column.render
+            ? column.render(value, row)
+            : String(value ?? "");
+          const isId = column.id === "id";
           return (
             <TableCell
               key={column.id.toString()}
               align={column.align || "left"}
               sx={{
                 width: column.width,
+                maxWidth: column.width,
                 whiteSpace: column.noWrap ? "nowrap" : "normal",
-                color: column.id.toString() === "id" ? "gray" : "",
-                ...(column.id === "actions" && {
-                  position: "sticky",
-                  right: 0,
-                  zIndex: 10,
-                  backgroundColor: "#f1f5f9",
-                  boxShadow: "-2px 0 5px rgba(0,0,0,0.05)",
-                }),
+                ...(isId && idSx),
               }}
             >
-              {column.render ? column.render(value, row) : String(value ?? "")}
+              {typeof rendered === "string" || typeof rendered === "number" ? (
+                <Tooltip
+                  title={String(rendered)}
+                  placement="auto"
+                  disableInteractive
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      display: "inherit",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: column.width ?? 200,
+                    }}
+                  >
+                    {rendered}
+                  </Box>
+                </Tooltip>
+              ) : (
+                rendered
+              )}
             </TableCell>
           );
         })}
@@ -143,10 +177,32 @@ const DataTable = <T,>({
   renderDetail,
   hideEmptyRows = false,
 }: DynamicTableProps<T>) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [page, setPage] = useState(1);
-  const rowsPerPage = 10; //số dòng
+  const rowsPerPage = 10;
+  const stickyActionsSx: SxProps<Theme> = {
+    ...(isMobile
+      ? {}
+      : {
+          position: "sticky",
+          right: 0,
+          zIndex: 2,
+          boxShadow: "-2px 0 5px rgba(0,0,0,0.08)",
+        }),
+    width: 95,
+    minWidth: 95,
+    maxWidth: 95,
+  };
 
-  //tổng số trang
+  const idSx: SxProps<Theme> = {
+    width: ID_WIDTH,
+    minWidth: ID_WIDTH,
+    maxWidth: ID_WIDTH,
+    color: "gray",
+  };
+
+  //total number of pages
   const totalPages = Math.ceil(data.length / rowsPerPage);
   const handleChangePage = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -162,7 +218,7 @@ const DataTable = <T,>({
     <Paper sx={{ borderRadius: 1.5, boxShadow: 3, overflow: "hidden" }}>
       <TableContainer
         component={Paper}
-        sx={{ borderRadius: 1.5, boxShadow: 0 }}
+        sx={{ borderRadius: 1.5, boxShadow: 0, overflowX: "auto" }}
       >
         <Table size="small">
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
@@ -177,6 +233,10 @@ const DataTable = <T,>({
                     fontWeight: "bold",
                     backgroundColor: "#f1f5f9",
                     width: col.width,
+                    ...(col.id === "id" ? idSx : {}),
+                    ...(col.id === "actions"
+                      ? { ...stickyActionsSx, zIndex: 3 }
+                      : {}),
                   }}
                 >
                   {col.label}
@@ -194,6 +254,8 @@ const DataTable = <T,>({
                   actions={actions}
                   getRowKey={getRowKey}
                   renderDetail={renderDetail}
+                  stickyActionsSx={stickyActionsSx}
+                  idSx={idSx}
                 />
               ))
             ) : (
@@ -225,7 +287,6 @@ const DataTable = <T,>({
             page={page}
             onChange={handleChangePage}
             color="primary"
-            // shape="rounded"
             showFirstButton
             showLastButton
           />

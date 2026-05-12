@@ -1,6 +1,8 @@
 export interface IngredientFilters {
   id?: number;
   search?: string;
+  unit?: string;
+  orderBy?: string;
 }
 
 export interface CreateIngredientData {
