@@ -30,6 +30,7 @@ export const getFormulaDetailService = async (
       },
       standard_quality: true,
     },
+    orderBy: { id: "asc" },
   });
 };
 

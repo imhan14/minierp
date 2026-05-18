@@ -25,7 +25,6 @@ export const getFormulaDetail = catchAsync(
 export const createFormulaDetail = catchAsync(
   async (req: Request, res: Response) => {
     const { formula_id, ingredient_id, standard_quality } = req.body;
-
     const formulaDetail = await createFormulaDetailService({
       formula_id: Number(formula_id),
       ingredient_id: Number(ingredient_id),
@@ -39,9 +38,8 @@ export const updateFormulaDetail = catchAsync(
   async (req: Request, res: Response) => {
     const id = Number(req.params.id);
     if (isNaN(id)) throw new Error("Invalid ID");
-    const { formula_id, ingredient_id, standard_quality } = req.body;
+    const { ingredient_id, standard_quality } = req.body;
     const updateData: UpdateFormulaDetailData = {};
-    if (formula_id !== undefined) updateData.formula_id = Number(formula_id);
     if (ingredient_id !== undefined)
       updateData.ingredient_id = Number(ingredient_id);
     if (standard_quality !== undefined)

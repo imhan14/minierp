@@ -1,17 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import DataTable, { type ActionConfig } from "@components/DataTable";
 import { Autocomplete, Box, Button, TextField } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { useFormulaDetailData } from "@/hooks/useFormulaDetailData";
-import { useFormulaDetailForm } from "@/hooks/useFormulaDetailForm";
-import type { FormulaDetailDisplay } from "@/types/FormulaDetailType";
-import { formulaDetailSchema } from "@/schema/formulaDetail.schema";
+import { type FormulaDetailType } from "@/schema/formulaDetail.schema";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
-import type { IngredientType } from "@/types/IngredientType";
-import ingredientApi from "@/apis/ingredientApi";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { useNotify } from "@/hooks/useNotify";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { useFormulaDetail } from "../customHooks/useFormulaDetail";
 
 interface FormulaDetailListProps {
   formula_id: number | null;
@@ -22,129 +19,118 @@ const FormulaDetailList = ({
   formula_id,
   onSaveSuccess,
 }: FormulaDetailListProps) => {
-  const [ingredients, setIngredients] = useState<IngredientType[]>([]);
-  const { formulaDetail, setFormulaDetail, fetchFormulaDetail } =
-    useFormulaDetailData(formula_id);
+  const notify = useNotify();
   const {
+    rows,
+    loading,
     editingId,
-    saveEditing,
-    startEditing,
-    cancelEditing,
+    editingData,
+    isSaving,
+    ingredientOptions,
+    setField,
     handleAddNewRow,
-    showConfirmDialog,
-    handleDetailChange,
-    setShowConfirmDialog,
-    handleDiscardChanges,
-    handleSaveAndContinue,
-    deleteRowWithGuard,
-    logDetail,
-    setLogDetail,
-  } = useFormulaDetailForm(
-    formula_id,
-    () => fetchFormulaDetail(formula_id),
-    formulaDetail,
-    setFormulaDetail,
-  );
-
-  const handleIngredientChange = useCallback(
-    (id: number | string, field: keyof FormulaDetailDisplay, value: string) => {
-      setFormulaDetail((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, [field]: value } : item,
-        ),
-      );
-    },
-    [setFormulaDetail],
-  );
-
-  const formulaDetailColumns = useMemo(
+    cancelEditing,
+    saveEditing,
+    handleDelete,
+    startEditing,
+  } = useFormulaDetail(formula_id, onSaveSuccess);
+  // ── Columns ───────────────────────────────────────────────────────────────
+  const columns = useMemo(
     () => [
       {
-        ...formulaDetailSchema.ingredient_name,
-        render: (_: unknown, row: FormulaDetailDisplay) => {
-          const isEditing = editingId === row.id;
-          return isEditing ? (
+        id: "ingredient_name" as keyof FormulaDetailType,
+        label: "Tên nguyên liệu",
+        width: 250,
+        render: (_: unknown, row: FormulaDetailType) => {
+          if (editingId !== row.id)
+            return <span>{row.ingredient_name || "-"}</span>;
+          return (
             <Autocomplete
               size="small"
-              sx={{ width: 300 }}
-              options={ingredients}
-              renderInput={(params) => (
-                <TextField {...params} label="Ingredient" />
-              )}
-              getOptionLabel={(option) =>
-                typeof option === "string" ? option : option.ingredient_name
+              sx={{ minWidth: 220 }}
+              options={ingredientOptions}
+              getOptionLabel={(opt) =>
+                typeof opt === "string" ? opt : opt.ingredient_name
               }
-              isOptionEqualToValue={(option, value) => {
-                if (!value) return false;
-                return (
-                  option.id === (typeof value === "string" ? value : value.id)
-                );
-              }}
+              isOptionEqualToValue={(opt, val) =>
+                opt.id === (typeof val === "object" ? val?.id : val)
+              }
+              value={
+                ingredientOptions.find(
+                  (o) => o.id === editingData?.ingredient_id,
+                ) || null
+              }
               onChange={(_, newValue) => {
                 if (newValue && typeof newValue !== "string") {
-                  handleDetailChange(
-                    row.id,
-                    "ingredient_id",
-                    String(newValue.id),
-                  );
-                  handleDetailChange(
-                    row.id,
-                    "ingredient_name",
-                    newValue.ingredient_name,
-                  );
-                  handleDetailChange(row.id, "unit", newValue.unit);
+                  setField("ingredient_id", newValue.id);
+                  setField("ingredient_name", newValue.ingredient_name);
+                  setField("unit", newValue.unit);
                 } else {
-                  handleDetailChange(row.id, "ingredient_id", null);
-                  handleDetailChange(row.id, "ingredient_name", newValue || "");
-                  handleDetailChange(row.id, "unit", "");
+                  setField("ingredient_id", undefined);
+                  setField("ingredient_name", "");
+                  setField("unit", undefined);
                 }
               }}
-              value={
-                (ingredients.find(
-                  (p) => p.id === row.ingredient_id,
-                ) as IngredientType) || row.ingredient_name
-              }
+              renderInput={(params) => (
+                <TextField {...params} label="Nguyên liệu *" size="small" />
+              )}
             />
-          ) : (
-            <span>{row.ingredient_name}</span>
           );
         },
       },
-      { ...formulaDetailSchema.unit },
       {
-        ...formulaDetailSchema.standard_quality,
-        render: (_: unknown, row: FormulaDetailDisplay) => (
-          <TextField
-            size="small"
-            disabled={editingId !== row.id}
-            value={row.standard_quality || ""}
-            onChange={(e) =>
-              handleIngredientChange(row.id, "standard_quality", e.target.value)
-            }
-          />
-        ),
+        id: "unit" as keyof FormulaDetailType,
+        label: "Đơn vị",
+        width: 80,
+        render: (_: unknown, row: FormulaDetailType) => {
+          const unit = editingId === row.id ? editingData?.unit : row.unit;
+          return <span>{unit ?? "-"}</span>;
+        },
       },
       {
-        id: "actions",
-        label: "Actions",
+        id: "standard_quality" as keyof FormulaDetailType,
+        label: "Số lượng",
+        width: 120,
+        render: (_: unknown, row: FormulaDetailType) => {
+          if (editingId !== row.id)
+            return <span>{row.standard_quality ?? "-"}</span>;
+          return (
+            <TextField
+              size="small"
+              type="number"
+              sx={{ width: 100 }}
+              value={editingData?.standard_quality ?? ""}
+              onChange={(e) =>
+                setField(
+                  "standard_quality",
+                  e.target.value ? Number(e.target.value) : undefined,
+                )
+              }
+              inputProps={{ min: 0.0001, step: 0.001 }}
+            />
+          );
+        },
       },
+      { id: "actions" as const, label: "Thao tác" },
     ],
-    [editingId, handleIngredientChange, handleDetailChange, ingredients],
+    [editingId, editingData, ingredientOptions, setField],
   );
 
-  const getDetailActions = (
-    row: FormulaDetailDisplay,
-  ): ActionConfig<FormulaDetailDisplay>[] => {
+  // ── Actions ───────────────────────────────────────────────────────────────
+  const actions = (
+    row: FormulaDetailType,
+  ): ActionConfig<FormulaDetailType>[] => {
     if (editingId === row.id) {
       return [
         {
-          label: "Save",
+          label: "Lưu",
           icon: <DoneOutlinedIcon />,
           color: "success",
-          onClick: (row) => saveEditing(row),
+          disabled: isSaving,
+          onClick: () => saveEditing(),
         },
         {
-          label: "Cancel",
+          label: "Hủy",
           icon: <CloseOutlinedIcon />,
           color: "error",
           onClick: () => cancelEditing(),
@@ -153,26 +139,28 @@ const FormulaDetailList = ({
     }
     return [
       {
-        label: "Edit",
+        label: "Sửa",
         icon: <EditOutlinedIcon />,
         color: "primary",
-        onClick: (row) => startEditing(row),
+        onClick: (row) => {
+          if (editingId !== undefined) {
+            notify(
+              "Vui lòng lưu hoặc hủy dòng đang chỉnh sửa trước",
+              "warning",
+            );
+            return;
+          }
+          startEditing(row);
+        },
       },
       {
-        label: "Delete",
+        label: "Xóa",
         icon: <DeleteOutlineIcon />,
-        color: "warning",
-        onClick: (row) => deleteRowWithGuard(row),
+        color: "error",
+        onClick: handleDelete,
       },
     ];
   };
-  useEffect(() => {
-    const fetchIngredient = async () => {
-      const ingredientOptions = await ingredientApi.getAllIngredients();
-      setIngredients(ingredientOptions.data);
-    };
-    fetchIngredient();
-  }, []);
 
   return (
     <Box>
@@ -180,13 +168,16 @@ const FormulaDetailList = ({
         variant="contained"
         startIcon={<AddCircleOutlinedIcon />}
         onClick={handleAddNewRow}
+        disabled={loading ? true : !formula_id || isSaving}
+        sx={{ mb: 1 }}
       >
         Thêm
       </Button>
+
       <DataTable
-        columns={formulaDetailColumns}
-        data={formulaDetail}
-        actions={getDetailActions}
+        columns={columns}
+        data={rows}
+        actions={actions}
         getRowKey={(row) => row.id}
         hideEmptyRows={true}
       />
