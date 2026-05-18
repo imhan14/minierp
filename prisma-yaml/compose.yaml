@@ -9,6 +9,8 @@ services:
     ports:
       - "5432:5432"
     restart: always
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
       
   pgadmin-minierp:
     container_name: pgadmin-minierp
@@ -19,3 +21,5 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: nqh200100
+    volumes:
+      - ./pgadmin_data:/var/lib/pgadmin

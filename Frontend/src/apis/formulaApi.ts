@@ -36,7 +36,6 @@ const formulaApi = {
     };
   },
   createFormula: (data?: FormulaData) => {
-    console.log(data);
     return instance.post<FormulaType>("/formula", data);
   },
   updateFormula: (id: number, data?: FormulaData) => {

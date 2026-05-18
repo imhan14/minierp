@@ -27,6 +27,7 @@ export interface ActionConfig<T> {
   icon?: React.ReactNode;
   color?: "primary" | "secondary" | "error" | "success" | "warning" | "info";
   onClick: (row: T) => void;
+  disabled?: boolean;
 }
 
 interface DynamicTableProps<T> {
@@ -76,7 +77,7 @@ const CollapsibleRow = <T,>({
               <TableCell
                 key="actions"
                 align={column.align || "left"}
-                sx={stickyActionsSx}
+                sx={{ ...stickyActionsSx, background: "white" }}
               >
                 <Stack direction="row" spacing={0.5}>
                   {rowActions.map((action, index) => (
@@ -87,6 +88,7 @@ const CollapsibleRow = <T,>({
                             size="small"
                             color={action.color || "primary"}
                             onClick={() => action.onClick(row)}
+                            disabled={action.disabled}
                           >
                             {action.icon}
                           </IconButton>
@@ -96,6 +98,7 @@ const CollapsibleRow = <T,>({
                             size="small"
                             color={action.color || "primary"}
                             onClick={() => action.onClick(row)}
+                            disabled={action.disabled}
                           >
                             {action.label}
                           </Button>
@@ -189,6 +192,7 @@ const DataTable = <T,>({
           right: 0,
           zIndex: 2,
           boxShadow: "-2px 0 5px rgba(0,0,0,0.08)",
+          // background: "#f1f5f9",
         }),
     width: 95,
     minWidth: 95,

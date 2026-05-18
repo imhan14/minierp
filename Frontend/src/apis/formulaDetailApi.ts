@@ -1,15 +1,17 @@
-import type { FormulaDetailType } from "../types/FormulaDetailType";
 import instance from "./axios";
 
-export interface FormulaDetailData {
+export interface FormulaFilters {
+  id?: number;
   formula_id?: number;
+}
+export interface FormulaDetailData {
   ingredient_id?: number;
   standard_quality?: number;
 }
 const formulaDetailApi = {
-  getAllFormulaDetails: (params?: unknown) => {
-    return instance.get<FormulaDetailType[]>("/formula-detail", {
-      params: params,
+  getAllFormulaDetails: (params?: FormulaFilters) => {
+    return instance.get("/formula-detail", {
+      params,
     });
   },
   updateFormulaDetail: (id: number, data: FormulaDetailData) => {
@@ -17,6 +19,9 @@ const formulaDetailApi = {
   },
   createFormulaDetail: (data: FormulaDetailData) => {
     return instance.post(`/formula-detail`, data);
+  },
+  deleteFormulaDetail: (id: number) => {
+    return instance.delete(`/formula-detail/${id}`);
   },
 };
 

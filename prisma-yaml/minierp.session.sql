@@ -508,16 +508,16 @@ INSERT INTO products (product_code, product_name, unit, description) VALUES
 --     CONSTRAINT fk_formula_product FOREIGN KEY (product_id) REFERENCES Products(id) on DELETE set null
 -- );
 INSERT INTO formulas (formula_code, formula_name, product_id, is_active, product_line, specification, color, type_of_specification, created_by) VALUES
-(1, '25-2-18 + TE PLUS (XK, CPC)', 80, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(2, '25-2-18 + TE PLUS (XK, CPC)', 81, TRUE, 'Tron', 'BTP', '3mau', '50Kg', 'NQH'),
-(3, '20-15-6 L1 Xuất khẩu CPC (dap đen 18-46-0)', 43, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(4, '20-15-6 L1 Xuất khẩu CPC (dap đen 16-44-0)', 75, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(5, '20-3-20 L2-XK CPC (DAP đen 18-46-0)', 42, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(6, '20-3-20 L2-XK CPC (DAP đen 16-44-0)', 74, TRUE, 'Tron', 'BTP', '3mau', '50Kg', 'NQH'),
-(7, '20-20-15 + TE PLUS (XK, CPC)', 73, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(8, '20-20-15 Đặc biệt CPC (dap xanh 18-46-0)', 31, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(9, '20-20-15 +TE PLUS (Xuất khẩu, CPC, DAP đen 16-44-0)', 34, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH'),
-(10, '20-20-15 + TE PLUS (Đặc biệt, CPC, DAP xanh 16-44-0)', 35, TRUE, 'Tron', 'BTP', '3mau', '25Kg', 'NQH');
+(1, '25-2-18 + TE PLUS (XK, CPC)', 80, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(2, '25-2-18 + TE PLUS (XK, CPC)', 81, TRUE, 'tron', 'btp', 'bamau', '50Kg', 'NQH'),
+(3, '20-15-6 L1 Xuất khẩu CPC (dap đen 18-46-0)', 43, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(4, '20-15-6 L1 Xuất khẩu CPC (dap đen 16-44-0)', 75, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(5, '20-3-20 L2-XK CPC (DAP đen 18-46-0)', 42, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(6, '20-3-20 L2-XK CPC (DAP đen 16-44-0)', 74, TRUE, 'tron', 'btp', 'bamau', '50Kg', 'NQH'),
+(7, '20-20-15 + TE PLUS (XK, CPC)', 73, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(8, '20-20-15 Đặc biệt CPC (dap xanh 18-46-0)', 31, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(9, '20-20-15 +TE PLUS (Xuất khẩu, CPC, DAP đen 16-44-0)', 34, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH'),
+(10, '20-20-15 + TE PLUS (Đặc biệt, CPC, DAP xanh 16-44-0)', 35, TRUE, 'tron', 'btp', 'bamau', '25Kg', 'NQH');
 -- SELECT * FROM Formulas;
 
 -- CREATE TABLE Formula_Details (
