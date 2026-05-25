@@ -26,7 +26,7 @@ interface GeneralInfoSectionProps<T> {
   data: T | null;
   onSave?: () => Promise<boolean | void> | boolean | void;
   onCancel?: () => void;
-  onGeneralChange?: (id: keyof T, value: string) => void;
+  onGeneralChange?: (id: keyof T, value: unknown) => void;
   mode?: SectionMode;
   showEditButton?: boolean;
   errors?: Partial<Record<keyof T, string>>;
@@ -134,6 +134,7 @@ const GeneralInfoSection = <T,>({
               {isFieldEditing ? (
                 col.inputType === "datetime-local" ? (
                   <DateTimePicker
+                    disabled={isDisabled}
                     label={isRequired ? `${col.label} *` : col.label}
                     value={rawValue ? dayjs(rawValue as string) : null}
                     onChange={(newValue) => {
@@ -156,6 +157,7 @@ const GeneralInfoSection = <T,>({
                   />
                 ) : col.inputType === "autocomplete" ? (
                   <Autocomplete
+                    disabled={isDisabled}
                     options={col.optionsAutoComplete || []}
                     getOptionLabel={
                       col.getOptionLabel ||
@@ -202,7 +204,16 @@ const GeneralInfoSection = <T,>({
                     error={!!fieldError}
                     helperText={fieldError}
                     onChange={(e) => {
-                      onGeneralChange?.(col.id as keyof T, e.target.value);
+                      const raw = e.target.value;
+                      let coerced: unknown = raw;
+
+                      if (col.inputType === "number") {
+                        const parsed = Number(raw);
+                        coerced =
+                          raw === "" ? undefined : isNaN(parsed) ? raw : parsed;
+                      }
+
+                      onGeneralChange?.(col.id as keyof T, coerced);
                     }}
                     slotProps={{ inputLabel: { shrink: true } }}
                     sx={{ ...col.sx }}

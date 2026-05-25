@@ -1,168 +1,204 @@
-CREATE TYPE status_type AS ENUM ('pending', 'ok', 'cancel');
+-- 1. Khởi tạo các kiểu ENUM
 CREATE TYPE shift_type AS ENUM ('C1x8', 'C2x8', 'C1x12', 'C2x12', 'C3x8');
+CREATE TYPE status_type AS ENUM ('pending', 'ok', 'cancel');
+
+-- 2. Tạo bảng 'roles'
 CREATE TABLE roles (
-    id serial PRIMARY KEY,
-    role_name varchar(50),
-    priority_level integer NOT NULL,
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE users (
-    id serial PRIMARY KEY,
-    username varchar(50) NOT NULL,
-    password_hash text NOT NULL,
-    full_name varchar(100),
-    role_id integer,
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    is_active boolean, -- use to delete
-    CONSTRAINT unique_username UNIQUE (username),
-    CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
-);
-CREATE TABLE teams (
-    id serial PRIMARY KEY,
-    team_name varchar(50),
-    user_id integer ,
-    CONSTRAINT fk_team_user FOREIGN KEY (user_id) REFERENCES users(id) on DELETE set null
+    id SERIAL PRIMARY KEY,
+    role_name VARCHAR(50),
+    priority_level INT NOT NULL,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE ingredients (
-  id serial PRIMARY KEY,
-  ingredient_code varchar(20) NOT NULL,
-  ingredient_name text,
-  unit varchar(15),
-  description varchar(50),
-  CONSTRAINT unique_ingredient_code UNIQUE (ingredient_code),
-  created_at timestamp DEFAULT CURRENT_TIMESTAMP
-);
-
+-- 3. Tạo bảng 'products'
 CREATE TABLE products (
-  id serial PRIMARY KEY,
-  product_code varchar(20) NOT NULL,
-  product_name text,
-  unit varchar(50),
-  description text,
-  CONSTRAINT unique_product_code UNIQUE (product_code),
-  created_at timestamp DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    product_code VARCHAR(20) NOT NULL,
+    product_name TEXT,
+    unit VARCHAR(50),
+    description TEXT,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_product_code UNIQUE (product_code)
 );
 
+-- 4. Tạo bảng 'ingredients'
+CREATE TABLE ingredients (
+    id SERIAL PRIMARY KEY,
+    ingredient_code VARCHAR(20) NOT NULL,
+    ingredient_name TEXT,
+    unit VARCHAR(15),
+    description VARCHAR(50),
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_ingredient_code UNIQUE (ingredient_code)
+);
+
+-- 5. Tạo bảng 'formulas'
 CREATE TABLE formulas (
-    id serial PRIMARY KEY,
-    formula_code integer,
-    formula_name text,
-    product_id integer ,
-    is_active boolean,
-    product_line text,
-    specification varchar(50),
-    color varchar(10),
-    type_of_specification varchar(10),
-    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-    created_by text,
+    id SERIAL PRIMARY KEY,
+    formula_code INT,
+    formula_name TEXT,
+    product_id INT,
+    is_active BOOLEAN,
+    product_line TEXT,
+    specification VARCHAR(50),
+    color VARCHAR(10),
+    type_of_specification VARCHAR(10),
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    created_by TEXT,
     CONSTRAINT unique_formula_code UNIQUE (formula_code),
-    CONSTRAINT fk_formula_product FOREIGN KEY (product_id) REFERENCES products(id) on DELETE set null
+    CONSTRAINT fk_formula_product FOREIGN KEY (product_id) REFERENCES products(id) ON UPDATE NO ACTION
 );
 
+-- 6. Tạo bảng 'formula_details' (Bảng trung gian giữa formulas và ingredients)
 CREATE TABLE formula_details (
-  id serial PRIMARY KEY,
-  formula_id integer,
-  ingredient_id integer,
-  standard_quality float,
-
-  CONSTRAINT fk_formulaDetail_formula FOREIGN KEY (formula_id) REFERENCES formulas(id) on DELETE set null,
-  CONSTRAINT fk_formulaDetail_ingredient FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) on delete set null
+    id SERIAL PRIMARY KEY,
+    formula_id INT,
+    ingredient_id INT,
+    standard_quality FLOAT,
+    CONSTRAINT fk_formuladetail_formula FOREIGN KEY (formula_id) REFERENCES formulas(id) ON UPDATE NO ACTION,
+    CONSTRAINT fk_formuladetail_ingredient FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON UPDATE NO ACTION
 );
 
-CREATE TABLE product_orders (
-  id serial PRIMARY KEY,
-  order_date date,
-  formula_id integer,
-  team_id integer,
-  product_shift shift_type,
-  target_quantity float,
-  urea_rate float,
-  status status_type,
-  input_temprature_1 integer,
-  output_temprature_1 integer,
-  input_temprature_2 integer,
-  output_temprature_2 integer,
-  order_note text,
-  created_at timestamp DEFAULT CURRENT_TIMESTAMP,
-  created_by text,
-    CONSTRAINT fk_order_formula FOREIGN KEY (formula_id) REFERENCES formulas(id) on delete set null,
-    CONSTRAINT fk_order_team FOREIGN key (team_id) REFERENCES teams(id) on delete set null
+-- 7. Tạo bảng 'teams'
+CREATE TABLE teams (
+    id SERIAL PRIMARY KEY,
+    team_name VARCHAR(50),
+    user_id INT
+    -- Khóa ngoại fk_team_user sẽ được thêm bằng ALTER TABLE ở dưới vì vòng lặp tham chiếu với bảng users
 );
 
+-- 8. Tạo bảng 'users'
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password_hash TEXT NOT NULL,
+    full_name VARCHAR(100),
+    role_id INT,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN,
+    team_id INT,
+    CONSTRAINT unique_username UNIQUE (username),
+    CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE NO ACTION,
+    CONSTRAINT fk_user_team FOREIGN KEY (team_id) REFERENCES teams(id) ON UPDATE NO ACTION
+);
+
+-- Thêm khóa ngoại còn thiếu cho bảng 'teams' sau khi bảng 'users' đã tạo xong
+ALTER TABLE teams ADD CONSTRAINT fk_team_user FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE NO ACTION;
+
+-- 9. Tạo bảng 'material_reports'
 CREATE TABLE material_reports (
-  id serial PRIMARY KEY,
-  team_id integer,
-  report_date date,
-  shift shift_type,
-  start_time time,
-  end_time time,
-  extral_materials JSONB default'[]'::jsonb,
-  foreman_check boolean,
-  CONSTRAINT fk_material_team FOREIGN KEY (team_id) REFERENCES teams(id) on delete set null
+    id SERIAL PRIMARY KEY,
+    team_id INT,
+    report_date TIMESTAMPTZ(6),
+    shift shift_type,
+    extral_materials JSONB DEFAULT '[]',
+    foreman_check BOOLEAN,
+    start_time TIMESTAMPTZ(6),
+    end_time TIMESTAMPTZ(6),
+    CONSTRAINT fk_material_team FOREIGN KEY (team_id) REFERENCES teams(id) ON UPDATE NO ACTION
 );
+
+-- 10. Tạo bảng 'material_details'
 CREATE TABLE material_details (
-    id serial PRIMARY KEY,
-    material_id integer,
-    ingredient_id integer,
-    weight float,
-    real_percent float,
-    note text,
-
-    CONSTRAINT fk_materialDetail_material FOREIGN KEY (material_id) REFERENCES material_Reports(id) on delete set null,
-    CONSTRAINT fk_materialDetail_ingredient FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) on delete set null
+    id SERIAL PRIMARY KEY,
+    material_id INT,
+    ingredient_id INT,
+    weight FLOAT,
+    real_percent FLOAT,
+    note TEXT,
+    CONSTRAINT fk_materialdetail_ingredient FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON UPDATE NO ACTION,
+    CONSTRAINT fk_materialdetail_material FOREIGN KEY (material_id) REFERENCES material_reports(id) ON UPDATE NO ACTION
 );
 
+-- 11. Tạo bảng 'product_reports'
 CREATE TABLE product_reports (
-  id serial PRIMARY KEY,
-  report_date date,
-  team_id integer,
-  furnace integer,
-  shift shift_type,
-  start_time time,
-  end_time time,
-  -- "product_report_jsonb" jsonb,
-  warehouse_check boolean,
-  producttion_check boolean,
-
-  CONSTRAINT fk_productReport_team FOREIGN KEY (team_id) REFERENCES teams(id)
+    id SERIAL PRIMARY KEY,
+    report_date TIMESTAMPTZ(6),
+    team_id INT,
+    furnace INT,
+    shift shift_type,
+    warehouse_check BOOLEAN DEFAULT FALSE,
+    start_time TIMESTAMPTZ(6),
+    end_time TIMESTAMPTZ(6),
+    created_at TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
+    production_check BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_productreport_team FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
-
-CREATE TABLE reports_products(
-  id serial primary key,
-  product_id integer,
-  report_id integer,
-  weight_ float,
-  is_finish  boolean,
-  type_of_specification varchar(20),
-  product_line text,
-  specification text,
-  start_time time,
-  end_time time,
-  note_ text,
-  CONSTRAINT fk_reportProduct_products FOREIGN key (product_id) REFERENCES products(id),
-  CONSTRAINT fk_reportProduct_report FOREIGN KEY (report_id) REFERENCES product_Reports(id)
+-- 12. Tạo bảng 'reports_products'
+CREATE TABLE reports_products (
+    id SERIAL PRIMARY KEY,
+    product_id INT,
+    report_id INT,
+    is_finish BOOLEAN,
+    type_of_specification VARCHAR(20),
+    product_line TEXT,
+    specification TEXT,
+    start_time TIMESTAMPTZ(6),
+    end_time TIMESTAMPTZ(6),
+    weight FLOAT,
+    note TEXT,
+    CONSTRAINT fk_reportproduct_products FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT fk_reportproduct_report FOREIGN KEY (report_id) REFERENCES product_reports(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
+-- 13. Tạo bảng 'production_logs'
 CREATE TABLE production_logs (
-  id serial PRIMARY KEY,
-  log_date date,
-  log_start time,
-  log_end time,
-  number_of_employee integer,
-  on_work integer,
-  unauthorized_absence text,
-  authorized_absence text,
-  HT_di text,
-  HT_den text,
-  forklift text,
-  shift_leader text,
-  team_id integer,
-  electric integer,
-  extral_logs JSONB default'[]'::jsonb,
+    id SERIAL PRIMARY KEY,
+    number_of_employee INT,
+    on_work INT,
+    unauthorized_absence TEXT,
+    authorized_absence TEXT,
+    ht_di TEXT,
+    ht_den TEXT,
+    forklift TEXT,
+    shift_leader TEXT,
+    team_id INT,
+    extral_logs JSONB DEFAULT '[]',
+    electric_production DECIMAL(10, 2),
+    electric_mix DECIMAL(10, 2),
+    log_date TIMESTAMPTZ(6),
+    log_start TIMESTAMPTZ(6),
+    log_end TIMESTAMPTZ(6),
+    CONSTRAINT fk_productlogs_teams FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
 
-  CONSTRAINT fk_ProductLogs_Teams FOREIGN KEY (team_id) REFERENCES teams(id)
+-- 14. Tạo bảng 'production_log_detail'
+CREATE TABLE production_log_detail (
+    id SERIAL PRIMARY KEY,
+    production_log_id INT NOT NULL,
+    start_time TIMESTAMPTZ(6),
+    end_time TIMESTAMPTZ(6),
+    task_type VARCHAR(50),
+    content TEXT,
+    quantity DECIMAL(12, 4),
+    product_type VARCHAR(100),
+    pkg_received INT DEFAULT 0,
+    pkg_returned INT DEFAULT 0,
+    pkg_damaged INT DEFAULT 0,
+    CONSTRAINT fk_production_log FOREIGN KEY (production_log_id) REFERENCES production_logs(id) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+-- 15. Tạo bảng 'product_orders'
+CREATE TABLE product_orders (
+    id SERIAL PRIMARY KEY,
+    formula_id INT,
+    team_id INT,
+    product_shift shift_type,
+    target_quantity FLOAT,
+    urea_rate FLOAT,
+    status status_type DEFAULT 'pending',
+    input_temprature_1 INT,
+    output_temprature_1 INT,
+    input_temprature_2 INT,
+    output_temprature_2 INT,
+    order_note TEXT,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    order_date TIMESTAMPTZ(6),
+    CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON UPDATE NO ACTION,
+    CONSTRAINT fk_order_formula FOREIGN KEY (formula_id) REFERENCES formulas(id) ON UPDATE NO ACTION,
+    CONSTRAINT fk_order_team FOREIGN KEY (team_id) REFERENCES teams(id) ON UPDATE NO ACTION
 );
 
 -- ---------------------------------------------------------------
@@ -173,12 +209,13 @@ CREATE TABLE production_logs (
 --     "created_at" timestamp DEFAULT CURRENT_TIMESTAMP
 -- );
 INSERT INTO roles(role_name, priority_level) values
-('Administrator',0),
-('CEO',1),
-('Deputy Director',2),
-('Department',3),
-('Staff',4),
-('Staff',5);
+('Administrator',1),
+('CEO',2),
+('Deputy Director',3),
+('Department',4),
+('Staff',5),
+('Staff',6);
+('Team Leader',7)
 
 SELECT * FROM roles;
 
@@ -192,18 +229,20 @@ SELECT * FROM roles;
 --     "is_active" boolean, -- use to delete
 --     CONSTRAINT fk_user_role FOREIGN KEY (id) REFERENCES Roles(role_id) ON DELETE SET NULL
 -- );
-
+--mk admin: admin123
+--mksx: binhdien123
 INSERT INTO users(username, password_hash, full_name, role_id,is_active) values
-  ('admin','admin','Admin', 1, true),
+  ('admin','$2a$10$N/aYiP4bq4b29GCpjuDNtO5777WO5KLLD./mv1VAGZZczm.z/oEfa','Admin', 1, true, null),
   ('ceo', 'binhdien2','Tên CEO', 2, true),
   ('director','binhdien2', 'Tên Tổng giám đốc',3,true),
   ('manager', 'binhdien2', 'Tên GĐ Sản Xuất',4,true),
   ('psx','binhdien2', 'Phòng Sản Xuất',5,true),
   ('vpkho', 'binhdien2','Văn Phòng Kho',6,true),
-  ('kho', 'binhdien2', 'Kho', 6, true),
-  ('sx1', 'binhdien2', 'Sản xuất 1',6,true),
-  ('sx2', 'binhdien2', 'Sản xuất 2',6,true),
-  ('sx3', 'binhdien2', 'Sản xuất 3',6,true);
+  ('kho', 'binhdien2', 'Kho', 6, true);
+INSERT INTO users(username, password_hash, full_name, role_id,is_active, team_id) values
+  ('sx1', '$2a$10$1weo6E2klyCVGzl194sZxeFxSBqJkV.YdlhQ0PkjbaV5bMUqei4zu', 'Sản xuất 1',6,true,1),
+  ('sx2', '$2a$10$1weo6E2klyCVGzl194sZxeFxSBqJkV.YdlhQ0PkjbaV5bMUqei4zu', 'Sản xuất 2',6,true,2),
+  ('sx3', '$2a$10$1weo6E2klyCVGzl194sZxeFxSBqJkV.YdlhQ0PkjbaV5bMUqei4zu', 'Sản xuất 3',6,true,3);
 -- SELECT * FROM Users;
 -- SELECT u.username,u.full_name, r.role_name FROM Users u INNER JOIN Roles r ON u.id = r.role_id;
 

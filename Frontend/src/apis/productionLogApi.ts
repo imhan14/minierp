@@ -1,4 +1,4 @@
-import type { ProductionLogType } from "../types/ProductionLogType";
+import type { ProductionLogType } from "@/schema/productionLog.schema";
 import instance from "./axios";
 
 export interface ProductionLogFilters {
@@ -25,15 +25,25 @@ export interface ProductionLogData {
 }
 
 const productionLogApi = {
-  getAllProductionLog: (params?: ProductionLogFilters) => {
-    return instance.get<ProductionLogType[]>("/production-log", {
+  getAllProductionLog: async (params?: ProductionLogFilters) => {
+    const res = await instance.get("/production-log", {
       params,
     });
+    return {
+      ...res,
+      data: res.data.map((item: ProductionLogType) => ({
+        ...item,
+        team_id: item.teams?.id ?? item.team_id,
+        team_name: item.teams?.team_name ?? item.team_name,
+      })),
+    };
   },
   createProductionLog: (data: ProductionLogData) => {
-    return instance.post<ProductionLogType>("/production-log", data);
+    return instance.post("/production-log", data);
   },
   updateProductionLog: (id: number, data: ProductionLogData) => {
+    console.log(id);
+    console.log(data);
     return instance.patch(`/production-log/${id}`, data);
   },
 };

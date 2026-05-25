@@ -7,7 +7,7 @@ import { validateWithZod } from "@/utils/validate";
 export interface EntityService<T, CreatePayload, UpdatePayload> {
   create: (payload: CreatePayload) => Promise<{ data: T }>;
   update: (id: number, payload: UpdatePayload) => Promise<{ data: T }>;
-  delete: (id: number) => Promise<unknown>;
+  delete?: (id: number) => Promise<unknown>;
 }
 
 /** Config cho useEntityForm */
@@ -260,7 +260,7 @@ export function useEntityForm<
 
       setIsDeleting(true);
       try {
-        await service.delete(Number(id));
+        await service.delete?.(Number(id));
         notify(messages.deleteSuccess ?? "Xóa thành công!", "success");
         onSuccess();
       } catch (err) {

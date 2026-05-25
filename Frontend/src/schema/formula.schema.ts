@@ -53,7 +53,11 @@ export const FormulaSchema = z.object({
       }),
     ),
   is_active: z
-    .boolean("Trạng thái không hợp lệ")
+    .preprocess((val) => {
+      if (val === "true" || val === true) return true;
+      if (val === "false" || val === false) return false;
+      return val;
+    }, z.boolean("Trạng thái không hợp lệ"))
     .default(true)
     .describe(
       JSON.stringify({
