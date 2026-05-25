@@ -78,7 +78,6 @@ const FormulaPage = () => {
           setProductOptions(formattedData);
         }
       } catch (err) {
-        // notify("Get Product List failded", "error");
         console.error("API Error:", err);
       }
     };
@@ -377,7 +376,7 @@ const FormulaPage = () => {
                   fontWeight="bold"
                   color="primary"
                 >
-                  Formula List
+                  Ingredients
                 </Typography>
               </Divider>
               <FormulaDetailList

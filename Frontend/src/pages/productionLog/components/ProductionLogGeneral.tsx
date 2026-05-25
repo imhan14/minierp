@@ -1,6 +1,6 @@
 import type { ProductionLogDisplay } from "@/types/ProductionLogType";
 import GeneralInfoSection from "@components/GeneralInfoSection";
-import { productionLogSchema } from "@/schema/productionLog.schema";
+// import { productionLogSchema } from "@/schema/productionLog.schema";
 import type { FieldConfig } from "@/types/FieldConfig";
 import { useNotify } from "@/hooks/useNotify";
 import dayjs from "dayjs";

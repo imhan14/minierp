@@ -6,6 +6,7 @@ import { verifyUser } from "../services/authService.js";
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   const user = await verifyUser(username);
+
   if (!user) return res.status(401).json({ error: "Sai tên đăng nhập" });
 
   const isMatch = await bcrypt.compare(password, user.password_hash);
@@ -25,6 +26,7 @@ export const login = async (req: Request, res: Response) => {
       role: user.role_id,
       is_active: user.is_active,
       team_id: user.team_id,
+      team_name: user.teams,
     },
   });
 };

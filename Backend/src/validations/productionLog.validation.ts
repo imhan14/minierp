@@ -9,7 +9,7 @@ export const createProductLogSchema = Joi.object({
 
 export const updateProductLogSchema = Joi.object({
   log_start: Joi.date()
-    .format("DD-MM-YYYY HH:mm")
+    // .format("DD-MM-YYYY HH:mm")
     .optional()
     .messages({
       "date.base": "Thời gian bắt đầu không hợp lệ",
@@ -17,7 +17,7 @@ export const updateProductLogSchema = Joi.object({
     })
     .allow(null),
   log_end: Joi.date()
-    .format("DD-MM-YYYY HH:mm")
+    // .format("DD-MM-YYYY HH:mm")
     .greater(Joi.ref("log_start"))
     .optional()
     .messages({

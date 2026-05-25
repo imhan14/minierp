@@ -44,11 +44,19 @@ const FormulaDetailList = ({
         render: (_: unknown, row: FormulaDetailType) => {
           if (editingId !== row.id)
             return <span>{row.ingredient_name || "-"}</span>;
+          const filteredIngredientOptions = ingredientOptions.filter(
+            (option) => {
+              const isAlreadySelected = rows.some(
+                (r) => r.ingredient_id === option.id && r.id !== editingId,
+              );
+              return !isAlreadySelected;
+            },
+          );
           return (
             <Autocomplete
               size="small"
               sx={{ minWidth: 220 }}
-              options={ingredientOptions}
+              options={filteredIngredientOptions}
               getOptionLabel={(opt) =>
                 typeof opt === "string" ? opt : opt.ingredient_name
               }
@@ -113,7 +121,7 @@ const FormulaDetailList = ({
       },
       { id: "actions" as const, label: "Thao tác" },
     ],
-    [editingId, editingData, ingredientOptions, setField],
+    [editingId, editingData, ingredientOptions, setField, rows],
   );
 
   // ── Actions ───────────────────────────────────────────────────────────────
@@ -133,6 +141,7 @@ const FormulaDetailList = ({
           label: "Hủy",
           icon: <CloseOutlinedIcon />,
           color: "error",
+          disabled: isSaving,
           onClick: () => cancelEditing(),
         },
       ];
