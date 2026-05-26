@@ -1,4 +1,4 @@
-import type { ProductionReportType } from "../types/ProductionReportType";
+import type { ProductionReportType } from "@/schema/productionReport.schema";
 import instance from "./axios";
 
 export interface ProductionReportFilter {
@@ -20,16 +20,24 @@ export interface UpdateReportData {
 }
 
 const productionReportApi = {
-  getAllProductionReports: (params?: ProductionReportFilter) => {
-    return instance.get<ProductionReportType[]>("/product-report", {
+  getAllProductionReports: async (params?: ProductionReportFilter) => {
+    const res = await instance.get("/product-report", {
       params,
     });
+    return {
+      ...res,
+      data: res.data.map((item: ProductionReportType) => ({
+        ...item,
+        team_id: item.teams?.id ?? item.team_id,
+        team_name: item.teams?.team_name ?? item.team_name,
+      })),
+    };
   },
-  addProductionReport: (data: CreateReportPayload) => {
-    return instance.post<ProductionReportType>("/product-report", data);
+  createProductionReport: (data: CreateReportPayload) => {
+    return instance.post("/product-report", data);
   },
   updateProductReport: (id: number | undefined, data: UpdateReportData) => {
-    return instance.patch<ProductionReportType>(`/product-report/${id}`, data);
+    return instance.patch(`/product-report/${id}`, data);
   },
 };
 

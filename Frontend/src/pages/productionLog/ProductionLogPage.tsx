@@ -57,7 +57,7 @@ const ProductionLogPage = () => {
     null,
   );
   const [isSaving, setIsSaving] = useState(false);
-  // ── Fetch product options một lần khi mount ───────────────────────────────
+  // ── Fetch options ───────────────────────────────
   const [teamOptions, setTeamOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -143,7 +143,7 @@ const ProductionLogPage = () => {
     defaultValues: {
       log_date: dayjs().format("YYYY-MM-DD"),
       // log_start: dayjs().toISOString(),
-      team_id: currentUser.team_id ? (currentUser.team_id ?? 0) : 0,
+      team_id: currentUser.team_id ? (currentUser.team_id ?? 0) : "",
       team_name:
         currentUser.team_name.length > 0
           ? currentUser.team_name[0].team_name
