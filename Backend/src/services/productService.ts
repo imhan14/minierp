@@ -4,22 +4,35 @@ import {
   UpdateProductData,
 } from "@/types/product.type";
 import { prisma } from "../../lib/prisma";
+import { Prisma } from "../../generated/prisma/client";
 
 export const getProductsService = async (filters: ProductFilters) => {
-  const { id, search } = filters;
-  const where: Record<string, unknown> = {};
-  if (id) {
-    where.id = id;
-  }
-  if (search) {
-    where.OR = [
-      { product_code: { contains: search, mode: "insensitive" } },
-      { product_name: { contains: search, mode: "insensitive" } },
+  const { id, search, unit, orderBy } = filters;
+  const where: Prisma.productsWhereInput = {};
+  if (id) where.id = id;
+  if (unit) where.unit = unit;
+  if (search && search.trim() !== "") {
+    const searchTrim = search.trim();
+    const searchCode = searchTrim;
+    const orConditions: Prisma.productsWhereInput[] = [
+      { product_name: { contains: searchTrim, mode: "insensitive" } },
     ];
+    if (!searchCode) {
+      orConditions.push({ product_code: searchCode });
+    }
+    where.OR = orConditions;
+  }
+  let sortField = "id";
+  let sortDirection: Prisma.SortOrder = "asc";
+  if (orderBy && orderBy.includes(":")) {
+    const parts = orderBy.split(":");
+    sortField = parts[0];
+    sortDirection = parts[1] as Prisma.SortOrder;
   }
 
   return await prisma.products.findMany({
-    where: where,
+    where,
+    orderBy: { [sortField]: sortDirection } as Record<string, Prisma.SortOrder>,
   });
 };
 

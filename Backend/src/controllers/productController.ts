@@ -13,10 +13,12 @@ export const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const getProducts = catchAsync(async (req: Request, res: Response) => {
-  const { id, search } = req.query;
+  const { id, search, unit, orderBy } = req.query;
   const filters: Record<string, unknown> = {
     id: id && !isNaN(Number(id)) ? Number(id) : undefined,
     search: search,
+    unit: unit ? String(unit) : undefined,
+    orderBy: orderBy ? String(orderBy) : undefined,
   };
   const products = await getProductsService(filters);
   res.status(200).json(products);

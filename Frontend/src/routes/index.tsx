@@ -12,6 +12,7 @@ import MaterialReportPage from "../pages/materialReport";
 import ProtectedRoute from "../components/ProtectedRoute";
 import FormulaPage from "../pages/formula";
 import IngredientPage from "@/pages/ingredientPage";
+import ProductPage from "@/pages/productPage";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
           {
             element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
             children: [{ path: "/ingredient", element: <IngredientPage /> }],
+          },
+          {
+            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            children: [{ path: "/product", element: <ProductPage /> }],
           },
         ],
       },

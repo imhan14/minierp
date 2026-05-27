@@ -22,6 +22,7 @@ import NavItem from "./NavItem";
 import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlined";
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
 import Co2OutlinedIcon from "@mui/icons-material/Co2Outlined";
+import AllInboxOutlinedIcon from "@mui/icons-material/AllInboxOutlined";
 
 const drawerWidth = 240;
 const themeColor = {
@@ -112,6 +113,12 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       text: "Ingredient",
       icon: <Co2OutlinedIcon />,
       path: "/ingredient",
+      minRole: 5,
+    },
+    {
+      text: "Product",
+      icon: <AllInboxOutlinedIcon />,
+      path: "/product",
       minRole: 5,
     },
   ];
