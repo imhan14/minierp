@@ -1,6 +1,8 @@
 export interface ProductFilters {
   id?: number;
   search?: string;
+  unit?: string;
+  orderBy?: string;
 }
 
 export interface UpdateProductData {

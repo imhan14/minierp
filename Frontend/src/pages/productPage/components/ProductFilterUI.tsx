@@ -1,12 +1,11 @@
+import type { ProductFilters } from "@/apis/productionApi";
 import { InputAdornment, MenuItem, Paper, TextField } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import { useState } from "react";
-import type { IngredientFilters } from "@/apis/ingredientApi";
-
-const IngredientFilterUI = ({
+import SearchIcon from "@mui/icons-material/Search";
+const ProductFilterUI = ({
   onFilterChange,
 }: {
-  onFilterChange?: (filters: IngredientFilters) => void;
+  onFilterChange?: (filters: ProductFilters) => void;
 }) => {
   const [filters, setFilters] = useState({
     search: "",
@@ -27,8 +26,8 @@ const IngredientFilterUI = ({
       label: "Order By",
       options: [
         { label: "ID: Z-A", value: "id:desc" },
-        { label: "Name: A-Z", value: "ingredient_name:asc" },
-        { label: "Name: Z-A", value: "ingredient_name:desc" },
+        { label: "Name: A-Z", value: "product_name:asc" },
+        { label: "Name: Z-A", value: "product_name:desc" },
       ],
     },
   ];
@@ -114,4 +113,4 @@ const IngredientFilterUI = ({
   );
 };
 
-export default IngredientFilterUI;
+export default ProductFilterUI;
