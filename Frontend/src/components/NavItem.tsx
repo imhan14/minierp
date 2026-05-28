@@ -3,6 +3,8 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  type SxProps,
+  type Theme,
 } from "@mui/material";
 import { type ReactElement } from "react";
 
@@ -14,6 +16,7 @@ interface NavBarType {
   onClick?: () => void;
   icon: ReactElement;
   isUser?: boolean;
+  sx?: SxProps<Theme>;
 }
 
 const NavItem = ({
@@ -24,17 +27,23 @@ const NavItem = ({
   active = false,
   subtext = "",
   isUser,
+  sx,
 }: NavBarType) => {
   return (
     <ListItem disablePadding sx={{ display: "block" }}>
       <ListItemButton
         onClick={onClick}
-        sx={{
-          minHeight: 48,
-          px: 2.5,
-          justifyContent: open ? "initial" : "center",
-          backgroundColor: active ? "rgba(255, 255, 255, 0.2)" : "transparent",
-        }}
+        sx={[
+          {
+            minHeight: 48,
+            px: 2.5,
+            justifyContent: open ? "initial" : "center",
+            backgroundColor: active
+              ? "rgba(255, 255, 255, 0.2)"
+              : "transparent",
+          },
+          ...(Array.isArray(sx) ? sx : [sx]),
+        ]}
       >
         <ListItemIcon
           sx={{
