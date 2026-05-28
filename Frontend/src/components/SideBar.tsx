@@ -6,7 +6,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Box, Typography } from "@mui/material";
+import { Box, Collapse, Typography } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
@@ -23,7 +23,11 @@ import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlin
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
 import Co2OutlinedIcon from "@mui/icons-material/Co2Outlined";
 import AllInboxOutlinedIcon from "@mui/icons-material/AllInboxOutlined";
-
+import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
+import GamepadOutlinedIcon from "@mui/icons-material/GamepadOutlined";
+import { useState } from "react";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
 const drawerWidth = 240;
 const themeColor = {
   bg: "#22C55E",
@@ -83,6 +87,13 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { full_name, role, id } = useSelector((state: RootState) => state.auth);
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  const toggleExpand = (text: string) => {
+    setExpandedItems((prev) => ({ ...prev, [text]: !prev[text] }));
+  };
 
   const menuItems = [
     {
@@ -121,10 +132,23 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       path: "/product",
       minRole: 5,
     },
+    {
+      text: "Manage",
+      icon: <GroupOutlinedIcon />,
+      path: "/setting",
+      minRole: 5,
+      children: [
+        { text: "User", icon: <PersonIcon />, path: "/manage/user" },
+        { text: "Role", icon: <GamepadOutlinedIcon />, path: "/manage/role" },
+      ],
+    },
   ];
   const filteredMenuItems = menuItems.filter((item) => {
     if (
-      (item.text === "Dashboard" || item.text === "Formulas") &&
+      (item.text === "Dashboard" ||
+        item.text === "Formulas" ||
+        item.text === "Ingredient" ||
+        item.text === "Product") &&
       Number(id) > 5
     ) {
       return false;
@@ -168,21 +192,57 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
         </List>
         <Divider />
         <List>
-          {filteredMenuItems.map((item) => {
-            return (
+          {filteredMenuItems.map((item) => (
+            <Box>
               <NavItem
                 key={item.path}
                 open={open}
-                icon={item.icon}
                 text={item.text}
                 onClick={() => {
-                  onTitleChange(item.text);
-                  navigate(item.path);
+                  if (item.children) {
+                    toggleExpand(item.text);
+                  } else {
+                    onTitleChange(item.text);
+                    navigate(item.path);
+                  }
                 }}
                 active={pathname === item.path}
+                icon={
+                  item.children ? (
+                    expandedItems[item.text] ? (
+                      <ExpandLessOutlinedIcon />
+                    ) : (
+                      <ExpandMoreOutlinedIcon />
+                    )
+                  ) : (
+                    item.icon
+                  )
+                }
               />
-            );
-          })}
+              {item.children && (
+                <Collapse
+                  in={
+                    expandedItems[item.text] || pathname.startsWith(item.path)
+                  }
+                >
+                  {item.children.map((child) => (
+                    <NavItem
+                      key={child.path}
+                      open={open}
+                      icon={child.icon}
+                      text={child.text}
+                      onClick={() => {
+                        onTitleChange(child.text);
+                        navigate(child.path);
+                      }}
+                      active={pathname === child.path}
+                      sx={{ pl: open ? 4 : 0 }}
+                    />
+                  ))}
+                </Collapse>
+              )}
+            </Box>
+          ))}
         </List>
       </Box>
       <Divider />

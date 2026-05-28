@@ -1,5 +1,5 @@
 import { Box, Button, styled } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import IngredientFilterUI from "./components/IngredientFilterUI";
 import DataTable, { type ActionConfig } from "@/components/DataTable";
 import {
@@ -17,12 +17,12 @@ import { getFieldConfigs } from "@/utils/schema-parser";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ingredientApi, { type IngredientFilters } from "@/apis/ingredientApi";
 import { useEntity } from "@/hooks/useEntity";
-import { useEntityForm } from "@/hooks/useEntityForm";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { ConfirmDiscardDialog } from "@/components/ConfirmDiscardDialog";
 import type { FieldConfig } from "@/types/FieldConfig";
 import GeneralInfoSection from "@/components/GeneralInfoSection";
 import DynamicPopup from "@/components/DynamicPopup";
+import { usePageForm } from "@/hooks/usePageForm";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -38,54 +38,36 @@ const FIELD_WIDTHS: Partial<Record<string, number>> = {
 };
 
 const IngredientPage = () => {
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const { data: ingredients, reload } = useEntity<
     IngredientType,
     IngredientType,
     IngredientFilters
   >(ingredientApi.getAllIngredients);
 
-  // ── Dirty check guard ─────────────────────────────────────────────────────────
-  const guardAction = (action: () => void) => {
-    if (form.isDirty) {
-      setPendingAction(() => action);
-      setConfirmOpen(true);
-    } else {
-      action();
-    }
-  };
-
-  const handleDiscard = () => {
-    form.close();
-    setConfirmOpen(false);
-    pendingAction?.();
-    setPendingAction(null);
-  };
-
-  const handleContinueEditing = () => {
-    setConfirmOpen(false);
-    setPendingAction(null);
-  };
-  const form = useEntityForm<
+  const {
+    form,
+    confirmOpen,
+    handleDiscard,
+    handleContinueEditing,
+    guardAction,
+    setConfirmOpen,
+  } = usePageForm<
     IngredientType,
     IngredientCreatePayload,
     IngredientUpdatePayload
   >({
     service: {
-      create: (payload) => ingredientApi.createIngredient(payload),
-      update: (id, payload) => ingredientApi.update(id, payload),
-      delete: (id) => ingredientApi.deleteIngredient(id),
+      create: ingredientApi.createIngredient,
+      update: ingredientApi.update,
     },
     createSchema: CreateIngredientSchema,
     updateSchema: UpdateIngredientSchema,
-    toCreatePayload: (d) => d as IngredientCreatePayload,
-    toUpdatePayload: (d) => d as IngredientUpdatePayload,
-    defaultValues: {
-      ingredient_code: "",
-      ingredient_name: "",
-      unit: undefined,
+    defaultValues: {},
+    messages: {
+      createSuccess: "Thêm nguyên liệu thành công!",
+      updateSuccess: "Cập nhật thành công!",
     },
+
     onSuccess: reload,
   });
 

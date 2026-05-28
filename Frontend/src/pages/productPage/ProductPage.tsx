@@ -30,12 +30,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 const FIELD_WIDTHS: Partial<Record<string, number>> = {
   product_code: 100,
-  product_name: 200,
+  product_name: 300,
   unit: 100,
 };
 const ProductPage = () => {
-  // const [confirmOpen, setConfirmOpen] = useState(false);
-  // const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const { data: products, reload } = useEntity<
     ProductType,
     ProductType,
@@ -117,7 +115,7 @@ const ProductPage = () => {
         color: "error",
         onClick: (row) =>
           guardAction(() =>
-            form.deleteRecord(row, `Xóa nguyên liệu "${row.product_name}"?`),
+            form.deleteRecord(row, `Xóa sản phẩm "${row.product_name}"?`),
           ),
       },
     ];
@@ -145,9 +143,7 @@ const ProductPage = () => {
           open={form.isOpen}
           onClose={() => guardAction(form.close)}
           title={
-            form.mode === "add"
-              ? "Thêm nguyên liệu mới"
-              : "Chỉnh sửa nguyên liệu"
+            form.mode === "add" ? "Thêm sản phẩm mới" : "Chỉnh sửa sản phẩm"
           }
           mode={form.mode === "idle" ? undefined : form.mode}
           onSubmit={form.submit}

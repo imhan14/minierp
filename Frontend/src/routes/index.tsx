@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import NotFound from "../pages/NotFound";
 import UserLayout from "../layouts/UserLayout";
 import Home from "../pages/Home";
@@ -13,6 +13,9 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import FormulaPage from "../pages/formula";
 import IngredientPage from "@/pages/ingredientPage";
 import ProductPage from "@/pages/productPage";
+import ManagePage from "@/pages/ManagePage";
+import UserSetting from "@/pages/manage/UserSetting";
+import Role from "@/pages/manage/Role";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +66,26 @@ const router = createBrowserRouter([
           {
             element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
             children: [{ path: "/product", element: <ProductPage /> }],
+          },
+          {
+            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            children: [
+              {
+                path: "/manage",
+                element: <ManagePage />,
+                children: [
+                  {
+                    index: true,
+                    element: <Navigate to="/manage/user" replace />,
+                  },
+                  {
+                    path: "user",
+                    element: <UserSetting />,
+                  },
+                  { path: "role", element: <Role /> },
+                ],
+              },
+            ],
           },
         ],
       },
