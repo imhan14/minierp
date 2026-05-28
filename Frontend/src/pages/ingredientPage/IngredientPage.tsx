@@ -1,6 +1,5 @@
-import { Box, Button, styled } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useMemo } from "react";
-import IngredientFilterUI from "./components/IngredientFilterUI";
 import DataTable, { type ActionConfig } from "@/components/DataTable";
 import {
   CreateIngredientSchema,
@@ -13,7 +12,6 @@ import type {
   IngredientUpdatePayload,
 } from "@/schema/ingredient.schema";
 import { getFieldConfigs } from "@/utils/schema-parser";
-// import type { IngredientType } from "@/types/IngredientType";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ingredientApi, { type IngredientFilters } from "@/apis/ingredientApi";
 import { useEntity } from "@/hooks/useEntity";
@@ -23,14 +21,10 @@ import type { FieldConfig } from "@/types/FieldConfig";
 import GeneralInfoSection from "@/components/GeneralInfoSection";
 import DynamicPopup from "@/components/DynamicPopup";
 import { usePageForm } from "@/hooks/usePageForm";
+import Filters from "@/components/Filters";
+import { ingredientFilterOptions } from "./utils/ingredient.constants";
+import { DrawerHeader } from "@/utils/others";
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
 const FIELD_WIDTHS: Partial<Record<string, number>> = {
   ingredient_code: 130,
   ingredient_name: 200,
@@ -135,7 +129,10 @@ const IngredientPage = () => {
   return (
     <>
       <DrawerHeader />
-      <IngredientFilterUI onFilterChange={(newFilters) => reload(newFilters)} />
+      <Filters
+        filterOptions={ingredientFilterOptions}
+        onFilterChange={(newFilters) => reload(newFilters)}
+      />
       <Box>
         <Button
           variant="contained"

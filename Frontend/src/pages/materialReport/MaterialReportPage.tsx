@@ -116,6 +116,7 @@ const MaterialReportPage = () => {
     <Box>
       <DrawerHeader />
       <Filters
+        showDateFilter
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
         mode={filterMode}

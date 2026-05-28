@@ -138,7 +138,7 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       path: "/setting",
       minRole: 5,
       children: [
-        { text: "User", icon: <PersonIcon />, path: "/manage/user" },
+        { text: "User", icon: <GroupOutlinedIcon />, path: "/manage/user" },
         { text: "Role", icon: <GamepadOutlinedIcon />, path: "/manage/role" },
       ],
     },
@@ -148,7 +148,8 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       (item.text === "Dashboard" ||
         item.text === "Formulas" ||
         item.text === "Ingredient" ||
-        item.text === "Product") &&
+        item.text === "Product" ||
+        item.text === "Manage") &&
       Number(id) > 5
     ) {
       return false;

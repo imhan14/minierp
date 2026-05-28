@@ -18,3 +18,40 @@ export const COLOR_OPTIONS = [
   { label: "3 màu", value: "bamau" },
   { label: "Xám", value: "xam" },
 ];
+
+export const filterOptions = [
+  {
+    id: "active",
+    label: "Active",
+    options: ACTIVE_OPTIONS,
+  },
+  {
+    id: "line",
+    label: "Line",
+    options: PRODUCT_LINE_OPTIONS,
+  },
+  {
+    id: "specification",
+    label: "Specification",
+    options: SPECIFICATION_OPTIONS,
+  },
+  {
+    id: "color",
+    label: "Color",
+    options: COLOR_OPTIONS,
+  },
+  {
+    id: "typeOfSpecification",
+    label: "Type of Specification",
+    options: SPEC_TYPE_OPTIONS,
+  },
+  {
+    id: "orderBy",
+    label: "Order By",
+    options: [
+      { label: "ID: A-Z", value: "id:asc" },
+      { label: "Name: A-Z", value: "formula_name:asc" },
+      { label: "Name: Z-A", value: "formula_name:desc" },
+    ],
+  },
+];

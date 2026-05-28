@@ -6,13 +6,11 @@ import {
   Step,
   StepLabel,
   Stepper,
-  styled,
   Typography,
 } from "@mui/material";
 import DataTable, { type ActionConfig } from "@/components/DataTable";
 import DynamicPopup from "@/components/DynamicPopup";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
-import FormulaFiltersUI from "./components/FormulaFiltersUI";
 import FormulaDetailList from "./components/FormulaDetailList";
 import { useEntity } from "@/hooks/useEntity";
 import formulaApi, { type FormulaFilters } from "@/apis/formulaApi";
@@ -35,14 +33,10 @@ import GeneralInfoSection from "@/components/GeneralInfoSection";
 import productionApi from "@/apis/productionApi";
 import type { ProductType } from "@/types/ProductType";
 import { useNotify } from "@/hooks/useNotify";
+import Filters from "@/components/Filters";
+import { filterOptions } from "./utils/formula.constant";
+import { DrawerHeader } from "@/utils/others";
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
 const FIELD_WIDTHS: Partial<Record<string, number>> = {
   formula_code: 80,
   formula_name: 300,
@@ -291,10 +285,14 @@ const FormulaPage = () => {
       : `Công thức: ${selectedFormula?.formula_code ?? ""}`;
   const activeFormulaId =
     popupMode === "edit" ? (selectedFormula?.id ?? null) : newFormulaId;
+
   return (
     <>
       <DrawerHeader />
-      <FormulaFiltersUI onFilterChange={(newFilters) => reload(newFilters)} />
+      <Filters
+        filterOptions={filterOptions}
+        onFilterChange={(newFilters) => reload(newFilters)}
+      />
       <Box>
         <Button
           variant="contained"

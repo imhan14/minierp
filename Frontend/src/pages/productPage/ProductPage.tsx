@@ -1,4 +1,4 @@
-import { Box, Button, styled } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useMemo } from "react";
 import DataTable, { type ActionConfig } from "@/components/DataTable";
 import { getFieldConfigs } from "@/utils/schema-parser";
@@ -19,15 +19,10 @@ import {
   type ProductType,
   type ProductUpdatePayload,
 } from "@/schema/product.schema";
-import ProductFilterUI from "./components/ProductFilterUI";
+import Filters from "@/components/Filters";
+import { productFilterOptions } from "./utils/product.constants";
+import { DrawerHeader } from "@/utils/others";
 
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
 const FIELD_WIDTHS: Partial<Record<string, number>> = {
   product_code: 100,
   product_name: 300,
@@ -123,7 +118,10 @@ const ProductPage = () => {
   return (
     <>
       <DrawerHeader />
-      <ProductFilterUI onFilterChange={(newFilters) => reload(newFilters)} />
+      <Filters
+        filterOptions={productFilterOptions}
+        onFilterChange={(newFilters) => reload(newFilters)}
+      />
       <Box>
         <Button
           variant="contained"
