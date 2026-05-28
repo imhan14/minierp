@@ -1,7 +1,7 @@
-import React from "react";
+import { Outlet } from "react-router";
 
 const ManagePage = () => {
-  return <div>ManagePage</div>;
+  return <Outlet />;
 };
 
 export default ManagePage;

@@ -1,8 +1,7 @@
 import {
   Box,
-  FormControl,
-  IconButton,
   InputAdornment,
+  MenuItem,
   Paper,
   TextField,
   ToggleButton,
@@ -11,33 +10,54 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
 import { Dayjs } from "dayjs";
-// import { useLocation } from "react-router";
+import { useState } from "react";
 
-interface Filters {
-  selectedDate: Dayjs | null;
-  setSelectedDate: (value: Dayjs | null) => void;
-  mode: "single" | "range";
-  setMode: (mode: "single" | "range") => void;
+export interface FilterOption {
+  id: string;
+  label: string;
+  options: { label: string; value: string }[];
+}
+interface Filters<T> {
+  initialFilters?: Partial<T>;
+  onFilterChange?: (filters: T) => void;
+  filterOptions?: FilterOption[];
   children?: React.ReactNode;
+  // ---Date---
+  showDateFilter?: boolean;
+  mode?: "single" | "range";
+  setMode?: (mode: "single" | "range") => void;
+  selectedDate?: Dayjs | null;
+  setSelectedDate?: (value: Dayjs | null) => void;
   endDate?: Dayjs | null;
   setEndDate?: (value: Dayjs | null) => void;
 }
 
-const Filters = ({
-  selectedDate,
+const Filters = <T extends Record<string, unknown>>({
+  initialFilters,
+  showDateFilter = false,
+  selectedDate = null,
   setSelectedDate,
-  mode,
+  mode = "single",
   setMode,
   children,
-  endDate,
+  endDate = null,
   setEndDate,
-}: Filters) => {
-  // const location = useLocation();
-  // const [age, setAge] = useState("");
+  onFilterChange,
+  filterOptions = [],
+}: Filters<T>) => {
+  const [filters, setFilters] = useState<T>({
+    search: "",
+    orderBy: "",
+    ...initialFilters,
+  } as unknown as T);
+  const handleChange = <K extends keyof T>(field: K, value: string) => {
+    const newFilters = { ...filters, [field]: value as unknown as T[K] };
+    setFilters(newFilters);
 
-  // const handleChange = (event: SelectChangeEvent) => {
-  //   setAge(event.target.value);
-  // };
+    if (onFilterChange) {
+      onFilterChange(newFilters);
+    }
+  };
   return (
     <Paper
       elevation={0}
@@ -48,110 +68,126 @@ const Filters = ({
         p: 2,
         mb: 3,
         boxShadow: "0px 2px 10px rgba(0,0,0,0.2)",
-        position: "sticky",
+        // position: "sticky",
         top: 60,
         zIndex: 10,
         flexWrap: "wrap",
       }}
     >
-      <ToggleButtonGroup
-        value={mode}
-        exclusive
-        onChange={(_, nextMode) => {
-          if (nextMode) {
-            setMode(nextMode);
+      {/* DATE PICKER */}
+      {showDateFilter && (
+        <>
+          <ToggleButtonGroup
+            value={mode}
+            exclusive
+            onChange={(_, nextMode) => {
+              if (nextMode && setMode) {
+                setMode(nextMode);
 
-            if (nextMode === "single") {
-              setEndDate?.(null);
-            } else if (nextMode === "range") {
-              setEndDate?.(selectedDate);
-            }
-          }
-        }}
-        size="small"
-        sx={{ mr: 2 }}
-      >
-        <ToggleButton value="single">Một ngày</ToggleButton>
-        <ToggleButton value="range">Bộ lọc</ToggleButton>
-      </ToggleButtonGroup>
+                if (nextMode === "single") {
+                  setEndDate?.(null);
+                } else if (nextMode === "range") {
+                  setEndDate?.(selectedDate);
+                }
+              }
+            }}
+            size="small"
+            sx={{ mr: 2 }}
+          >
+            <ToggleButton value="single">Một ngày</ToggleButton>
+            <ToggleButton value="range">Bộ lọc</ToggleButton>
+          </ToggleButtonGroup>
 
-      <DatePicker
-        label={mode === "single" ? "Chọn ngày" : "Từ ngày"}
-        value={selectedDate}
-        onChange={(newValue) => setSelectedDate(newValue)}
-        format="DD/MM/YYYY"
-        slotProps={{
-          textField: {
-            sx: { maxWidth: "150px" },
-            size: "small",
-            fullWidth: true,
-          },
-        }}
-      />
-      {mode === "range" && (
-        <DatePicker
-          label="Đến ngày"
-          value={endDate || null}
-          onChange={(newValue) => {
-            if (setEndDate) setEndDate(newValue);
-          }}
-          format="DD/MM/YYYY"
-          slotProps={{
-            textField: {
-              sx: { maxWidth: "150px" },
-              size: "small",
-              fullWidth: true,
-            },
-          }}
-        />
+          <DatePicker
+            label={mode === "single" ? "Chọn ngày" : "Từ ngày"}
+            value={selectedDate}
+            onChange={(newValue) => setSelectedDate?.(newValue)}
+            format="DD/MM/YYYY"
+            slotProps={{
+              textField: {
+                sx: { maxWidth: "150px" },
+                size: "small",
+                fullWidth: true,
+              },
+            }}
+          />
+          {mode === "range" && (
+            <DatePicker
+              label="Đến ngày"
+              value={endDate || null}
+              onChange={(newValue) => {
+                if (setEndDate) setEndDate(newValue);
+              }}
+              format="DD/MM/YYYY"
+              slotProps={{
+                textField: {
+                  sx: { maxWidth: "150px" },
+                  size: "small",
+                  fullWidth: true,
+                },
+              }}
+            />
+          )}
+        </>
       )}
+      {/* SEARCH */}
       <TextField
         variant="outlined"
-        placeholder="Search..."
+        placeholder="Search name..."
         size="small"
-        fullWidth
+        value={filters.search as string}
+        onChange={(e) => handleChange("search" as keyof T, e.target.value)}
         sx={{
-          maxWidth: "250px",
-          borderRadius: 1.5,
-          "& .MuiOutlinedInput-root": {
-            color: "black",
-            "& fieldset": {
-              borderColor: "gray 0.5",
-            },
-            "&:hover fieldset": {
-              borderColor: "black",
-            },
-          },
+          maxWidth: "220px",
+          "& .MuiOutlinedInput-root": { borderRadius: 2 },
         }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <IconButton>
-                <SearchIcon sx={{ color: "gray" }} />
-              </IconButton>
+              <SearchIcon fontSize="small" sx={{ color: "gray" }} />
             </InputAdornment>
           ),
         }}
       />
-
-      {/* {location.pathname === "/production-log" && ( */}
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
-        {/* <Select
-            value={age}
-            onChange={handleChange}
-            displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
+      {/* FILTER OPTIONS */}
+      {filterOptions.map((item) => {
+        const currentValue = (filters[item.id as keyof T] as string) || "";
+        const isDefaultValue = currentValue === "";
+        return (
+          <TextField
+            key={item.id}
+            size="small"
+            label={item.label}
+            select
+            value={currentValue}
+            onChange={(e) => {
+              handleChange(item.id as keyof T, e.target.value);
+            }}
+            SelectProps={{
+              displayEmpty: true,
+            }}
+            slotProps={{ inputLabel: { shrink: true } }}
+            sx={{
+              width: 120,
+              "& .MuiSelect-select": {
+                color: isDefaultValue ? "text.secondary" : "inherit",
+                fontStyle: isDefaultValue ? "italic" : "normal",
+                opacity: isDefaultValue ? 0.8 : 1,
+              },
+            }}
           >
             <MenuItem value="">
-              <em>None</em>
+              {item.id === "orderBy" ? "Default" : <em>All</em>}
             </MenuItem>
-            <MenuItem value={10}>Ten</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
-          </Select> */}
-        {/* <FormHelperText>Without label</FormHelperText> */}
-      </FormControl>
-      {/* )} */}
+
+            {item.options.map((opt) => (
+              <MenuItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        );
+      })}
       <Box sx={{ flexGrow: 1 }} />
       {children}
     </Paper>

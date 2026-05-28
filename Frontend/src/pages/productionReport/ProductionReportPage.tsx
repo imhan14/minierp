@@ -1,6 +1,5 @@
 import { Box, Button, Divider, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
-import { styled } from "@mui/material/styles";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import Filters from "@components/Filters";
@@ -30,14 +29,7 @@ import {
   PRODUCTION_REPORT_TABLE_FIELDS,
 } from "./utils/ProductionReport.fieldConfig";
 import ProductListDetail from "./components/ProductListDetail";
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
+import { DrawerHeader } from "@/utils/others";
 
 const ProductionReportPage = () => {
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -198,6 +190,7 @@ const ProductionReportPage = () => {
     <Box>
       <DrawerHeader />
       <Filters
+        showDateFilter
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
         mode={filterMode}

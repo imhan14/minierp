@@ -31,6 +31,11 @@ export const getAllFormlasService = async (filters: FormulaFilters) => {
 
     const orConditions: Prisma.formulasWhereInput[] = [
       { formula_name: { contains: searchTrim, mode: "insensitive" } },
+      {
+        products: {
+          product_name: { contains: searchTrim, mode: "insensitive" },
+        },
+      },
     ];
     if (!isNaN(searchAsNumber)) {
       orConditions.push({ formula_code: searchAsNumber });

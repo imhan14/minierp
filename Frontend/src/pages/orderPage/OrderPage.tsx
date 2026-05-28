@@ -121,6 +121,7 @@ const OrderPage = () => {
     <Box>
       <DrawerHeader />
       <Filters
+        showDateFilter
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
         mode={filterMode}
