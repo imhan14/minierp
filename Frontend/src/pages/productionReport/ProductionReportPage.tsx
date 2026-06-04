@@ -45,7 +45,7 @@ const ProductionReportPage = () => {
     let isMounted = true;
     const fetchTeamList = async () => {
       try {
-        const response = await teamApi.getAllteams();
+        const response = await teamApi.getAllTeams();
         if (isMounted) {
           const formattedData = response.data.map((item: TeamType) => ({
             label: item.team_name,

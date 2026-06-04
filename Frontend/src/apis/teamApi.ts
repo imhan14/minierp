@@ -4,7 +4,7 @@ interface TeamFilters {
   id?: number;
 }
 const teamApi = {
-  getAllteams: (params?: TeamFilters) => {
+  getAllTeams: (params?: TeamFilters) => {
     return instance.get("/teams", { params: params });
   },
 };

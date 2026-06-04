@@ -3,11 +3,12 @@ export interface UserFilters {
   role_id?: number;
   id?: number;
   search?: string;
+  orderBy?: string;
 }
 
 export interface CreateUserData {
   username: string;
-  password: string;
+  new_password: string;
   full_name: string;
   role_id: number;
 }

@@ -86,12 +86,12 @@ export const ProductionLogSchema = z.object({
     )
     .optional(),
   team_name: z
-    .number()
+    .string()
     .optional()
     .describe(
       JSON.stringify({
         label: "Tổ",
-        type: "number",
+        type: "text",
         tableVisible: true,
         formOrder: 1,
       }),
