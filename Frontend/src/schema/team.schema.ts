@@ -5,9 +5,8 @@ export const TeamSchema = z.object({
   id: z.number().optional(),
 
   team_name: z
-    .string()
+    .string("Vui lòng nhập tên team")
     .min(1, "Team name không hợp lệ")
-    .optional()
     .describe(
       JSON.stringify({
         label: "Tổ",
@@ -39,7 +38,9 @@ export const CreateTeamSchema = TeamSchema.omit({
   id: true,
 });
 
-export const UpdateTeamSchema = TeamSchema.partial();
+export const UpdateTeamSchema = TeamSchema.pick({
+  team_name: true,
+});
 
 export const DeleteTeamSchema = z.object({
   id: z.number(),

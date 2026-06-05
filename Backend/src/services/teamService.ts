@@ -12,6 +12,7 @@ export const getTeamsService = async (filters: TeamFilters) => {
     where: {
       id: id ? Number(id) : undefined,
     },
+    orderBy: { id: "asc" },
   });
 };
 
@@ -32,7 +33,6 @@ export const updateTeamService = async (
   const { team_name, user_id } = teamData;
   const data: Prisma.teamsWhereInput = {};
   if (team_name) data.team_name = team_name;
-  if (user_id) data.user_id = user_id;
   return await prisma.teams.update({
     where: { id },
     data: data as Prisma.teamsUncheckedUpdateInput,

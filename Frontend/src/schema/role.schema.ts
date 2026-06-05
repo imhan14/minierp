@@ -4,9 +4,8 @@ export const RoleSchema = z.object({
   id: z.number().optional(),
 
   role_name: z
-    .string()
+    .string("Vui lòng nhập Role name")
     .min(1, "Role name không hợp lệ")
-    .optional()
     .describe(
       JSON.stringify({
         label: "Role name",
@@ -17,9 +16,8 @@ export const RoleSchema = z.object({
     ),
 
   priority_level: z
-    .number()
+    .number("Vui lòng nhập priority_level")
     .min(1, "User Không hợp lệ")
-    .optional()
     .describe(
       JSON.stringify({
         label: "Level",
@@ -30,9 +28,7 @@ export const RoleSchema = z.object({
     ),
 });
 
-export const CreateRoleSchema = RoleSchema.omit({
-  id: true,
-});
+export const CreateRoleSchema = RoleSchema.omit({ id: true });
 
 export const UpdateRoleSchema = RoleSchema.partial();
 

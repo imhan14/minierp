@@ -16,7 +16,7 @@ import type { EntityService } from "@/hooks/useEntityForm";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-interface SimpleEntityPageProps<
+interface BaseEntityPageProps<
   T extends { id?: number | string },
   CreatePayload,
   UpdatePayload,
@@ -33,7 +33,6 @@ interface SimpleEntityPageProps<
   fieldWidths?: Partial<Record<string, number>>;
   disabledOnEdit?: (keyof T)[];
   filterOptions?: FilterOption[];
-
   messages?: {
     createSuccess?: string;
     updateSuccess?: string;
@@ -59,15 +58,23 @@ const BaseEntityPage = <
   disabledOnEdit = [],
   filterOptions = [],
   messages,
-}: SimpleEntityPageProps<T, CreatePayload, UpdatePayload>) => {
+}: BaseEntityPageProps<T, CreatePayload, UpdatePayload>) => {
   const { data, reload } = useEntity<T, T>(fetchAll);
 
+  // Bóc tách thêm các hàm điều khiển Popup thực tế từ hook usePageForm
   const {
     form,
+    popupMode,
     confirmOpen,
+    isSaving,
+    guardAction,
     handleDiscard,
     handleContinueEditing,
-    guardAction,
+    handleOpenAdd,
+    handleOpenEdit,
+    handleClosePopup,
+    handleAddSubmit,
+    handleEditSave,
     setConfirmOpen,
   } = usePageForm<T, CreatePayload, UpdatePayload>({
     service,
@@ -123,7 +130,7 @@ const BaseEntityPage = <
       label: "Sửa",
       color: "primary",
       icon: <EditOutlinedIcon />,
-      onClick: (row) => guardAction(() => form.openEdit(row)),
+      onClick: (row) => handleOpenEdit(row), // Sửa từ guardAction sang hàm chuẩn handleOpenEdit
     },
     {
       label: "Xóa",
@@ -133,6 +140,15 @@ const BaseEntityPage = <
         guardAction(() => form.deleteRecord(row, deleteConfirmMessage(row))),
     },
   ];
+
+  // Quyết định hàm submit dựa theo trạng thái popup hiện tại
+  const handleSubmitAction = () => {
+    if (popupMode === "add") {
+      handleAddSubmit();
+    } else if (popupMode === "edit") {
+      handleEditSave();
+    }
+  };
 
   return (
     <>
@@ -145,7 +161,7 @@ const BaseEntityPage = <
         <Button
           variant="contained"
           sx={{ marginBottom: 1 }}
-          onClick={() => guardAction(form.openAdd)}
+          onClick={() => handleOpenAdd()} // Sửa sang hàm chuẩn handleOpenAdd
         >
           {addButtonLabel}
         </Button>
@@ -158,12 +174,12 @@ const BaseEntityPage = <
         />
 
         <DynamicPopup
-          open={form.isOpen}
-          onClose={() => guardAction(form.close)}
-          title={form.mode === "add" ? addPopupTitle : editPopupTitle}
-          mode={form.mode === "idle" ? undefined : form.mode}
-          onSubmit={form.submit}
-          isSubmitting={form.isSubmitting}
+          open={popupMode !== "closed"} // Dựa theo trạng thái popupMode thực tế
+          onClose={handleClosePopup} // Dựa theo hàm close popup thực tế
+          title={popupMode === "add" ? addPopupTitle : editPopupTitle}
+          mode={popupMode === "closed" ? undefined : popupMode}
+          onSubmit={handleSubmitAction} // Trỏ chuẩn về hàm chạy Validate Zod
+          isSubmitting={form.isSubmitting || isSaving}
           maxWidth="sm"
         >
           <GeneralInfoSection<T>
@@ -181,7 +197,7 @@ const BaseEntityPage = <
           onDiscard={handleDiscard}
           onClose={handleContinueEditing}
           onSave={async () => {
-            await form.submit();
+            handleSubmitAction();
             setConfirmOpen(false);
           }}
         />

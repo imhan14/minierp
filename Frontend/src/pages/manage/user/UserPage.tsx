@@ -13,7 +13,6 @@ import {
   type UserUpdatePayload,
 } from "@/schema/user.schema";
 import { useEffect, useMemo, useState } from "react";
-import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { DrawerHeader } from "@/utils/others";
 import Filters from "@/components/Filters";
 import { Box, Button } from "@mui/material";
@@ -33,6 +32,7 @@ import { userFilterOptions } from "./utils/user.constants";
 import roleApi from "@/apis/roleApi";
 import type { RoleType } from "@/schema/role.schema";
 import axios from "axios";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 
 const UserPage = () => {
   const notify = useNotify();
@@ -283,7 +283,7 @@ const UserPage = () => {
     {
       label: "Chi tiết",
       color: "primary",
-      icon: <RemoveRedEyeOutlinedIcon />,
+      icon: <EditOutlinedIcon />,
       onClick: handleOpenEdit,
     },
   ];
@@ -318,7 +318,7 @@ const UserPage = () => {
           />
 
           <DynamicPopup
-            open={popupMode !== "closed"}
+            open={form.isOpen}
             onClose={() => guardAction(form.close)}
             title={popupTitle}
             maxWidth="md"

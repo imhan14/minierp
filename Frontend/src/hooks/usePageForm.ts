@@ -184,6 +184,7 @@ export function usePageForm<
       setSelectedRecord(merged);
       form.openEdit(merged);
       notify(messages?.updateSuccess ?? "Cập nhật thành công!", "success");
+      setPopupMode("closed");
       onSuccess();
       return true;
     } catch (err) {
