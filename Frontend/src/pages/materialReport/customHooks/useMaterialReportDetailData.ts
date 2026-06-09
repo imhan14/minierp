@@ -1,51 +1,51 @@
 import { useCallback, useState } from "react";
-import mateiralDetailApi from "@/apis/materialDetailApi";
-import type { MaterialDetailDisplay } from "@/types/MaterialDetailType";
+import materialDetailApi from "@/apis/materialDetailApi";
+import type { MaterialDetailType } from "@/schema/materialDetail.schema";
+import type { IngredientType } from "@/schema/ingredient.schema";
+import ingredientApi from "@/apis/ingredientApi";
 
-const useMaterialReportDetailData = () => {
-  const [error, setError] = useState<string | null>(null);
+const useMaterialDetailData = () => {
   const [detailLoading, setDetailLoading] = useState(false);
-  const [editIngredients, setEditIngredients] = useState<
-    MaterialDetailDisplay[]
-  >([]);
-
-  const getMaterialReportDetail = async (
-    material_id: number | null | undefined,
-  ) => {
-    const response = await mateiralDetailApi.getAllMaterialDetails({
-      material_id: material_id,
-    });
-    const formattedData: MaterialDetailDisplay[] = response.data.map((item) => {
-      const { ingredients, ...rest } = item;
-      return {
-        ...rest,
-        ingredient_name: ingredients?.ingredient_name,
-      };
-    });
-    return formattedData;
-  };
-  const fetchMaterialReportDetail = useCallback(
-    async (material_id: number | null | undefined) => {
-      try {
-        setDetailLoading(true);
-        setEditIngredients(await getMaterialReportDetail(material_id));
-        setError(null);
-      } catch (err) {
-        setError("Không thể tải dữ liệu.");
-        console.error("API Error:", err);
-      } finally {
-        setDetailLoading(false);
-      }
-    },
+  const [error, setError] = useState<string | null>(null);
+  const [rows, setRows] = useState<MaterialDetailType[]>([]);
+  const [ingredientOptions, setIngredientOptions] = useState<IngredientType[]>(
     [],
   );
+
+  const fetchDetails = useCallback(async (material_id: number | null) => {
+    if (!material_id) return;
+    try {
+      setDetailLoading(true);
+      const [detailRes, ingRes] = await Promise.all([
+        materialDetailApi.getAllMaterialDetails({ material_id }),
+        ingredientApi.getAllIngredients(),
+      ]);
+      console.log(detailRes.data);
+      // flatten ingredient_name từ join
+      const flat: MaterialDetailType[] = detailRes.data.map((item) => ({
+        ...item,
+        id: item.ingredients?.id ?? item.ingredient_id,
+        label: item.ingredients?.ingredient_name ?? item.ingredient_name,
+      }));
+      setRows(flat);
+      setIngredientOptions(ingRes.data);
+      setError(null);
+    } catch (err) {
+      setError("Không thể tải dữ liệu.");
+      console.error(err);
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
   return {
-    fetchMaterialReportDetail,
-    error,
+    fetchDetails,
     detailLoading,
-    editIngredients,
-    setEditIngredients,
+    error,
+    rows,
+    setRows,
+    ingredientOptions,
   };
 };
 
-export default useMaterialReportDetailData;
+export default useMaterialDetailData;

@@ -11,7 +11,6 @@ const teamApi = {
     return instance.get("/teams", { params: params });
   },
   createTeam: (data: TeamData) => {
-    console.log(data);
     return instance.post("/teams", data);
   },
   updateTeam: (id: number, data: TeamData) => {

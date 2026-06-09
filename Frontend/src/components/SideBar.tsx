@@ -139,7 +139,11 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       minRole: 5,
       children: [
         { text: "User", icon: <GroupOutlinedIcon />, path: "/manage/user" },
-        { text: "Role", icon: <GamepadOutlinedIcon />, path: "/manage/role" },
+        {
+          text: "Role & Team",
+          icon: <GamepadOutlinedIcon />,
+          path: "/manage/role",
+        },
       ],
     },
   ];

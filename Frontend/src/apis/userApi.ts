@@ -32,11 +32,9 @@ const userApi = {
     };
   },
   createUser: (data: UserData) => {
-    console.log(data);
     return instance.post("/users", data);
   },
   updateUser: (id: number, data: UserData) => {
-    console.log(data);
     return instance.patch(`/users/${id}`, data);
   },
   deleteUser: (id: number) => {
