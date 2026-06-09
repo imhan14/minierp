@@ -15,9 +15,9 @@ import { useState } from "react";
 export interface FilterOption {
   id: string;
   label: string;
-  options: { label: string; value: string }[];
+  options?: { label: string; value: string }[];
 }
-interface Filters<T> {
+interface Filters<T extends Record<string, unknown>> {
   initialFilters?: Partial<T>;
   onFilterChange?: (filters: T) => void;
   filterOptions?: FilterOption[];
@@ -180,7 +180,7 @@ const Filters = <T extends Record<string, unknown>>({
               {item.id === "orderBy" ? "Default" : <em>All</em>}
             </MenuItem>
 
-            {item.options.map((opt) => (
+            {item.options?.map((opt) => (
               <MenuItem key={opt.value} value={opt.value}>
                 {opt.label}
               </MenuItem>

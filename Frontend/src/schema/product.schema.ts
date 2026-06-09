@@ -7,7 +7,12 @@ export const ProductSchema = z.object({
 
   product_code: z
     .string()
+    .trim()
     .min(3, "Code ít nhất 3 ký tự")
+    .regex(
+      /^[a-zA-Z0-9]+$/,
+      "Code chỉ được chứa chữ cái và số, không có ký tự đặc biệt",
+    )
     .describe(
       JSON.stringify({
         label: "Code",
@@ -74,7 +79,7 @@ export const CreateProductSchema = ProductSchema.omit({
   created_at: true,
 });
 
-export const UpdateProductSchema = ProductSchema.partial().pick({
+export const UpdateProductSchema = ProductSchema.pick({
   product_code: true,
   product_name: true,
   unit: true,

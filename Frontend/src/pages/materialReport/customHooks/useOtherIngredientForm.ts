@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useNotify } from "@/hooks/useNotify";
-import type { ExtraMaterialsJson } from "@/types/MaterialReportType";
 import materialReportApi from "@/apis/materialReportApi";
+import type { ExtraMaterialsJson } from "@/schema/materialReport.schema";
 
 const useOtherIngredientForm = (
   material_id: number | undefined,
@@ -12,9 +12,7 @@ const useOtherIngredientForm = (
   >,
 ) => {
   const notify = useNotify();
-  const [editingId, setEditingId] = useState<
-    number | null | string | undefined
-  >(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [originalData, setOriginalData] = useState<ExtraMaterialsJson | null>(
     null,
   );
@@ -28,7 +26,7 @@ const useOtherIngredientForm = (
           ),
         );
       }
-      setEditingId(row.id);
+      setEditingId(Number(row.id));
       setOriginalData({ ...row });
     },
     [editingId, originalData, setEditIngredients],
@@ -70,7 +68,7 @@ const useOtherIngredientForm = (
       note: "",
     };
     setEditIngredients((prev) => [newRow, ...prev]);
-    setEditingId(newRow.id);
+    setEditingId(Number(newRow.id));
   };
   const handleDeleteRow = async (row: ExtraMaterialsJson) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa nguyên liệu này?")) return;

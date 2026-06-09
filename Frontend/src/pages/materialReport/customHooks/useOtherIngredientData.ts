@@ -1,12 +1,11 @@
 import { useCallback, useState } from "react";
+
 import type {
   ExtraMaterialsJson,
-  MaterialReportDisplay,
-} from "@/types/MaterialReportType";
+  MaterialReportType,
+} from "@/schema/materialReport.schema";
 
-const useOtherIngredientData = (
-  extral_material: MaterialReportDisplay | null,
-) => {
+const useOtherIngredientData = (extral_material: MaterialReportType) => {
   const [error, setError] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [editIngredients, setEditIngredients] = useState<ExtraMaterialsJson[]>(
@@ -19,7 +18,7 @@ const useOtherIngredientData = (
       const materialsWithIds = (extral_material?.extral_materials || []).map(
         (item, index) => ({
           ...item,
-          id: item.id || `${extral_material?.id}-${index}`,
+          id: item.id ?? Date.now() + index,
         }),
       );
       setEditIngredients(materialsWithIds);

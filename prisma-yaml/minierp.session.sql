@@ -63,7 +63,7 @@ CREATE TABLE formula_details (
 CREATE TABLE teams (
     id SERIAL PRIMARY KEY,
     team_name VARCHAR(50),
-    user_id INT
+    -- user_id INT
     -- Khóa ngoại fk_team_user sẽ được thêm bằng ALTER TABLE ở dưới vì vòng lặp tham chiếu với bảng users
 );
 
@@ -83,7 +83,7 @@ CREATE TABLE users (
 );
 
 -- Thêm khóa ngoại còn thiếu cho bảng 'teams' sau khi bảng 'users' đã tạo xong
-ALTER TABLE teams ADD CONSTRAINT fk_team_user FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE NO ACTION;
+-- ALTER TABLE teams ADD CONSTRAINT fk_team_user FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE NO ACTION;
 
 -- 9. Tạo bảng 'material_reports'
 CREATE TABLE material_reports (

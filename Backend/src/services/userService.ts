@@ -1,5 +1,6 @@
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
+import { Prisma } from "../../generated/prisma/client";
 import type {
   UserFilters,
   CreateUserData,
@@ -11,13 +12,13 @@ const userSelect = {
   username: true,
   full_name: true,
   is_active: true,
-  roles: { select: { role_name: true } },
-  teams: { select: { team_id: true, team_name: true } },
-} as const;
+  roles: { select: { id: true, role_name: true } },
+  teams: { select: { id: true, team_name: true } },
+};
 
 export const createUserService = async (userData: CreateUserData) => {
-  const { username, password, full_name, role_id } = userData;
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const { username, new_password, full_name, role_id } = userData;
+  const hashedPassword = await bcrypt.hash(new_password, 10);
   return await prisma.users.create({
     data: {
       username,
@@ -38,25 +39,37 @@ export const getAUserService = async (id: number) => {
 };
 
 export const getUsersService = async (filters: UserFilters) => {
-  const { role_id, id, search } = filters;
+  const { role_id, id, search, orderBy } = filters;
+  const where: Prisma.usersWhereInput = {};
+  if (id) where.id = id;
+  if (role_id) where.role_id = role_id;
+  if (search && search.trim() !== "") {
+    const searchTrim = search.trim();
+
+    const orConditions: Prisma.usersWhereInput[] = [
+      { full_name: { contains: searchTrim, mode: "insensitive" } },
+    ];
+
+    where.OR = orConditions;
+  }
+  let sortField = "id";
+  let sortDirection: Prisma.SortOrder = "asc";
+  if (orderBy && orderBy.includes(":")) {
+    const parts = orderBy.split(":");
+    sortField = parts[0];
+    sortDirection = parts[1] as Prisma.SortOrder;
+  }
   return await prisma.users.findMany({
-    where: {
-      id: id ?? undefined,
-      role_id: role_id ?? undefined,
-      full_name: search
-        ? {
-            contains: search,
-            mode: "insensitive",
-          }
-        : undefined,
-    },
+    where,
     select: userSelect,
+    orderBy: { [sortField]: sortDirection } as Record<string, Prisma.SortOrder>,
   });
 };
 
 export const updateUserService = async (
   id: number,
   userData: UpdateUserData,
+  requestingUserRoleId?: number,
 ) => {
   const {
     username,
@@ -67,21 +80,52 @@ export const updateUserService = async (
     new_password,
     team_id,
   } = userData;
+  const user = await prisma.users.findUnique({ where: { id: id } });
+  if (!user) {
+    const error = Object.assign(
+      new Error("User không tồn tại trên hệ thống!"),
+      {
+        statusCode: 404,
+      },
+    );
+    throw error;
+  }
   const data: Record<string, unknown> = {};
   if (username) data.username = username;
   if (full_name) data.full_name = full_name;
   if (role_id) data.role_id = Number(role_id);
   if (is_active !== undefined) data.is_active = is_active;
+  if (team_id) data.team_id = Number(team_id);
+
   if (new_password) {
-    const user = await prisma.users.findUnique({ where: { id: id } });
-    if (!user) throw new Error("User does not exist!");
-    const isMatch = await bcrypt.compare(old_password!, user.password_hash!);
-    if (!isMatch) {
-      const error = Object.assign(new Error("The old password is incorrect."), {
-        statusCode: 400,
-      });
-      throw error;
+    const ADMIN_ROLES = [1, 2, 3];
+    const isAdmin = requestingUserRoleId
+      ? ADMIN_ROLES.includes(requestingUserRoleId)
+      : false;
+    if (!isAdmin) {
+      if (!old_password) {
+        const error = Object.assign(
+          new Error("Vui lòng nhập mật khẩu cũ để xác thực."),
+          { statusCode: 400 },
+        );
+        throw error;
+      }
+      const isMatch = await bcrypt.compare(old_password!, user.password_hash!);
+      if (!isMatch) {
+        const error = Object.assign(
+          new Error("The old password is incorrect."),
+          {
+            statusCode: 400,
+          },
+        );
+        throw error;
+      }
+    } else {
+      console.log(
+        `[Auth] Admin (Role ID: ${requestingUserRoleId}) đang ghi đè mật khẩu cho User ID: ${id}`,
+      );
     }
+
     const isSameAsOld = await bcrypt.compare(new_password, user.password_hash!);
     if (isSameAsOld) {
       const error = Object.assign(
@@ -104,6 +148,55 @@ export const updateUserService = async (
   });
 };
 
+// export const updateUserService = async (
+//   id: number,
+//   userData: UpdateUserData,
+// ) => {
+//   const {
+//     username,
+//     full_name,
+//     role_id,
+//     is_active,
+//     old_password,
+//     new_password,
+//     team_id,
+//   } = userData;
+//   const data: Record<string, unknown> = {};
+//   if (username) data.username = username;
+//   if (full_name) data.full_name = full_name;
+//   if (role_id) data.role_id = Number(role_id);
+//   if (is_active !== undefined) data.is_active = is_active;
+//   if (new_password) {
+//     const user = await prisma.users.findUnique({ where: { id: id } });
+//     if (!user) throw new Error("User does not exist!");
+//     const isMatch = await bcrypt.compare(old_password!, user.password_hash!);
+//     if (!isMatch) {
+//       const error = Object.assign(new Error("The old password is incorrect."), {
+//         statusCode: 400,
+//       });
+//       throw error;
+//     }
+//     const isSameAsOld = await bcrypt.compare(new_password, user.password_hash!);
+//     if (isSameAsOld) {
+//       const error = Object.assign(
+//         new Error("The new password must not be the same as the old password."),
+//         { statusCode: 400 },
+//       );
+//       throw error;
+//     }
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedNewPassword = await bcrypt.hash(new_password, salt);
+//     data.password_hash = hashedNewPassword;
+//   }
+//   if (team_id) data.team_id = team_id;
+//   return await prisma.users.update({
+//     where: {
+//       id: id,
+//     },
+//     data: data,
+//     select: userSelect,
+//   });
+// };
 export const deleteUserService = async (filters: { id: string }) => {
   const { id } = filters;
   return await prisma.users.delete({

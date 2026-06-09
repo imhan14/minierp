@@ -126,7 +126,9 @@ const GeneralInfoSection = <T,>({
           const isFieldEditing = showInputs && !col.isReadOnly;
           const rawValue = data[col.id as keyof T] ?? "";
           const currentGridSize = col.gridSize || { xs: 12, sm: 6, md: 3 };
-          const fieldError = errors[col.id as keyof T];
+          const fieldError =
+            errors[col.id as keyof T] ||
+            (errors as Record<string, string>)[String(col.id)];
           const isDisabled = disabledFields[col.id as keyof T] ?? false;
           const isRequired = requiredFields?.[col.id as keyof T];
           return (

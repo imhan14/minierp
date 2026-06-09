@@ -107,7 +107,7 @@ const ProductionLogDetail = ({
           columns={columns}
           data={logDetail}
           actions={getDetailActions}
-          getRowKey={(row) => row.id!}
+          getRowKey={(row) => Number(row.id)!}
           hideEmptyRows={true}
           renderDetail={(row) => (
             <LogExtraInfor

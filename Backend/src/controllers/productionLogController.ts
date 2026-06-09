@@ -30,7 +30,7 @@ export const getProductionLog = async (req: Request, res: Response) => {
 
 export const createProductionLog = async (req: Request, res: Response) => {
   let createData: CreateProductLogData = { ...req.body };
-  console.log(req);
+
   const productionLog = await createProductionLogService(createData);
   res.status(201).json(productionLog);
 };

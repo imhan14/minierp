@@ -1,53 +1,116 @@
 import { useCallback, useEffect, useMemo } from "react";
-import DataTable, { type ActionConfig } from "@components/DataTable";
-import { materialDetailSchema } from "@/schema/materialDetail.schema";
-import { Skeleton, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  Skeleton,
+  TextField,
+  Typography,
+} from "@mui/material";
+import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import useMaterialReportDetailData from "../customHooks/useMaterialReportDetailData";
-import useMaterialReportDetailForm from "../customHooks/useMaterialReportDetailForm";
-import type { MaterialDetailDisplay } from "@/types/MaterialDetailType";
+import DataTable, { type ActionConfig } from "@components/DataTable";
+import type { MaterialDetailType } from "@/schema/materialDetail.schema";
+import useMaterialDetailData from "../customHooks/useMaterialReportDetailData";
+import useMaterialDetailForm from "../customHooks/useMaterialReportDetailForm";
 
 interface MaterialDetailListProps {
-  material_id: number | null;
+  material_id: number;
+  onSaveSuccess: () => void;
 }
 
-const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
+const MaterialDetailList = ({
+  material_id,
+  onSaveSuccess,
+}: MaterialDetailListProps) => {
   const {
+    fetchDetails,
     detailLoading,
     error,
-    editIngredients,
-    fetchMaterialReportDetail,
-    setEditIngredients,
-  } = useMaterialReportDetailData();
-  const { editingId, saveEditing, startEditing, cancelEditing } =
-    useMaterialReportDetailForm(setEditIngredients);
+    rows,
+    setRows,
+    ingredientOptions,
+  } = useMaterialDetailData();
 
-  const handleIngredientChange = useCallback(
-    (id: number, field: keyof MaterialDetailDisplay, value: string) => {
-      setEditIngredients((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, [field]: value } : item,
-        ),
-      );
-    },
-    [setEditIngredients],
+  const refetch = useCallback(
+    () => fetchDetails(material_id),
+    [fetchDetails, material_id],
   );
 
-  const materialDetailColumns = useMemo(
+  const {
+    editingId,
+    pendingIds,
+    startEditing,
+    cancelEditing,
+    saveEditing,
+    handleAddRow,
+    handleFieldChange,
+  } = useMaterialDetailForm(
+    material_id,
+    rows,
+    setRows,
+    ingredientOptions,
+    refetch,
+  );
+
+  useEffect(() => {
+    fetchDetails(material_id);
+  }, [material_id, fetchDetails]);
+
+  const columns = useMemo(
     () => [
-      { ...materialDetailSchema.ingredient_name },
       {
-        ...materialDetailSchema.weight,
-        render: (_: unknown, row: MaterialDetailDisplay) => (
+        id: "ingredient_name" as keyof MaterialDetailType,
+        label: "Nguyên liệu",
+        render: (_: unknown, row: MaterialDetailType) => {
+          const isPending = pendingIds.has(row.id);
+          if (editingId === row.id && isPending) {
+            return (
+              <Select
+                size="small"
+                fullWidth
+                value={row.ingredient_id || ""}
+                onChange={(e) =>
+                  handleFieldChange(row.id, "ingredient_id", e.target.value)
+                }
+                displayEmpty
+              >
+                <MenuItem value="" disabled>
+                  Chọn nguyên liệu
+                </MenuItem>
+                {ingredientOptions.map((opt) => (
+                  <MenuItem key={opt.id} value={opt.id}>
+                    {opt.ingredient_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            );
+          }
+          return (
+            <Typography variant="body2">
+              {row.ingredient_name || "-"}
+            </Typography>
+          );
+        },
+      },
+      {
+        id: "weight" as keyof MaterialDetailType,
+        label: "Khối lượng",
+        render: (_: unknown, row: MaterialDetailType) => (
           <TextField
             size="small"
             type="number"
             disabled={editingId !== row.id}
-            value={row.weight || ""}
+            value={row.weight ?? ""}
             onChange={(e) =>
-              handleIngredientChange(row.id, "weight", e.target.value)
+              handleFieldChange(
+                row.id,
+                "weight",
+                e.target.value === "" ? null : Number(e.target.value),
+              )
             }
             sx={{
               "& .MuiInputBase-input.Mui-disabled": {
@@ -58,91 +121,114 @@ const MaterialDetailList = ({ material_id }: MaterialDetailListProps) => {
         ),
       },
       {
-        ...materialDetailSchema.real_percent,
-        render: (_: unknown, row: MaterialDetailDisplay) => (
+        id: "real_percent" as keyof MaterialDetailType,
+        label: "Tỉ lệ thực",
+        render: (_: unknown, row: MaterialDetailType) => (
           <TextField
             size="small"
+            type="number"
             disabled={editingId !== row.id}
-            value={row.real_percent || ""}
+            value={row.real_percent ?? ""}
             onChange={(e) =>
-              handleIngredientChange(row.id, "real_percent", e.target.value)
+              handleFieldChange(
+                row.id,
+                "real_percent",
+                e.target.value === "" ? null : Number(e.target.value),
+              )
             }
+            sx={{
+              "& .MuiInputBase-input.Mui-disabled": {
+                WebkitTextFillColor: "#000",
+              },
+            }}
           />
         ),
       },
       {
-        ...materialDetailSchema.note,
-        render: (_: unknown, row: MaterialDetailDisplay) => (
+        id: "note" as keyof MaterialDetailType,
+        label: "Ghi chú",
+        render: (_: unknown, row: MaterialDetailType) => (
           <TextField
             size="small"
             fullWidth
             disabled={editingId !== row.id}
-            value={row.note || ""}
-            onChange={(e) =>
-              handleIngredientChange(row.id, "note", e.target.value)
-            }
+            value={row.note ?? ""}
+            onChange={(e) => handleFieldChange(row.id, "note", e.target.value)}
           />
         ),
       },
-      {
-        id: "actions",
-        label: "Actions",
-      },
+      { id: "actions" as const, label: "Thao tác" },
     ],
-    [editingId, handleIngredientChange],
+    [editingId, pendingIds, ingredientOptions, handleFieldChange],
   );
 
-  const getDetailActions = useCallback(
-    (row: MaterialDetailDisplay): ActionConfig<MaterialDetailDisplay>[] => {
-      if (editingId === row.id) {
+  const getActions = useCallback(
+    (row: MaterialDetailType): ActionConfig<MaterialDetailType>[] => {
+      if (editingId === row.id)
         return [
           {
-            label: "Save",
+            label: "Lưu",
             icon: <DoneOutlinedIcon />,
             color: "success",
-            onClick: (row) => saveEditing(row),
+            onClick: (r) => saveEditing(r),
           },
           {
-            label: "Cancel",
+            label: "Huỷ",
             icon: <CloseOutlinedIcon />,
             color: "error",
             onClick: () => cancelEditing(),
           },
         ];
-      }
       return [
         {
-          label: "Edit",
+          label: "Sửa",
           icon: <EditOutlinedIcon />,
           color: "primary",
-          onClick: (row) => startEditing(row),
+          onClick: (r) => startEditing(r),
         },
       ];
     },
-    [saveEditing, startEditing, cancelEditing, editingId],
+    [editingId, saveEditing, cancelEditing, startEditing],
   );
 
-  useEffect(() => {
-    fetchMaterialReportDetail(material_id);
-  }, [material_id, fetchMaterialReportDetail]);
-  if (error) {
+  if (error)
     return (
       <Typography color="error" textAlign="center">
         {error}
       </Typography>
     );
-  }
-  return detailLoading ? (
-    <Skeleton variant="rounded" height={300} />
-  ) : (
+
+  return (
     <>
-      <DataTable
-        columns={materialDetailColumns}
-        data={editIngredients}
-        actions={getDetailActions}
-        getRowKey={(row) => row.id}
-        hideEmptyRows={true}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mb: 2,
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h6">Danh sách nguyên liệu</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddCircleOutlinedIcon />}
+          onClick={handleAddRow}
+          disabled={!!editingId} // tránh add nhiều row cùng lúc
+        >
+          Thêm nguyên liệu
+        </Button>
+      </Box>
+      {detailLoading ? (
+        <Skeleton variant="rounded" height={300} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={rows}
+          actions={getActions}
+          getRowKey={(row) => row.id}
+          hideEmptyRows
+        />
+      )}
     </>
   );
 };

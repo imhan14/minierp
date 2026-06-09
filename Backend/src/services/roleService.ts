@@ -12,6 +12,7 @@ export const getRolesService = async (filters: RoleFilters) => {
     where: {
       id: id ? Number(id) : undefined,
     },
+    orderBy: { id: "asc" },
   });
 };
 

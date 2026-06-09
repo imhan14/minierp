@@ -11,11 +11,11 @@ import ProductionLogPage from "../pages/productionLog";
 import MaterialReportPage from "../pages/materialReport";
 import ProtectedRoute from "../components/ProtectedRoute";
 import FormulaPage from "../pages/formula";
-import IngredientPage from "@/pages/ingredientPage";
-import ProductPage from "@/pages/productPage";
 import ManagePage from "@/pages/ManagePage";
-import UserSetting from "@/pages/manage/UserSetting";
-import Role from "@/pages/manage/Role";
+import ProductPage from "@/pages/admin/product";
+import IngredientPage from "@/pages/admin/ingredient";
+import UserPage from "@/pages/manage/user";
+import RoleTeamPage from "@/pages/manage/roleAndTeam";
 
 const router = createBrowserRouter([
   {
@@ -80,9 +80,9 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "user",
-                    element: <UserSetting />,
+                    element: <UserPage />,
                   },
-                  { path: "role", element: <Role /> },
+                  { path: "role", element: <RoleTeamPage /> },
                 ],
               },
             ],

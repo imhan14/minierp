@@ -5,7 +5,12 @@ export const IngredientSchema = z.object({
 
   ingredient_code: z
     .string()
+    .trim()
     .min(2, "Mã nguyên liệu quá ngắn")
+    .regex(
+      /^[a-zA-Z0-9]+$/,
+      "Code chỉ được chứa chữ cái và số, không có ký tự đặc biệt",
+    )
     .describe(
       JSON.stringify({
         label: "Mã nguyên liệu",

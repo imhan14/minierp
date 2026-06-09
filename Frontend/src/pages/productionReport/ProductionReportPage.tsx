@@ -45,7 +45,7 @@ const ProductionReportPage = () => {
     let isMounted = true;
     const fetchTeamList = async () => {
       try {
-        const response = await teamApi.getAllteams();
+        const response = await teamApi.getAllTeams();
         if (isMounted) {
           const formattedData = response.data.map((item: TeamType) => ({
             label: item.team_name,
@@ -108,10 +108,7 @@ const ProductionReportPage = () => {
     defaultValues: {
       report_date: dayjs().format("YYYY-MM-DD"),
       team_id: currentUser.team_id ? (currentUser.team_id ?? 0) : "",
-      team_name:
-        currentUser.team_name.length > 0
-          ? currentUser.team_name[0].team_name
-          : "",
+      team_name: currentUser.team_name > 0 ? currentUser.team_name : "",
     },
     messages: {
       createSuccess: "Thêm báo cáo thành công!",

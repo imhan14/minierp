@@ -65,7 +65,7 @@ const ProductionLogPage = () => {
     let isMounted = true;
     const fetchTeamList = async () => {
       try {
-        const response = await teamApi.getAllteams();
+        const response = await teamApi.getAllTeams();
         if (isMounted) {
           const formattedData = response.data.map((item: TeamType) => ({
             label: item.team_name,
@@ -144,10 +144,7 @@ const ProductionLogPage = () => {
       log_date: dayjs().format("YYYY-MM-DD"),
       // log_start: dayjs().toISOString(),
       team_id: currentUser.team_id ? (currentUser.team_id ?? 0) : "",
-      team_name:
-        currentUser.team_name.length > 0
-          ? currentUser.team_name[0].team_name
-          : "",
+      team_name: currentUser.team_name > 0 ? currentUser.team_name : "",
     },
     messages: {
       createSuccess: "Tạo báo cáo thành công",
@@ -157,6 +154,7 @@ const ProductionLogPage = () => {
   });
   // ── Mở/đóng popup ────────────────────────────────────────────────────────
   const handleOpenEdit = (row: ProductionLogType) => {
+    console.log(currentUser);
     guardAction(() => {
       setSelectedLog(row);
       form.openEdit(row);

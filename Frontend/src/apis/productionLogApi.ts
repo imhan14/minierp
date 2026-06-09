@@ -42,8 +42,6 @@ const productionLogApi = {
     return instance.post("/production-log", data);
   },
   updateProductionLog: (id: number, data: ProductionLogData) => {
-    console.log(id);
-    console.log(data);
     return instance.patch(`/production-log/${id}`, data);
   },
 };

@@ -86,12 +86,12 @@ export const ProductionLogSchema = z.object({
     )
     .optional(),
   team_name: z
-    .number()
+    .string()
     .optional()
     .describe(
       JSON.stringify({
         label: "Tổ",
-        type: "number",
+        type: "text",
         tableVisible: true,
         formOrder: 1,
       }),
@@ -178,7 +178,6 @@ export const CreateProductionLogSchema = ProductionLogSchema.omit({
 }).extend({
   team_id: z.number({ message: "Vui lòng chọn tổ" }),
   log_date: z.string("Ngày không được để trống"),
-  on_work: z.number({ message: "Số lượng đang làm là bắt buộc" }).min(0),
 });
 
 export const UpdateProductionLogSchema = ProductionLogSchema.partial().pick({

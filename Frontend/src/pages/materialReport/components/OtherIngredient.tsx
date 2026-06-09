@@ -6,17 +6,18 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+
 import type {
   ExtraMaterialsJson,
-  MaterialReportDisplay,
-} from "@/types/MaterialReportType";
-import { ExtraMaterialsJsonSchema } from "@/schema/extralMaterial.schema";
+  MaterialReportType,
+} from "@/schema/materialReport.schema";
 import useOtherIngredientForm from "../customHooks/useOtherIngredientForm";
 import useOtherIngredientData from "../customHooks/useOtherIngredientData";
+import { EXTRA_MATERIALS_FIELD_CONFIGS } from "../utils/materialReport.fieldconfigs";
 
-interface MaterialDetailListProps {
+interface OtherIngredientProps {
   material_id: number | undefined;
-  extral_material: MaterialReportDisplay | null;
+  extral_material: MaterialReportType;
   onSaveSuccess: () => void;
 }
 
@@ -24,7 +25,7 @@ const OtherIngredient = ({
   material_id,
   extral_material,
   onSaveSuccess,
-}: MaterialDetailListProps) => {
+}: OtherIngredientProps) => {
   const {
     getOtherIngredients,
     error,
@@ -47,10 +48,47 @@ const OtherIngredient = ({
     setEditIngredients,
   );
 
+  const handleIngredientChange = (
+    id: number,
+    field: keyof ExtraMaterialsJson,
+    value: string,
+  ) => {
+    setEditIngredients((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        return {
+          ...item,
+          [field]:
+            field === "weight" || field === "real_percent"
+              ? value === ""
+                ? 0
+                : Number(value)
+              : value,
+        };
+      }),
+    );
+  };
+
   const materialDetailColumns = [
     {
-      ...ExtraMaterialsJsonSchema.ingredient_name,
-      render: (_: string | number | undefined, row: ExtraMaterialsJson) => (
+      ...EXTRA_MATERIALS_FIELD_CONFIGS.id,
+      id: "id",
+      render: (_: unknown, row: ExtraMaterialsJson) => (
+        <TextField
+          size="small"
+          fullWidth
+          disabled={editingId !== row.id}
+          value={row.id || ""}
+          onChange={(e) =>
+            handleIngredientChange(row.id!, "id", e.target.value)
+          }
+        />
+      ),
+    },
+    {
+      ...EXTRA_MATERIALS_FIELD_CONFIGS.ingredient_name,
+      id: "ingredient_name",
+      render: (_: unknown, row: ExtraMaterialsJson) => (
         <TextField
           size="small"
           fullWidth
@@ -63,8 +101,9 @@ const OtherIngredient = ({
       ),
     },
     {
-      ...ExtraMaterialsJsonSchema.weight,
-      render: (_: string | number | undefined, row: ExtraMaterialsJson) => (
+      ...EXTRA_MATERIALS_FIELD_CONFIGS.weight,
+      id: "weight",
+      render: (_: unknown, row: ExtraMaterialsJson) => (
         <TextField
           size="small"
           type="number"
@@ -82,8 +121,9 @@ const OtherIngredient = ({
       ),
     },
     {
-      ...ExtraMaterialsJsonSchema.real_percent,
-      render: (_: string | number | undefined, row: ExtraMaterialsJson) => (
+      ...EXTRA_MATERIALS_FIELD_CONFIGS.real_percent,
+      id: "real_percent",
+      render: (_: unknown, row: ExtraMaterialsJson) => (
         <TextField
           size="small"
           disabled={editingId !== row.id}
@@ -95,8 +135,9 @@ const OtherIngredient = ({
       ),
     },
     {
-      ...ExtraMaterialsJsonSchema.note,
-      render: (_: string | number | undefined, row: ExtraMaterialsJson) => (
+      ...EXTRA_MATERIALS_FIELD_CONFIGS.note,
+      id: "note",
+      render: (_: unknown, row: ExtraMaterialsJson) => (
         <TextField
           size="small"
           fullWidth
@@ -108,10 +149,7 @@ const OtherIngredient = ({
         />
       ),
     },
-    {
-      id: "actions",
-      label: "Actions",
-    },
+    { id: "actions", label: "Thao tác" },
   ];
 
   const getDetailActions = (
@@ -120,13 +158,13 @@ const OtherIngredient = ({
     if (editingId === row.id) {
       return [
         {
-          label: "Save",
+          label: "Lưu",
           icon: <DoneOutlinedIcon />,
           color: "success",
-          onClick: (row) => saveEditing(row),
+          onClick: (r) => saveEditing(r),
         },
         {
-          label: "Cancel",
+          label: "Huỷ",
           icon: <CloseOutlinedIcon />,
           color: "error",
           onClick: () => cancelEditing(),
@@ -135,54 +173,31 @@ const OtherIngredient = ({
     }
     return [
       {
-        label: "Edit",
+        label: "Sửa",
         icon: <EditOutlinedIcon />,
         color: "primary",
-        onClick: (row) => startEditing(row),
+        onClick: (r) => startEditing(r),
       },
       {
-        label: "Delete",
+        label: "Xoá",
         icon: <DeleteOutlineIcon />,
         color: "warning",
-        onClick: (row) => handleDeleteRow(row),
+        onClick: (r) => handleDeleteRow(r),
       },
     ];
-  };
-
-  const handleIngredientChange = (
-    id: number | string,
-    field: keyof ExtraMaterialsJson,
-    value: string,
-  ) => {
-    setEditIngredients((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            [field]:
-              field === "weight" || field === "real_percent"
-                ? value === ""
-                  ? 0
-                  : Number(value)
-                : value,
-          };
-        }
-        return item;
-      }),
-    );
   };
 
   useEffect(() => {
     getOtherIngredients();
   }, [getOtherIngredients]);
 
-  if (error) {
+  if (error)
     return (
       <Typography color="error" textAlign="center">
         {error}
       </Typography>
     );
-  }
+
   return (
     <>
       <Box
@@ -193,13 +208,13 @@ const OtherIngredient = ({
           alignItems: "center",
         }}
       >
-        <Typography variant="h6">Danh sách nguyên liệu</Typography>
+        <Typography variant="h6">Nguyên liệu ngoài danh mục</Typography>
         <Button
           variant="contained"
           startIcon={<AddCircleOutlinedIcon />}
           onClick={handleAddNewRow}
         >
-          Thêm nguyên liệu ngoài danh mục
+          Thêm nguyên liệu
         </Button>
       </Box>
       {detailLoading ? (
