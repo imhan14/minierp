@@ -66,7 +66,7 @@ export const MATERIAL_REPORT_FIELD_CONFIGS: Partial<
   created_by: {
     id: "created_by",
     label: "Người tạo",
-    inputType: "text",
+    inputType: "number",
     gridSize: { xs: 12, sm: 6 },
     isReadOnly: true,
   },

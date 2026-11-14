@@ -302,17 +302,17 @@ const MaterialReportPage = () => {
           <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
             <Button
               variant="contained"
-              disabled={filterMode === "range"}
+              // disabled={filterMode === "range"}
               sx={{ marginBottom: 1 }}
               onClick={handleOpenAdd}
             >
               Add new Report
             </Button>
-            {filterMode === "range" && (
+            {/* {filterMode === "range" && (
               <Typography sx={{ color: "red" }} variant="subtitle2">
                 *Add button only available on Single Mode
               </Typography>
-            )}
+            )} */}
           </Box>
         )}
 

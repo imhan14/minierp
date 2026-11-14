@@ -18,9 +18,9 @@ const AdminLayout = () => {
     <Box
       sx={{
         display: "flex",
-        backgroundColor: "#cbffde",
-        overflowX: "hidden",
-        height: "100vh",
+        backgroundColor: "#f4f7f5",
+        height: "100dvh",
+        minHeight: 0,
         width: "100%",
         overflow: "hidden",
       }}
@@ -41,7 +41,9 @@ const AdminLayout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          height: "100vh",
+          height: "100dvh",
+          minWidth: 0,
+          minHeight: 0,
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -51,7 +53,9 @@ const AdminLayout = () => {
           sx={{
             flexGrow: 1,
             overflowY: "auto",
-            p: 3,
+            minWidth: 0,
+            p: { xs: 1.5, sm: 2, md: 3 },
+            overscrollBehavior: "contain",
           }}
         >
           <Outlet context={[setTitle]} />

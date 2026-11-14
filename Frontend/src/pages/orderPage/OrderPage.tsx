@@ -26,6 +26,7 @@ import { useOrderData } from "./customHooks/useOrderData";
 import { useOrderForm } from "./customHooks/useOrderForm";
 import OrderGeneral from "./components/OrderGeneral";
 import { orderColumnSchema } from "@/schema/orders.schema";
+import { useNotify } from "@/hooks/useNotify";
 
 dayjs.extend(utc);
 
@@ -38,7 +39,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const OrderPage = () => {
+  const notify = useNotify();
   const [openDetail, setOpenDetail] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<OrderDisplay | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [editGeneral, setEditGeneral] = useState<OrderDisplay | null>(null);
@@ -55,8 +58,9 @@ const OrderPage = () => {
     setFormula,
     fetchOrders,
   } = useOrderData(selectedDate, endDate);
-  const { handleAddNewReport } = useOrderForm(selectedDate, () =>
-    fetchOrders(selectedDate, endDate),
+  const { isSubmitting, handleCreateOrder: createOrder } = useOrderForm(
+    selectedDate,
+    () => fetchOrders(selectedDate, endDate),
   );
   const orderColumns = useMemo(
     () => [
@@ -87,8 +91,60 @@ const OrderPage = () => {
   const handleOpenDetail = (row: OrderDisplay) => {
     setSelectedOrder(row);
     setEditGeneral(row);
-    fetchFormulaDetail(row.formula_id);
+    if (row.formula_id) fetchFormulaDetail(row.formula_id);
     setOpenDetail(true);
+  };
+  const handleOpenCreate = () => {
+    const draft: OrderDisplay = {
+      id: 0,
+      order_date:
+        selectedDate?.format("YYYY-MM-DD") ?? dayjs().format("YYYY-MM-DD"),
+      formula_id: 0,
+      formula_name: "",
+      team_id: 0,
+      team_name: "",
+      product_shift: "",
+      target_quantity: 0,
+      urea_rate: null,
+      status: "pending",
+      input_temprature_1: 0,
+      output_temprature_1: 0,
+      input_temprature_2: 0,
+      output_temprature_2: 0,
+      order_note: "",
+      created_at: "",
+      created_by: 0,
+    };
+    setSelectedOrder(draft);
+    setEditGeneral(draft);
+    setOpenCreate(true);
+  };
+  const handleCloseCreate = () => {
+    if (isSubmitting) return;
+    setOpenCreate(false);
+    setSelectedOrder(null);
+    setEditGeneral(null);
+  };
+  const handleSubmitCreate = async () => {
+    if (
+      !editGeneral?.formula_id ||
+      !editGeneral.team_id ||
+      !editGeneral.product_shift ||
+      !editGeneral.target_quantity ||
+      editGeneral.target_quantity <= 0
+    ) {
+      notify("Vui lòng điền công thức, tổ, ca và sản lượng hợp lệ.", "error");
+      return;
+    }
+    const created = await createOrder({
+      formula_id: Number(editGeneral.formula_id),
+      team_id: Number(editGeneral.team_id),
+      product_shift: editGeneral.product_shift,
+      target_quantity: Number(editGeneral.target_quantity),
+      urea_rate: editGeneral.urea_rate ?? undefined,
+      order_note: editGeneral.order_note || undefined,
+    });
+    if (created) handleCloseCreate();
   };
   const handleCloseDetail = () => {
     setOpenDetail(false);
@@ -132,18 +188,12 @@ const OrderPage = () => {
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
         <PermissionGate allowedRoles={[1, 2, 3, 4, 5]}>
           <Button
-            disabled={filterMode === "range"}
             variant="contained"
             sx={{ marginBottom: 1 }}
-            onClick={handleAddNewReport}
+            onClick={handleOpenCreate}
           >
             Add new Order
           </Button>
-          {filterMode === "range" && (
-            <Typography sx={{ color: "red" }} variant="subtitle2">
-              *Add button only available on Single Mode
-            </Typography>
-          )}
         </PermissionGate>
       </Box>
       {loading ? (
@@ -158,6 +208,22 @@ const OrderPage = () => {
           getRowKey={(row) => row.id}
         />
       )}
+      <DynamicPopup
+        open={openCreate}
+        onClose={handleCloseCreate}
+        title="Tạo lệnh sản xuất"
+        mode="add"
+        onSubmit={handleSubmitCreate}
+        isSubmitting={isSubmitting}
+      >
+        <OrderGeneral
+          selectedOrder={selectedOrder}
+          editGeneral={editGeneral}
+          onEditGeneral={setEditGeneral}
+          onSaveSuccess={() => undefined}
+          mode="form"
+        />
+      </DynamicPopup>
       <DynamicPopup
         open={openDetail}
         onClose={handleCloseDetail}
@@ -184,7 +250,7 @@ const OrderPage = () => {
               <DataTable
                 columns={formulaColumns}
                 data={formula}
-                getRowKey={(row) => row.id}
+                getRowKey={(row) => Number(row.id)}
               />
             )}
           </Box>

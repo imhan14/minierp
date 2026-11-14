@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { JwtHeader, JwtPayload } from "jsonwebtoken";
-import { verifyUser } from "../services/authService.js";
+import { registerUser, verifyUser } from "../services/authService.js";
+import catchAsync from "@/utils/catchAsync";
+
+export const register = catchAsync(async (req: Request, res: Response) => {
+  const user = await registerUser(req.body);
+  res.status(201).json({ message: "Đăng ký thành công.", user });
+});
 
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;

@@ -58,8 +58,18 @@ export const orderColumnSchema: Record<string, FieldConfig<OrderDisplay>> = {
     label: "Team ID",
   },
   product_shift: { id: "product_shift", label: "Shift", align: "right" },
-  target_quantity: { id: "target_quantity", label: "Quantity", align: "right" },
-  urea_rate: { id: "urea_rate", label: "Urea", align: "right" },
+  target_quantity: {
+    id: "target_quantity",
+    label: "Quantity",
+    inputType: "number",
+    align: "right",
+  },
+  urea_rate: {
+    id: "urea_rate",
+    label: "Urea",
+    inputType: "number",
+    align: "right",
+  },
   status: {
     id: "status",
     label: "Status",

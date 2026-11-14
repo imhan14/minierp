@@ -20,7 +20,7 @@ const useMaterialDetailData = () => {
         materialDetailApi.getAllMaterialDetails({ material_id }),
         ingredientApi.getAllIngredients(),
       ]);
-      console.log(detailRes.data);
+      console.log("ppp", detailRes.data);
       // flatten ingredient_name từ join
       const flat: MaterialDetailType[] = detailRes.data.map((item) => ({
         ...item,

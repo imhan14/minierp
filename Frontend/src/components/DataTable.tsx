@@ -219,10 +219,18 @@ const DataTable = <T,>({
   }, [data, page]);
   const emptyRows = rowsPerPage - visibleRows.length;
   return (
-    <Paper sx={{ borderRadius: 1.5, boxShadow: 3, overflow: "hidden" }}>
+    <Paper
+      sx={{
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "divider",
+        boxShadow: "0 8px 24px rgba(15, 23, 42, 0.05)",
+        overflow: "hidden",
+      }}
+    >
       <TableContainer
         component={Paper}
-        sx={{ borderRadius: 1.5, boxShadow: 0, overflowX: "auto" }}
+        sx={{ borderRadius: 2, boxShadow: 0, overflowX: "auto" }}
       >
         <Table size="small">
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
@@ -234,8 +242,12 @@ const DataTable = <T,>({
                   align={col.align || "left"}
                   style={{ maxWidth: col.width }}
                   sx={{
-                    fontWeight: "bold",
-                    backgroundColor: "#f1f5f9",
+                    fontWeight: 650,
+                    color: "text.secondary",
+                    fontSize: "0.75rem",
+                    letterSpacing: "0.035em",
+                    textTransform: "uppercase",
+                    backgroundColor: "#f5f7f6",
                     width: col.width,
                     ...(col.id === "id" ? idSx : {}),
                     ...(col.id === "actions"

@@ -125,6 +125,10 @@ const GeneralInfoSection = <T,>({
         {displayFields.map((col) => {
           const isFieldEditing = showInputs && !col.isReadOnly;
           const rawValue = data[col.id as keyof T] ?? "";
+          const inputValue =
+            col.inputType === "date" && rawValue
+              ? dayjs(String(rawValue)).format("YYYY-MM-DD")
+              : rawValue;
           const currentGridSize = col.gridSize || { xs: 12, sm: 6, md: 3 };
           const fieldError =
             errors[col.id as keyof T] ||
@@ -199,9 +203,16 @@ const GeneralInfoSection = <T,>({
                   <TextField
                     fullWidth
                     size="small"
+                    type={
+                      col.inputType === "date"
+                        ? "date"
+                        : col.inputType === "number"
+                          ? "number"
+                          : "text"
+                    }
                     label={isRequired ? `${col.label} *` : col.label}
                     select={col.inputType === "select"}
-                    value={rawValue}
+                    value={inputValue}
                     disabled={isDisabled}
                     error={!!fieldError}
                     helperText={fieldError}

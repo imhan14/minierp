@@ -56,7 +56,7 @@ export const useOrderData = (
         formula_id: formulaId,
       });
       const formattedData: FormulaDetailDisplay[] = response.data.map(
-        (item) => {
+        (item: FormulaDetailDisplay) => {
           const { ingredients, ...rest } = item;
           return {
             ...rest,

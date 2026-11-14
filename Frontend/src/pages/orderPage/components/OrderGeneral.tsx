@@ -8,11 +8,12 @@ import { orderValidateSchema } from "@/validate/order.validate";
 import { orderColumnSchema } from "@/schema/orders.schema";
 import { useEffect, useMemo, useState } from "react";
 import formulaApi from "@/apis/formulaApi";
-import type { FormulaType } from "@/types/FormulaType";
+import type { FormulaType } from "@/schema/formula.schema";
 import productOrderApi from "@/apis/productOrderApi";
 
 interface Props {
   selectedOrder: OrderDisplay | null;
+  mode?: "view-edit" | "form";
   editGeneral: OrderDisplay | null;
   onEditGeneral: (editGeneral: OrderDisplay | null) => void;
   onSaveSuccess: () => void;
@@ -20,6 +21,7 @@ interface Props {
 
 const OrderGeneral = ({
   selectedOrder,
+  mode = "view-edit",
   onSaveSuccess,
   editGeneral,
   onEditGeneral,
@@ -30,12 +32,15 @@ const OrderGeneral = ({
   );
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdminRole = [1, 2, 3, 4, 5].includes(Number(user.role));
-  const isCanceled = selectedOrder?.status === "cancel";
-  const canShowEdit = isAdminRole && !isCanceled;
+  const canShowEdit = isAdminRole && selectedOrder?.status === "pending";
 
   const orderDetail: FieldConfig<OrderDisplay>[] = useMemo(
     () => [
-      { ...orderColumnSchema.order_date },
+      {
+        ...orderColumnSchema.order_date,
+        isReadOnly: false,
+        inputType: "date",
+      },
       {
         ...orderColumnSchema.formula_id,
         label: "Formula Name",
@@ -69,7 +74,16 @@ const OrderGeneral = ({
       },
       { ...orderColumnSchema.target_quantity },
       { ...orderColumnSchema.urea_rate },
-      { ...orderColumnSchema.status },
+      {
+        ...orderColumnSchema.status,
+        isReadOnly: false,
+        inputType: "select",
+        options: [
+          { label: "Đang đợi", value: "pending" },
+          { label: "Hoàn tất", value: "ok" },
+          { label: "Đã hủy", value: "cancel" },
+        ],
+      },
       { ...orderColumnSchema.input_temprature_1 },
       { ...orderColumnSchema.output_temprature_1 },
       { ...orderColumnSchema.input_temprature_2 },
@@ -77,10 +91,23 @@ const OrderGeneral = ({
     ],
     [formula],
   );
+  const fields =
+    mode === "form"
+      ? orderDetail.filter(
+          (field) =>
+            ![
+              "input_temprature_1",
+              "output_temprature_1",
+              "input_temprature_2",
+              "output_temprature_2",
+              "status",
+            ].includes(String(field.id)),
+        )
+      : orderDetail;
 
-  const handleGeneralChange = (field: keyof OrderDisplay, value: string) => {
+  const handleGeneralChange = (field: keyof OrderDisplay, value: unknown) => {
     if (editGeneral) {
-      onEditGeneral({ ...editGeneral, [field]: value });
+      onEditGeneral({ ...editGeneral, [field]: value } as OrderDisplay);
     }
   };
   const handleSave = async () => {
@@ -97,7 +124,7 @@ const OrderGeneral = ({
       const isValidDate = (date: string | undefined) => {
         if (!date) return undefined;
         const d = dayjs(date);
-        return d.isValid() ? d.format("DD-MM-YYYY") : undefined;
+        return d.isValid() ? d.format("YYYY-MM-DD") : undefined;
       };
       const payload = {
         order_date: isValidDate(editGeneral?.order_date),
@@ -129,10 +156,12 @@ const OrderGeneral = ({
       });
       onSaveSuccess();
       notify("Cập nhật dữ liệu thành công!", "success");
+      return true;
     } catch (err) {
       console.error("Save error:", err);
       onEditGeneral(selectedOrder);
       notify("Lỗi khi nhập dữ liệu!", "error");
+      return false;
     }
   };
 
@@ -161,7 +190,19 @@ const OrderGeneral = ({
   return (
     <GeneralInfoSection
       title="General"
-      displayFields={orderDetail}
+      displayFields={fields}
+      mode={mode}
+      requiredFields={
+        mode === "form"
+          ? {
+              order_date: true,
+              formula_id: true,
+              team_id: true,
+              product_shift: true,
+              target_quantity: true,
+            }
+          : undefined
+      }
       data={editGeneral ?? selectedOrder}
       onGeneralChange={handleGeneralChange}
       onSave={handleSave}

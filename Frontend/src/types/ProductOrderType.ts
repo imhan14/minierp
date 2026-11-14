@@ -1,14 +1,14 @@
 import type { TeamType } from "../types/TeamType";
-import type { FormulaType } from "../types/FormulaType";
+import type { FormulaType } from "../schema/formula.schema";
 
 export interface OrderDisplay extends Omit<
   ProductOrderType,
   "teams" | "formulas"
 > {
-  formula_id: number;
+  formula_id?: number;
   team_name: string;
   formula_name: string;
-  team_id: number;
+  team_id?: number;
 }
 export interface ProductOrderType {
   id: number;

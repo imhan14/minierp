@@ -30,7 +30,7 @@ import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
 const drawerWidth = 240;
 const themeColor = {
-  bg: "#22C55E",
+  bg: "#15803d",
   text: "white",
 };
 
@@ -45,11 +45,14 @@ const drawerMixin = (theme: Theme, open: boolean): CSSObject => ({
   // overflowX: "hidden",
   backgroundColor: themeColor.bg,
   color: themeColor.text,
+  boxShadow: "none",
   "& .MuiDrawer-paper": {
     width: open ? drawerWidth : `calc(${theme.spacing(8)} + 1px)`,
     backgroundColor: themeColor.bg,
     color: themeColor.text,
     overflowX: "hidden",
+    borderRight: "1px solid rgba(255,255,255,0.12)",
+    boxShadow: "none",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: open
@@ -198,9 +201,8 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
         <Divider />
         <List>
           {filteredMenuItems.map((item) => (
-            <Box>
+            <Box key={item.path}>
               <NavItem
-                key={item.path}
                 open={open}
                 text={item.text}
                 onClick={() => {

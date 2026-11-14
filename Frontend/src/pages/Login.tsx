@@ -5,6 +5,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  Link,
   OutlinedInput,
   TextField,
 } from "@mui/material";
@@ -13,6 +14,7 @@ import { useForm, Controller } from "react-hook-form";
 import { VisibilityOff, Visibility } from "@mui/icons-material";
 import api from "../apis/axios";
 import { useNavigate } from "react-router";
+import { Link as RouterLink } from "react-router";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { authInformation } from "../redux/slices/authSlice";
@@ -31,7 +33,7 @@ const Login = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       username: "",
@@ -102,7 +104,7 @@ const Login = () => {
               label="Username"
               fullWidth
               margin="normal"
-              error={!!errors.username || !!serverError}
+              error={!!errors.username}
               helperText={errors.username?.message}
             />
           )}
@@ -118,7 +120,7 @@ const Login = () => {
             },
           }}
           render={({ field }) => (
-            <FormControl sx={{ width: "full" }} variant="outlined">
+            <FormControl fullWidth variant="outlined">
               <InputLabel
                 htmlFor="outlined-adornment-password"
                 error={!!errors.password || !!serverError}
@@ -157,9 +159,17 @@ const Login = () => {
           )}
         />
 
-        <Button type="submit" variant="contained">
-          LOGIN
+        <Button type="submit" variant="contained" disabled={isSubmitting}>
+          {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
         </Button>
+        <Link
+          component={RouterLink}
+          to="/signup"
+          underline="hover"
+          sx={{ alignSelf: "center" }}
+        >
+          Chưa có tài khoản? Đăng ký
+        </Link>
       </form>
     </div>
   );

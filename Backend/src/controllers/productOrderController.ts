@@ -21,9 +21,32 @@ export const createProductOrder = async (req: Request, res: Response) => {
       .status(403)
       .json({ message: "Access denied: Your role is not allowed." });
   }
-  const { order_date } = req.body;
+  const {
+    order_date,
+    formula_id,
+    team_id,
+    product_shift,
+    target_quantity,
+    urea_rate,
+    input_temprature_1,
+    input_temprature_2,
+    output_temprature_1,
+    output_temprature_2,
+    order_note,
+  } = req.body;
   const createData: CreateOrderData = {
-    ...(order_date && { order_date: new Date(order_date) }),
+    order_date: new Date(order_date),
+    formula_id,
+    team_id,
+    product_shift,
+    target_quantity,
+    urea_rate,
+    input_temprature_1,
+    input_temprature_2,
+    output_temprature_1,
+    output_temprature_2,
+    order_note,
+    created_by: req.users?.id,
   };
   const productOrder = await createProductOrderService(createData);
   res.status(201).json(productOrder);
@@ -64,7 +87,7 @@ export const updateProductOrder = async (req: Request, res: Response) => {
     order_note,
   } = req.body;
   const updateData: UpdateOrderData = {};
-  if (order_date) updateData.order_date = order_date;
+  if (order_date) updateData.order_date = new Date(order_date);
   if (formula_id) updateData.formula_id = formula_id;
   if (team_id) updateData.team_id = team_id;
   if (product_shift) updateData.product_shift = product_shift;

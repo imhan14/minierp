@@ -1,32 +1,26 @@
-import type { Dayjs } from "dayjs";
 import { useNotify } from "@/hooks/useNotify";
 import { useState } from "react";
-import productOrderApi from "@/apis/productOrderApi";
+import productOrderApi, { type OrderData } from "@/apis/productOrderApi";
 
 export const useOrderForm = (
-  selectedDate: Dayjs | null,
   onSuccess: () => void,
 ) => {
   const notify = useNotify();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const handleAddNewReport = async () => {
+  const handleCreateOrder = async (data: OrderData) => {
     try {
       setIsSubmitting(true);
-      const dateParam = selectedDate?.isValid()
-        ? selectedDate.format("YYYY-MM-DD")
-        : "";
-      const payload = {
-        order_date: dateParam,
-      };
-      await productOrderApi.createOrder(payload);
+      await productOrderApi.createOrder(data);
       onSuccess();
-      notify("Add successfull!", "success");
+      notify("Tạo lệnh thành công.", "success");
+      return true;
     } catch (err) {
       console.error(err);
-      notify("Add failed!", "error");
+      notify("Không thể tạo lệnh.", "error");
+      return false;
     } finally {
       setIsSubmitting(false);
     }
   };
-  return { isSubmitting, handleAddNewReport };
+  return { isSubmitting, handleCreateOrder };
 };

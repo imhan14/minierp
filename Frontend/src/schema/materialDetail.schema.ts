@@ -4,10 +4,13 @@ import { IngredientSchema } from "./ingredient.schema";
 export const MaterialDetailSchema = z.object({
   id: z.number(),
   material_id: z.number(),
-  ingredients: IngredientSchema.pick({}).optional(),
+  ingredients: IngredientSchema.pick({
+    id: true,
+    ingredient_name: true,
+  }).optional(),
   ingredient_id: z.number(),
   ingredient_name: z.string().optional(),
-  weight: z.number().nullable().optional(),
+  weight: z.number().nullable(),
   real_percent: z.number().nullable().optional(),
   note: z.string().nullable().optional(),
 });

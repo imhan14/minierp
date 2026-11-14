@@ -14,7 +14,7 @@ dayjs.extend(timezone);
 
 export const createProductOrderService = async (data: CreateOrderData) => {
   return await prisma.product_orders.create({
-    data: data,
+    data: data as Prisma.product_ordersUncheckedCreateInput,
   });
 };
 

@@ -16,7 +16,6 @@ const useMaterialDetailForm = (
   const [originalRow, setOriginalRow] = useState<MaterialDetailType | null>(
     null,
   );
-  // id dùng tạm cho pending rows chưa được save (dùng âm để tránh trùng id DB)
   const [pendingIds, setPendingIds] = useState<Set<number>>(new Set());
 
   // ── Editing ──────────────────────────────────────────────────────────────
@@ -57,6 +56,7 @@ const useMaterialDetailForm = (
   const saveEditing = useCallback(
     async (row: MaterialDetailType) => {
       const isPending = pendingIds.has(row.id);
+      // console.log(row);
       try {
         if (isPending) {
           if (!row.ingredient_id) {
@@ -98,10 +98,9 @@ const useMaterialDetailForm = (
 
   // ── Add new pending row ───────────────────────────────────────────────────
   const handleAddRow = useCallback(() => {
-    // nếu đang edit row khác thì cancel trước
     if (editingId !== null) cancelEditing();
 
-    const tempId = -Date.now(); // âm để không trùng id DB
+    const tempId = -Date.now();
     const newRow: MaterialDetailType = {
       id: tempId,
       material_id,

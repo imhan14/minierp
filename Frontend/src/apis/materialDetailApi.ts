@@ -18,6 +18,7 @@ const mateiralDetailApi = {
     });
   },
   createMateiralDetail: (data?: MaterialDetailData) => {
+    console.log(data);
     return instance.post("/material-detail", data);
   },
   updateMaterialDetail: (id?: number, data?: MaterialDetailData) => {

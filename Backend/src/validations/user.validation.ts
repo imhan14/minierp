@@ -1,5 +1,14 @@
 import Joi from "joi";
 
+export const registerSchema = Joi.object({
+  username: Joi.string().trim().min(1).max(50).required(),
+  full_name: Joi.string().trim().min(1).max(100).required(),
+  password: Joi.string().min(8).max(16).required(),
+  confirm_password: Joi.string().valid(Joi.ref("password")).required().messages({
+    "any.only": "Mật khẩu xác nhận không khớp.",
+  }),
+});
+
 export const createUserschema = Joi.object({
   username: Joi.string().min(1).max(100).required(),
   new_password: Joi.string().min(8).max(16).required(),

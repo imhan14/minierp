@@ -39,8 +39,16 @@ const NavItem = ({
             px: 2.5,
             justifyContent: open ? "initial" : "center",
             backgroundColor: active
-              ? "rgba(255, 255, 255, 0.2)"
+              ? "rgba(255, 255, 255, 0.18)"
               : "transparent",
+            borderRadius: 1.5,
+            mx: 0.75,
+            width: "calc(100% - 12px)",
+            transition: (theme) =>
+              theme.transitions.create(["background-color", "transform"], {
+                duration: theme.transitions.duration.shortest,
+              }),
+            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.14)" },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}

@@ -7,7 +7,18 @@ export interface OrderFilters {
 }
 
 export interface CreateOrderData {
-  order_date: string;
+  order_date: Date;
+  formula_id?: number;
+  team_id?: number;
+  product_shift?: string;
+  target_quantity?: number;
+  urea_rate?: number;
+  input_temprature_1?: number;
+  output_temprature_1?: number;
+  input_temprature_2?: number;
+  output_temprature_2?: number;
+  order_note?: string;
+  created_by?: number;
 }
 
 export interface UpdateOrderData {
@@ -22,5 +33,5 @@ export interface UpdateOrderData {
   input_temprature_2?: number;
   output_temprature_2?: number;
   order_note?: string;
-  order_date?: string;
+  order_date?: Date;
 }

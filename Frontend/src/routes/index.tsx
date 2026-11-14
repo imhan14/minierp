@@ -5,6 +5,7 @@ import Home from "../pages/Home";
 import AdminLayout from "../layouts/AdminLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Login from "../pages/Login";
+import Signup from "../pages/Signup";
 import AuthLayout from "../layouts/AuthLayout";
 import ProductionReportPage from "../pages/productionReport";
 import ProductionLogPage from "../pages/productionLog";
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "signup",
+        element: <Signup />,
       },
     ],
   },
