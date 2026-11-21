@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Outlet } from "react-router";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router";
 import SideBar from "../components/SideBar";
 import { Box, CssBaseline } from "@mui/material";
 import PageHeader from "../components/PageHeader";
@@ -12,6 +12,25 @@ const closedWidth = 64;
 const UserLayout = () => {
   const [open, setOpen] = useState(true);
   const [title, setTitle] = useState("Order");
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const pageTitle: Record<string, string> = {
+      "/dashboard": "Dashboard",
+      "/profile": "Profile",
+      "/warehouse": "Warehouse",
+      "/order": "Order",
+      "/material-report": "Material Report",
+      "/production-report": "Product Report",
+      "/production-log": "Production Log",
+      "/formula": "Formulas",
+      "/ingredient": "Ingredient",
+      "/product": "Product",
+      "/manage/user": "User",
+      "/manage/role": "Role & Team",
+    };
+    setTitle(pageTitle[pathname] ?? "");
+  }, [pathname]);
 
   const handleToggleSideBar = () => {
     setOpen(!open);

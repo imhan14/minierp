@@ -17,6 +17,11 @@ import ProductPage from "@/pages/admin/product";
 import IngredientPage from "@/pages/admin/ingredient";
 import UserPage from "@/pages/manage/user";
 import RoleTeamPage from "@/pages/manage/roleAndTeam";
+import { getAllowedRoles } from "@/utils/roleAccess";
+import RoleLandingRedirect from "@/components/RoleLandingRedirect";
+import ProfilePage from "@/pages/ProfilePage";
+import ForbiddenPage from "@/pages/ForbiddenPage";
+import WarehousePage from "@/pages/warehouse/WarehousePage";
 
 const router = createBrowserRouter([
   {
@@ -39,41 +44,77 @@ const router = createBrowserRouter([
         path: "/",
         element: <UserLayout />,
         children: [
+          { index: true, element: <RoleLandingRedirect /> },
           {
-            index: true,
-            // path: "/order",
-            element: <Home />,
+            element: <ProtectedRoute allowedRoles={getAllowedRoles("/order")} />,
+            children: [{ path: "/order", element: <Home /> }],
           },
           {
-            path: "/production-report",
-            element: <ProductionReportPage />,
+            element: <ProtectedRoute allowedRoles={getAllowedRoles("/profile")} />,
+            children: [{ path: "/profile", element: <ProfilePage /> }],
           },
           {
-            path: "/production-log",
-            element: <ProductionLogPage />,
+            element: <ProtectedRoute allowedRoles={getAllowedRoles("/warehouse")} />,
+            children: [{ path: "/warehouse", element: <WarehousePage /> }],
           },
           {
-            path: "/material-report",
-            element: <MaterialReportPage />,
+            element: (
+              <ProtectedRoute
+                allowedRoles={getAllowedRoles("/production-report")}
+              />
+            ),
+            children: [
+              { path: "/production-report", element: <ProductionReportPage /> },
+            ],
           },
           {
-            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            element: (
+              <ProtectedRoute
+                allowedRoles={getAllowedRoles("/production-log")}
+              />
+            ),
+            children: [
+              { path: "/production-log", element: <ProductionLogPage /> },
+            ],
+          },
+          {
+            element: (
+              <ProtectedRoute
+                allowedRoles={getAllowedRoles("/material-report")}
+              />
+            ),
+            children: [
+              { path: "/material-report", element: <MaterialReportPage /> },
+            ],
+          },
+          {
+            element: (
+              <ProtectedRoute allowedRoles={getAllowedRoles("/dashboard")} />
+            ),
             children: [{ path: "/dashboard", element: <Dashboard /> }],
           },
           {
-            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            element: (
+              <ProtectedRoute allowedRoles={getAllowedRoles("/formula")} />
+            ),
             children: [{ path: "/formula", element: <FormulaPage /> }],
           },
           {
-            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            element: (
+              <ProtectedRoute allowedRoles={getAllowedRoles("/ingredient")} />
+            ),
             children: [{ path: "/ingredient", element: <IngredientPage /> }],
           },
           {
-            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            element: (
+              <ProtectedRoute allowedRoles={getAllowedRoles("/product")} />
+            ),
             children: [{ path: "/product", element: <ProductPage /> }],
           },
           {
-            element: <ProtectedRoute allowedRoles={[1, 2, 3, 4]} />,
+            element: (
+              <ProtectedRoute allowedRoles={getAllowedRoles("/manage")} />
+            ),
             children: [
               {
                 path: "/manage",
@@ -94,8 +135,9 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "/403", element: <ForbiddenPage /> },
       {
-        // element: <ProtectedRoute />,
+        element: <ProtectedRoute allowedRoles={getAllowedRoles("/admin")} />,
         children: [
           {
             path: "/admin",

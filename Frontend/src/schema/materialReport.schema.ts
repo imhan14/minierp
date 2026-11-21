@@ -156,6 +156,8 @@ export const CreateMaterialReportSchema = MaterialReportSchema.omit({
   created_at: true,
   created_by: true,
 }).extend({
+  // New reports start without extra ingredients; the database uses the same default.
+  extral_materials: z.array(ExtraMaterialsJsonSchema).nullable().default([]),
   team_id: z.number({ message: "Vui lòng chọn tổ" }),
   report_date: z.string("Ngày không được để trống"),
 });

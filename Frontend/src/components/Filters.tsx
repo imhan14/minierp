@@ -26,6 +26,8 @@ interface Filters<T extends Record<string, unknown>> {
   showDateFilter?: boolean;
   mode?: "single" | "range";
   setMode?: (mode: "single" | "range") => void;
+  dateFilterMode?: "all" | "range";
+  setDateFilterMode?: (mode: "all" | "range") => void;
   selectedDate?: Dayjs | null;
   setSelectedDate?: (value: Dayjs | null) => void;
   endDate?: Dayjs | null;
@@ -39,6 +41,8 @@ const Filters = <T extends Record<string, unknown>>({
   setSelectedDate,
   mode = "single",
   setMode,
+  dateFilterMode,
+  setDateFilterMode,
   children,
   endDate = null,
   setEndDate,
@@ -75,7 +79,56 @@ const Filters = <T extends Record<string, unknown>>({
       }}
     >
       {/* DATE PICKER */}
-      {showDateFilter && (
+      {showDateFilter && dateFilterMode && (
+        <>
+          <ToggleButtonGroup
+            value={dateFilterMode}
+            exclusive
+            onChange={(_, nextMode: "all" | "range" | null) => {
+              if (nextMode) {
+                setDateFilterMode?.(nextMode);
+                if (nextMode === "range") setEndDate?.(selectedDate);
+              }
+            }}
+            size="small"
+            sx={{ mr: 2 }}
+          >
+            <ToggleButton value="all">Tất cả</ToggleButton>
+            <ToggleButton value="range">Khoảng ngày</ToggleButton>
+          </ToggleButtonGroup>
+          {dateFilterMode === "range" && (
+            <>
+              <DatePicker
+                label="Từ ngày"
+                value={selectedDate}
+                onChange={(newValue) => setSelectedDate?.(newValue)}
+                format="DD/MM/YYYY"
+                slotProps={{
+                  textField: {
+                    sx: { maxWidth: "150px" },
+                    size: "small",
+                    fullWidth: true,
+                  },
+                }}
+              />
+              <DatePicker
+                label="Đến ngày"
+                value={endDate || null}
+                onChange={(newValue) => setEndDate?.(newValue)}
+                format="DD/MM/YYYY"
+                slotProps={{
+                  textField: {
+                    sx: { maxWidth: "150px" },
+                    size: "small",
+                    fullWidth: true,
+                  },
+                }}
+              />
+            </>
+          )}
+        </>
+      )}
+      {showDateFilter && !dateFilterMode && (
         <>
           <ToggleButtonGroup
             value={mode}

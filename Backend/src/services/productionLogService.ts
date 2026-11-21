@@ -56,7 +56,7 @@ export const getProductionLogService = async (
         },
       },
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ log_date: "desc" }, { id: "desc" }],
   });
 };
 

@@ -53,7 +53,7 @@ export const getProductOrderService = async (filters: OrderFilters) => {
       created_at: true,
       created_by: true,
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ order_date: "desc" }, { id: "desc" }],
   });
 };
 

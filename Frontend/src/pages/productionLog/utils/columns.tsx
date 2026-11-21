@@ -3,6 +3,7 @@ import { logDetailSchema } from "@/schema/productionLogDetail.schema";
 import type { ProductionLogDetailType } from "@/types/ProductionLogDetailType";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
+import { PRODUCTION_PRODUCT_TYPES } from "./productTypes";
 
 export const productLogDetailColumns = (
   editingId: number | null | string | undefined,
@@ -173,19 +174,13 @@ export const productLogDetailColumns = (
     ...logDetailSchema.product_type,
     render: (_: unknown, row: ProductionLogDetailType) => {
       const isEditing = editingId === row.id;
-      const productType = [
-        { label: "Sang bao", value: "sb" },
-        { label: "Mùa khô", value: "mk" },
-        { label: "1 hạt", value: "mh" },
-        { label: "Nhỏ giọt", value: "ng" },
-        { label: "Trộn", value: "tr" },
-      ];
+
       return isEditing ? (
         <Autocomplete
           freeSolo
           size="small"
           sx={{ width: 140 }}
-          options={productType}
+          options={PRODUCTION_PRODUCT_TYPES}
           renderInput={(params) => (
             <TextField {...params} label="Product Type" />
           )}
@@ -204,14 +199,14 @@ export const productLogDetailColumns = (
             onFieldChange(row.id, "product_type", val);
           }}
           value={
-            productType.find((p) => p.value === row.product_type) ||
+            PRODUCTION_PRODUCT_TYPES.find((p) => p.value === row.product_type) ||
             row.product_type ||
             null
           }
         />
       ) : (
         <span>
-          {productType.find((p) => p.value === row.product_type)?.label ||
+          {PRODUCTION_PRODUCT_TYPES.find((p) => p.value === row.product_type)?.label ||
             row.product_type ||
             "-"}
         </span>

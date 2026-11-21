@@ -18,6 +18,7 @@ import { Link as RouterLink } from "react-router";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { authInformation } from "../redux/slices/authSlice";
+import { getWorkplacePath } from "@/utils/roleAccess";
 
 interface loginData {
   username: string;
@@ -72,11 +73,7 @@ const Login = () => {
         }),
       );
 
-      if (user.role === 1) {
-        navigate("/");
-      } else {
-        navigate("/");
-      }
+      navigate(getWorkplacePath(Number(user.role)), { replace: true });
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         const msg = err.response?.data?.error || "Lỗi server";

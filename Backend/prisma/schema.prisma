@@ -151,6 +151,18 @@ model products {
   reports_products reports_products[]
 }
 
+model warehouse_transactions {
+  id               Int                        @id @default(autoincrement())
+  product_type     String                     @db.VarChar(100)
+  transaction_type warehouse_transaction_type
+  quantity         Float
+  note             String?
+  created_by       Int?
+  created_at       DateTime                   @default(now()) @db.Timestamptz(6)
+
+  @@index([product_type, created_at])
+}
+
 model reports_products {
   id                    Int              @id @default(autoincrement())
   product_id            Int?
@@ -211,4 +223,9 @@ enum status_type {
   pending
   ok
   cancel
+}
+
+enum warehouse_transaction_type {
+  inbound
+  outbound
 }

@@ -23,11 +23,13 @@ import SpaceDashboardOutlinedIcon from "@mui/icons-material/SpaceDashboardOutlin
 import ScienceOutlinedIcon from "@mui/icons-material/ScienceOutlined";
 import Co2OutlinedIcon from "@mui/icons-material/Co2Outlined";
 import AllInboxOutlinedIcon from "@mui/icons-material/AllInboxOutlined";
+import WarehouseOutlinedIcon from "@mui/icons-material/WarehouseOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import GamepadOutlinedIcon from "@mui/icons-material/GamepadOutlined";
-import { useState } from "react";
+import { useState, type ReactElement } from "react";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
+import { canAccessPath } from "@/utils/roleAccess";
 const drawerWidth = 240;
 const themeColor = {
   bg: "#15803d",
@@ -85,11 +87,19 @@ interface SideBarProps {
   onTitleChange: (title: string) => void;
 }
 
+interface MenuItem {
+  text: string;
+  icon: ReactElement;
+  path: string;
+  children?: MenuItem[];
+}
+
 const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { full_name, role, id } = useSelector((state: RootState) => state.auth);
+  const { full_name, role } = useSelector((state: RootState) => state.auth);
+  const userRole = Number(JSON.parse(localStorage.getItem("user") || "{}").role);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>(
     {},
   );
@@ -98,14 +108,15 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
     setExpandedItems((prev) => ({ ...prev, [text]: !prev[text] }));
   };
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     {
       text: "Dashboard",
       icon: <SpaceDashboardOutlinedIcon />,
       path: "/dashboard",
-      minRole: 5,
     },
-    { text: "Order", icon: <AssignmentIcon />, path: "/" },
+    { text: "Profile", icon: <PersonIcon />, path: "/profile" },
+    { text: "Warehouse", icon: <WarehouseOutlinedIcon />, path: "/warehouse" },
+    { text: "Order", icon: <AssignmentIcon />, path: "/order" },
     {
       text: "Material Report",
       icon: <InventoryIcon />,
@@ -121,25 +132,21 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       text: "Formulas",
       icon: <ScienceOutlinedIcon />,
       path: "/formula",
-      minRole: 5,
     },
     {
       text: "Ingredient",
       icon: <Co2OutlinedIcon />,
       path: "/ingredient",
-      minRole: 5,
     },
     {
       text: "Product",
       icon: <AllInboxOutlinedIcon />,
       path: "/product",
-      minRole: 5,
     },
     {
       text: "Manage",
       icon: <GroupOutlinedIcon />,
-      path: "/setting",
-      minRole: 5,
+      path: "/manage",
       children: [
         { text: "User", icon: <GroupOutlinedIcon />, path: "/manage/user" },
         {
@@ -150,18 +157,14 @@ const SideBar = ({ open, onOpen, onTitleChange }: SideBarProps) => {
       ],
     },
   ];
-  const filteredMenuItems = menuItems.filter((item) => {
-    if (
-      (item.text === "Dashboard" ||
-        item.text === "Formulas" ||
-        item.text === "Ingredient" ||
-        item.text === "Product" ||
-        item.text === "Manage") &&
-      Number(id) > 5
-    ) {
-      return false;
+  const filteredMenuItems = menuItems.flatMap((item) => {
+    if (item.children) {
+      const children = item.children.filter((child) =>
+        canAccessPath(child.path, userRole),
+      );
+      return children.length > 0 ? [{ ...item, children }] : [];
     }
-    return true;
+    return canAccessPath(item.path, userRole) ? [item] : [];
   });
 
   const handleLogout = () => {

@@ -60,7 +60,7 @@ export const getProductReportService = async (
       warehouse_check: true,
       production_check: true,
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ report_date: "desc" }, { id: "desc" }],
   });
 };
 

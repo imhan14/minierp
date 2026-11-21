@@ -49,7 +49,7 @@ const ProductionLogPage = () => {
     currentUser.team_id === 3;
 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [filterMode, setFilterMode] = useState<"all" | "range">("all");
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   const [popupMode, setPopupMode] = useState<PopupMode>("closed");
@@ -83,8 +83,8 @@ const ProductionLogPage = () => {
     };
   }, []);
   useEffect(() => {
-    if (filterMode === "single" && selectedDate) {
-      reload({ date: selectedDate.format("YYYY-MM-DD") });
+    if (filterMode === "all") {
+      reload({} as ProductionLogFilters);
     } else if (filterMode === "range" && selectedDate && endDate) {
       reload({
         startDate: selectedDate.format("YYYY-MM-DD"),
@@ -117,7 +117,7 @@ const ProductionLogPage = () => {
     ProductionLogType,
     ProductionLogType,
     ProductionLogFilters
-  >(productionLogApi.getAllProductionLog);
+  >(productionLogApi.getAllProductionLog, { immediate: false });
   // ── Form hook ─────────────────────────────────────────────────────────────
   const form = useEntityForm<
     ProductionLogType,
@@ -301,10 +301,10 @@ const ProductionLogPage = () => {
       <DrawerHeader />
       <Filters
         showDateFilter
+        dateFilterMode={filterMode}
+        setDateFilterMode={setFilterMode}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
-        mode={filterMode}
-        setMode={setFilterMode}
         endDate={endDate}
         setEndDate={setEndDate}
       />

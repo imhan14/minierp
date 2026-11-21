@@ -38,7 +38,7 @@ const MaterialReportPage = () => {
   const isProductTeam = [1, 2, 3].includes(currentUser.team_id);
 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [filterMode, setFilterMode] = useState<"all" | "range">("all");
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   const [popupMode, setPopupMode] = useState<PopupMode>("closed");
@@ -73,8 +73,8 @@ const MaterialReportPage = () => {
     };
   }, []);
   useEffect(() => {
-    if (filterMode === "single" && selectedDate) {
-      reload({ date: selectedDate.format("YYYY-MM-DD") });
+    if (filterMode === "all") {
+      reload({} as MaterialReportFilters);
     } else if (filterMode === "range" && selectedDate && endDate) {
       reload({
         startDate: selectedDate.format("YYYY-MM-DD"),
@@ -107,7 +107,7 @@ const MaterialReportPage = () => {
     MaterialReportType,
     MaterialReportType,
     MaterialReportFilters
-  >(materialReportApi.getAllMaterialReports);
+  >(materialReportApi.getAllMaterialReports, { immediate: false });
   // ── Form hook ─────────────────────────────────────────────────────────────
   const form = useEntityForm<
     MaterialReportType,
@@ -290,10 +290,10 @@ const MaterialReportPage = () => {
       <DrawerHeader />
       <Filters
         showDateFilter
+        dateFilterMode={filterMode}
+        setDateFilterMode={setFilterMode}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
-        mode={filterMode}
-        setMode={setFilterMode}
         endDate={endDate}
         setEndDate={setEndDate}
       />

@@ -306,7 +306,7 @@ const UserPage = () => {
               sx={{ marginBottom: 1 }}
               onClick={handleOpenAdd}
             >
-              Add new Report
+              Add new User
             </Button>
           )}
 

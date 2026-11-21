@@ -45,8 +45,10 @@ const OrderPage = () => {
   const [selectedOrder, setSelectedOrder] = useState<OrderDisplay | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [editGeneral, setEditGeneral] = useState<OrderDisplay | null>(null);
-  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [filterMode, setFilterMode] = useState<"all" | "range">("all");
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const activeStartDate = filterMode === "all" ? null : selectedDate;
+  const activeEndDate = filterMode === "range" ? endDate : null;
 
   const {
     detailLoading,
@@ -57,10 +59,9 @@ const OrderPage = () => {
     orders,
     setFormula,
     fetchOrders,
-  } = useOrderData(selectedDate, endDate);
+  } = useOrderData(activeStartDate, activeEndDate);
   const { isSubmitting, handleCreateOrder: createOrder } = useOrderForm(
-    selectedDate,
-    () => fetchOrders(selectedDate, endDate),
+    () => fetchOrders(activeStartDate, activeEndDate),
   );
   const orderColumns = useMemo(
     () => [
@@ -178,10 +179,10 @@ const OrderPage = () => {
       <DrawerHeader />
       <Filters
         showDateFilter
+        dateFilterMode={filterMode}
+        setDateFilterMode={setFilterMode}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
-        mode={filterMode}
-        setMode={setFilterMode}
         endDate={endDate}
         setEndDate={setEndDate}
       />
@@ -231,7 +232,7 @@ const OrderPage = () => {
       >
         <OrderGeneral
           selectedOrder={selectedOrder}
-          onSaveSuccess={() => fetchOrders(selectedDate, endDate)}
+          onSaveSuccess={() => fetchOrders(activeStartDate, activeEndDate)}
           editGeneral={editGeneral}
           onEditGeneral={setEditGeneral}
         />

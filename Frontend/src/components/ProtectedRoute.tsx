@@ -53,7 +53,7 @@ const ProtectedRoute = ({ allowedRoles }: Props) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(Number(userRole))) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to="/403" replace />;
   }
 
   return <Outlet />;

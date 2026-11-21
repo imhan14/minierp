@@ -36,7 +36,7 @@ const ProductionReportPage = () => {
   const isProductTeam = [1, 2, 3].includes(currentUser.team_id);
 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
-  const [filterMode, setFilterMode] = useState<"single" | "range">("single");
+  const [filterMode, setFilterMode] = useState<"all" | "range">("all");
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [teamOptions, setTeamOptions] = useState<
     { label: string; value: string }[]
@@ -67,10 +67,9 @@ const ProductionReportPage = () => {
     ProductionReportType,
     ProductionReportType,
     ProductionReportFilter
-  >(productionReportApi.getAllProductionReports);
+  >(productionReportApi.getAllProductionReports, { immediate: false });
   useEffect(() => {
-    if (filterMode === "single" && selectedDate)
-      reload({ date: selectedDate.format("YYYY-MM-DD") });
+    if (filterMode === "all") reload({} as ProductionReportFilter);
     else if (filterMode === "range" && selectedDate && endDate)
       reload({
         startDate: selectedDate.format("YYYY-MM-DD"),
@@ -188,10 +187,10 @@ const ProductionReportPage = () => {
       <DrawerHeader />
       <Filters
         showDateFilter
+        dateFilterMode={filterMode}
+        setDateFilterMode={setFilterMode}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
-        mode={filterMode}
-        setMode={setFilterMode}
         endDate={endDate}
         setEndDate={setEndDate}
       />

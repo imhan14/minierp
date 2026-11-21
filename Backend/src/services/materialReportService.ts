@@ -46,7 +46,7 @@ export const getMaterialReportService = async (
       start_time: true,
       end_time: true,
     },
-    orderBy: { id: "asc" },
+    orderBy: [{ report_date: "desc" }, { id: "desc" }],
   });
 };
 
